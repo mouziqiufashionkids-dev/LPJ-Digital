@@ -310,20 +310,32 @@ export function tandaiLunas(wargaId, { tanggal, metode = "tunai", petugas = "Ben
 
 // tambah warga massal: tiap warga otomatis dapat kupon berkode unik.
 // nama yang sudah terdaftar OTOMATIS DILEWATI (anti data dobel).
-export function tambahWargaBatch(rows) {
+export function kosongkanWarga() {
+  S.warga = [];
+  S.kupon = [];
+  S.idWargaBerikut = 1;
+  S.idKuponBerikut = 1;
+  S.kodeAngkaBerikut = 1;
+  return { ok: true };
+}
+
+export function tambahWargaBatch(rows, opts = {}) {
   const valid = (rows || []).filter((r) => r && String(r.nama || "").trim());
   if (!valid.length) return { ok: false, pesan: "Tidak ada baris valid" };
-  const sudahAda = new Set(S.warga.map((w) => normNama(w.nama)));
   const dobel = [];
-  const baru = [];
-  for (const r of valid) {
-    const kunci = normNama(r.nama);
-    if (sudahAda.has(kunci)) {
-      dobel.push(r.nama);
-      continue;
+  let baru = valid;
+  if (!opts.paksa) {
+    const sudahAda = new Set(S.warga.map((w) => normNama(w.nama)));
+    baru = [];
+    for (const r of valid) {
+      const kunci = normNama(r.nama);
+      if (sudahAda.has(kunci)) {
+        dobel.push(r.nama);
+        continue;
+      }
+      sudahAda.add(kunci);
+      baru.push(r);
     }
-    sudahAda.add(kunci);
-    baru.push(r);
   }
   const dibuat = [];
   for (const r of baru) {

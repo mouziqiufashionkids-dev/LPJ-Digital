@@ -1,4 +1,4 @@
-import { tambahWargaBatch, hapusWarga } from "@/lib/store";
+import { tambahWargaBatch, hapusWarga, kosongkanWarga } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +12,7 @@ export async function POST(request) {
   } catch {
     return Response.json({ ok: false, pesan: "Format salah" }, { status: 400 });
   }
+  const paksa = Boolean(body?.paksa); // ganti total: kosongkan dulu, tanpa cek dobel
   const rows = Array.isArray(body?.rows) ? body.rows.slice(0, 500) : [];
   const bersih = rows
     .map((r) => {
@@ -31,7 +32,13 @@ export async function POST(request) {
       { status: 400 }
     );
   }
-  const hasil = await tambahWargaBatch(bersih);
+  if (paksa) {
+    const k = await kosongkanWarga();
+    if (!k.ok) {
+      return Response.json({ ok: false, pesan: "Gagal mengosongkan data lama: " + k.pesan }, { status: 500 });
+    }
+  }
+  const hasil = await tambahWargaBatch(bersih, { paksa });
   return Response.json(hasil, { status: hasil.ok ? 200 : 400 });
 }
 

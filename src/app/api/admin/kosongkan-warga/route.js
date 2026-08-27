@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL } from "@/lib/supabase-store";
+import { kosongkanWarga } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +11,8 @@ export async function POST() {
   const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
   const c = createClient(SUPABASE_URL, KEY, { auth: { persistSession: false } });
 
-  const h1 = await c.from("kupon").delete().neq("id", -1);
-  const h2 = await c.from("warga").delete().neq("id", -1);
+  const h = await kosongkanWarga();
+  if (!h.ok) return Response.json({ ok: false, pesan: h.pesan, sisa_warga: null, sisa_kupon: null });
 
   // hitung ulang beberapa kali (antisipasi jeda baca)
   let sisaWarga = null;

@@ -204,21 +204,33 @@ export async function cariWarga(q) {
 
 // tambah warga massal: kupon berkode unik dibuat otomatis.
 // nama yang sudah terdaftar OTOMATIS DILEWATI (anti data dobel).
-export async function tambahWargaBatch(rows) {
+export async function kosongkanWarga() {
+  const h1 = await db().from("kupon").delete().neq("id", -1);
+  if (h1.error) return { ok: false, pesan: "Kupon: " + h1.error.message };
+  const h2 = await db().from("warga").delete().neq("id", -1);
+  if (h2.error) return { ok: false, pesan: "Warga: " + h2.error.message };
+  return { ok: true };
+}
+
+export async function tambahWargaBatch(rows, opts = {}) {
   const valid = (rows || []).filter((r) => r?.nama?.trim());
   if (!valid.length) return { ok: false, pesan: "Tidak ada baris valid" };
-  const norm = (n) => String(n || "").toLowerCase().replace(/\s+/g, " ").trim();
-  const { data: eksisting } = await db().from("warga").select("nama");
-  const sudahAda = new Set((eksisting || []).map((w) => norm(w.nama)));
   const dobel = [];
-  const bersih = [];
-  for (const r of valid) {
-    if (sudahAda.has(norm(r.nama))) {
-      dobel.push(r.nama);
-      continue;
+  let bersih = valid;
+  if (!opts.paksa) {
+    // mode biasa: lewati nama yang sudah terdaftar (anti dobel)
+    const norm = (n) => String(n || "").toLowerCase().replace(/\s+/g, " ").trim();
+    const { data: eksisting } = await db().from("warga").select("nama");
+    const sudahAda = new Set((eksisting || []).map((w) => norm(w.nama)));
+    bersih = [];
+    for (const r of valid) {
+      if (sudahAda.has(norm(r.nama))) {
+        dobel.push(r.nama);
+        continue;
+      }
+      sudahAda.add(norm(r.nama));
+      bersih.push(r);
     }
-    sudahAda.add(norm(r.nama));
-    bersih.push(r);
   }
   if (!bersih.length) {
     return { ok: true, ditambah: 0, kupon: [], dobel };
