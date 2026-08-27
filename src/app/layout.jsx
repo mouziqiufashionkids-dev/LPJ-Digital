@@ -21,6 +21,7 @@ export async function generateMetadata() {
   return {
     title: `${s.nama_masjid} — Iuran & Laporan Terbuka`,
     description: `Laporan pertanggungjawaban digital ${s.nama_kegiatan} dari ${s.nama_masjid}: iuran ancalah, dana masuk & keluar realtime, terbuka untuk seluruh warga.`,
+    icons: { icon: "/logo-masjid.svg" },
   };
 }
 
