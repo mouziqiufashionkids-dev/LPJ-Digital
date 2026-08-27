@@ -27,8 +27,8 @@ export async function POST() {
   }
 
   return Response.json({
-    ok: !h1.error && !h2.error && sisaWarga === 0 && sisaKupon === 0,
-    pesan: h1.error?.message || h2.error?.message || null,
+    ok: sisaWarga === 0 && sisaKupon === 0,
+    pesan: h.pesan || null,
     sisa_warga: sisaWarga,
     sisa_kupon: sisaKupon,
   });
