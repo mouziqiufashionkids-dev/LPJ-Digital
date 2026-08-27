@@ -103,13 +103,30 @@ export async function cariWarga(q) {
   }));
 }
 
-// tambah warga massal: kupon berkode unik dibuat otomatis
+// tambah warga massal: kupon berkode unik dibuat otomatis.
+// nama yang sudah terdaftar OTOMATIS DILEWATI (anti data dobel).
 export async function tambahWargaBatch(rows) {
   const valid = (rows || []).filter((r) => r?.nama?.trim());
   if (!valid.length) return { ok: false, pesan: "Tidak ada baris valid" };
+  const norm = (n) => String(n || "").toLowerCase().replace(/\s+/g, " ").trim();
+  const { data: eksisting } = await db().from("warga").select("nama");
+  const sudahAda = new Set((eksisting || []).map((w) => norm(w.nama)));
+  const dobel = [];
+  const bersih = [];
+  for (const r of valid) {
+    if (sudahAda.has(norm(r.nama))) {
+      dobel.push(r.nama);
+      continue;
+    }
+    sudahAda.add(norm(r.nama));
+    bersih.push(r);
+  }
+  if (!bersih.length) {
+    return { ok: true, ditambah: 0, kupon: [], dobel };
+  }
   const { data: inserted, error } = await db()
     .from("warga")
-    .insert(valid.map((r) => ({
+    .insert(bersih.map((r) => ({
       nama: r.nama.trim().slice(0, 80),
       rt: r.rt || null,
       alamat: r.alamat || null,
@@ -131,6 +148,7 @@ export async function tambahWargaBatch(rows) {
     ok: true,
     ditambah: inserted.length,
     kupon: inserted.map((w, i) => ({ nama: w.nama, kode: kuponRows[i].kode, ancalah: w.ancalah })),
+    dobel,
   };
 }
 

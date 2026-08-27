@@ -10,6 +10,67 @@ import FormTransaksi from "@/components/FormTransaksi";
 import FormDokumentasi from "@/components/FormDokumentasi";
 import FormLoginAdmin from "@/components/FormLoginAdmin";
 
+// Patch lokal (optimistic): layar berubah seketika tanpa menunggu server —
+// data penuh disegarkan otomatis sesudahnya (debounce).
+function terapPatch(data, d) {
+  if (!data) return data;
+  const baru = { ...data };
+  const idSama = (a, b) => String(a) === String(b);
+  if (d.jenis === "lunas" && d.wargaId != null) {
+    const w = data.warga.find((x) => idSama(x.id, d.wargaId));
+    baru.warga = data.warga.map((x) =>
+      idSama(x.id, d.wargaId)
+        ? { ...x, kupon: { ...x.kupon, status: "lunas", tanggal_bayar: new Date().toISOString().slice(0, 10) } }
+        : x
+    );
+    if (w) {
+      baru.stats = {
+        ...data.stats,
+        dana_masuk: data.stats.dana_masuk + (w.ancalah || 0),
+        kk_lunas: data.stats.kk_lunas + 1,
+        transaksi_masuk: data.stats.transaksi_masuk + 1,
+      };
+    }
+  } else if (d.jenis === "hapusWarga" && d.id != null) {
+    const w = data.warga.find((x) => idSama(x.id, d.id));
+    baru.warga = data.warga.filter((x) => !idSama(x.id, d.id));
+    if (w) {
+      baru.stats = {
+        ...data.stats,
+        kk_total: data.stats.kk_total - 1,
+        target_dana: data.stats.target_dana - (w.ancalah || 0),
+        ...(w.kupon?.status === "lunas"
+          ? {
+              kk_lunas: data.stats.kk_lunas - 1,
+              dana_masuk: data.stats.dana_masuk - (w.ancalah || 0),
+            }
+          : {}),
+      };
+    }
+  } else if (d.jenis === "hapusBanyak" && Array.isArray(d.ids)) {
+    const set = new Set(d.ids.map(String));
+    const hilang = data.warga.filter((x) => set.has(String(x.id)));
+    baru.warga = data.warga.filter((x) => !set.has(String(x.id)));
+    const lunasHilang = hilang.filter((x) => x.kupon?.status === "lunas");
+    baru.stats = {
+      ...data.stats,
+      kk_total: data.stats.kk_total - hilang.length,
+      target_dana: data.stats.target_dana - hilang.reduce((a, x) => a + (x.ancalah || 0), 0),
+      kk_lunas: data.stats.kk_lunas - lunasHilang.length,
+      dana_masuk: data.stats.dana_masuk - lunasHilang.reduce((a, x) => a + (x.ancalah || 0), 0),
+    };
+  } else if (d.jenis === "hapusRsvp" && d.id != null) {
+    baru.rsvp = data.rsvp.filter((x) => !idSama(x.id, d.id));
+  } else if (d.jenis === "hapusDok" && d.id != null) {
+    baru.dokumentasi = data.dokumentasi.filter((x) => !idSama(x.id, d.id));
+  } else if (d.jenis === "saranTampil" && d.id != null) {
+    baru.saran = data.saran.map((x) => (idSama(x.id, d.id) ? { ...x, tampil: true } : x));
+  } else if (d.jenis === "saranTindak" && d.id != null) {
+    baru.saran = data.saran.map((x) => (idSama(x.id, d.id) ? { ...x, ditindaklanjuti: true } : x));
+  }
+  return baru;
+}
+
 export default function AdminPage() {
   const [data, setData] = useState(null);
   const [galat, setGalat] = useState("");
@@ -41,6 +102,13 @@ export default function AdminPage() {
 
   useEffect(() => {
     setPunyaToken(Boolean(ambilToken()));
+  }, []);
+
+  // patch optimistic dari tombol-tombol aksi
+  useEffect(() => {
+    const fn = (e) => setData((d) => terapPatch(d, e.detail));
+    window.addEventListener("lpj-admin-patch", fn);
+    return () => window.removeEventListener("lpj-admin-patch", fn);
   }, []);
 
   // muat data saat sesi tersedia / berubah
@@ -98,6 +166,29 @@ export default function AdminPage() {
   const sponsor = warga.filter((w) => w.kelas === "sponsor");
   const labelKelas = (k) => (k === "sponsor" ? "Sponsor" : `K${k || "3"}`);
 
+  // ------ deteksi data dobel (nama sama) ------
+  const normNama = (n) => String(n || "").toLowerCase().replace(/\s+/g, " ").trim();
+  const grupNama = {};
+  warga.forEach((w) => {
+    const k = normNama(w.nama);
+    (grupNama[k] ||= []).push(w);
+  });
+  const dobel = Object.values(grupNama).filter((g) => g.length > 1);
+  // yang dipertahankan: yang lunas lebih dulu, lalu yang terlama
+  const idDipertahankan = new Set(
+    dobel.map((g) =>
+      [...g].sort((a, b) => {
+        const la = a.kupon?.status === "lunas" ? 0 : 1;
+        const lb = b.kupon?.status === "lunas" ? 0 : 1;
+        return la - lb || Number(a.id) - Number(b.id);
+      })[0].id
+    )
+  );
+  const idDobelHapus = dobel.flatMap((g) =>
+    g.filter((x) => !idDipertahankan.has(x.id)).map((x) => x.id)
+  );
+  const namaSudahAda = new Set(Object.keys(grupNama));
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -144,7 +235,54 @@ export default function AdminPage() {
 
       {/* tambah warga + generate kupon */}
       <div className="mt-8">
-        <TambahWarga />
+        <TambahWarga namaSudahAda={namaSudahAda} />
+      </div>
+
+      {/* bersihkan data dobel */}
+      <div className="mt-8">
+        <div className="kartu p-5 md:p-6">
+          <h3 className="font-judul text-xl font-bold text-zamrud-800">
+            🧹 Bersihkan Data Dobel
+          </h3>
+          {dobel.length === 0 ? (
+            <p className="text-sm text-zamrud-900/70 mt-2">
+              ✓ Tidak ada data dobel — semua nama warga unik. Upload yang sama
+              dua kali pun aman: sistem otomatis melewatkan nama yang sudah ada.
+            </p>
+          ) : (
+            <>
+              <p className="text-sm text-zamrud-900/70 mt-2">
+                <strong>{dobel.length} nama</strong> terdaftar lebih dari satu
+                ({idDobelHapus.length} baris duplikat). Yang dipertahankan:
+                yang sudah lunas / terlama.
+              </p>
+              <ul className="mt-3 space-y-1 text-sm">
+                {dobel.slice(0, 6).map((g) => (
+                  <li key={g[0].id} className="text-zamrud-900/80">
+                    • <strong>{g[0].nama}</strong> ×{g.length}{" "}
+                    <span className="text-zamrud-900/50">
+                      ({g.map((x) => `${labelKelas(x.kelas)}${x.kupon?.status === "lunas" ? " ✓" : ""}`).join(", ")})
+                    </span>
+                  </li>
+                ))}
+                {dobel.length > 6 && (
+                  <li className="text-xs text-zamrud-900/50">…dan {dobel.length - 6} nama lain</li>
+                )}
+              </ul>
+              <div className="mt-4">
+                <AksiAdmin
+                  url="/api/admin/warga"
+                  method="DELETE"
+                  body={{ ids: idDobelHapus }}
+                  label={`Hapus ${idDobelHapus.length} Data Dobel`}
+                  merah
+                  tanya={`Hapus ${idDobelHapus.length} baris duplikat? Yang dipertahankan adalah yang sudah lunas / terlama.`}
+                  patch={{ jenis: "hapusBanyak", ids: idDobelHapus }}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* catat transaksi */}
@@ -221,6 +359,7 @@ export default function AdminPage() {
                           url="/api/admin/bayar"
                           body={{ wargaId: w.id }}
                           label="Lunaskan"
+                          patch={{ jenis: "lunas", wargaId: w.id }}
                         />
                       )}
                       <AksiAdmin
@@ -230,6 +369,7 @@ export default function AdminPage() {
                         label="Hapus"
                         merah
                         tanya={`Hapus ${w.nama}? Kupon & catatan iurannya juga akan dihapus.`}
+                        patch={{ jenis: "hapusWarga", id: w.id }}
                       />
                     </div>
                   </td>
@@ -315,6 +455,7 @@ export default function AdminPage() {
                   label="✕"
                   merah
                   tanya={`Hapus foto "${d.judul}"?`}
+                  patch={{ jenis: "hapusDok", id: d.id }}
                 />
               </div>
             </div>
@@ -352,6 +493,7 @@ export default function AdminPage() {
                   url="/api/admin/saran"
                   body={{ id: x.id, tampil: true }}
                   label="Tampilkan"
+                  patch={{ jenis: "saranTampil", id: x.id }}
                 />
               )}
               {!x.ditindaklanjuti && (
@@ -359,6 +501,7 @@ export default function AdminPage() {
                   url="/api/admin/saran"
                   body={{ id: x.id, ditindaklanjuti: true }}
                   label="Tandai Ditindaklanjuti"
+                  patch={{ jenis: "saranTindak", id: x.id }}
                 />
               )}
             </div>
@@ -428,6 +571,7 @@ export default function AdminPage() {
                     label="Hapus"
                     merah
                     tanya={`Hapus konfirmasi dari ${r.nama}?`}
+                    patch={{ jenis: "hapusRsvp", id: r.id }}
                   />
                 </td>
               </tr>

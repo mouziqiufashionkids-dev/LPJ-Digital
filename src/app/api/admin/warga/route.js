@@ -42,9 +42,19 @@ export async function DELETE(request) {
   } catch {
     return Response.json({ ok: false, pesan: "Format salah" }, { status: 400 });
   }
-  if (!body?.id) {
+  // terima satu id ATAU daftar ids (untuk bersih-bersih data dobel)
+  const ids = Array.isArray(body?.ids)
+    ? body.ids.map((x) => String(x)).slice(0, 500)
+    : body?.id
+    ? [String(body.id)]
+    : [];
+  if (!ids.length) {
     return Response.json({ ok: false, pesan: "id wajib" }, { status: 400 });
   }
-  const hasil = await hapusWarga(body.id);
-  return Response.json(hasil, { status: hasil.ok ? 200 : 404 });
+  let terhapus = 0;
+  for (const id of ids) {
+    const hasil = await hapusWarga(id);
+    if (hasil.ok) terhapus++;
+  }
+  return Response.json({ ok: true, terhapus });
 }

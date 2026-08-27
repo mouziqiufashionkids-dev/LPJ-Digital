@@ -74,7 +74,18 @@ export async function fetchAdmin(url, opsi = {}) {
   return fetch(url, { ...opsi, headers, credentials: "include" });
 }
 
-// minta seluruh panel memuat ulang data setelah ada perubahan
+// Perubahan kecil tampil SEKETIKA di layar (optimistic update) —
+// panel tidak menunggu server untuk memperbarui tampilan.
+export function patchPanel(detail) {
+  window.dispatchEvent(new CustomEvent("lpj-admin-patch", { detail }));
+}
+
+// Muat ulang data penuh — DITUNDA 0,8 detik setelah aktivitas terakhir,
+// agar klik cepat 2–10x hanya memicu SATU permintaan (anti-macet).
+let timerSegar = null;
 export function segarkanPanel() {
-  window.dispatchEvent(new CustomEvent("lpj-admin-segar"));
+  try { clearTimeout(timerSegar); } catch {}
+  timerSegar = setTimeout(() => {
+    window.dispatchEvent(new CustomEvent("lpj-admin-segar"));
+  }, 800);
 }

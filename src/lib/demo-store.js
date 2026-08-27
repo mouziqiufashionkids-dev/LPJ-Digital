@@ -211,6 +211,8 @@ if (S.__versi !== VERSI_DEMO) {
   Object.assign(S, buatDataDemo(), { __versi: VERSI_DEMO });
 }
 
+const normNama = (n) => String(n || "").toLowerCase().replace(/\s+/g, " ").trim();
+
 // ------------------------- API -----------------------------------
 
 function tampilanWarga(w) {
@@ -301,12 +303,25 @@ export function tandaiLunas(wargaId, { tanggal, metode = "tunai", petugas = "Ben
   return { ok: true };
 }
 
-// tambah warga massal: tiap warga otomatis dapat kupon berkode unik
+// tambah warga massal: tiap warga otomatis dapat kupon berkode unik.
+// nama yang sudah terdaftar OTOMATIS DILEWATI (anti data dobel).
 export function tambahWargaBatch(rows) {
   const valid = (rows || []).filter((r) => r && String(r.nama || "").trim());
   if (!valid.length) return { ok: false, pesan: "Tidak ada baris valid" };
-  const dibuat = [];
+  const sudahAda = new Set(S.warga.map((w) => normNama(w.nama)));
+  const dobel = [];
+  const baru = [];
   for (const r of valid) {
+    const kunci = normNama(r.nama);
+    if (sudahAda.has(kunci)) {
+      dobel.push(r.nama);
+      continue;
+    }
+    sudahAda.add(kunci);
+    baru.push(r);
+  }
+  const dibuat = [];
+  for (const r of baru) {
     const w = {
       id: String(S.idWargaBerikut++),
       nama: String(r.nama).trim().slice(0, 80),
@@ -330,7 +345,12 @@ export function tambahWargaBatch(rows) {
     S.kupon.push(k);
     dibuat.push({ nama: w.nama, kode: k.kode, ancalah: w.ancalah });
   }
-  return { ok: true, ditambah: dibuat.length, kupon: dibuat };
+  return {
+    ok: true,
+    ditambah: dibuat.length,
+    kupon: dibuat,
+    dobel, // nama yang dilewati karena sudah terdaftar
+  };
 }
 
 export function hapusWarga(id) {

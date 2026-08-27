@@ -91,7 +91,9 @@ async function parseExcel(berkas) {
     .filter((r) => r.nama && !/^nama/.test(r.nama.toLowerCase()));
 }
 
-export default function TambahWarga() {
+export default function TambahWarga({ namaSudahAda }) {
+  // namaSudahAda: Set nama (sudah dinormalisasi) yang telah terdaftar —
+  // dipakai menandai & mencegah upload dobel sebelum mengirim ke server.
   const [mode, setMode] = useState("satu"); // satu | banyak
   const [nama, setNama] = useState("");
   const [rt, setRt] = useState("");
@@ -113,6 +115,10 @@ export default function TambahWarga() {
         : []
       : parseBaris(teks);
   const siap = baris.filter((b) => b.nama.trim());
+  const sudahAda = (n) =>
+    namaSudahAda instanceof Set &&
+    namaSudahAda.has(String(n || "").toLowerCase().replace(/\s+/g, " ").trim());
+  const siapBener = siap.filter((b) => !sudahAda(b.nama));
 
   function isiNominalDariKelas(k) {
     setKelas(k);
@@ -142,11 +148,11 @@ export default function TambahWarga() {
   }
 
   async function kirim() {
-    if (!siap.length) return;
+    if (!siapBener.length) return;
     setProses(true);
     setGagal("");
     try {
-      const rows = siap.map((b) => {
+      const rows = siapBener.map((b) => {
         const k = b.kelas || (mode === "satu" ? kelas : kelasBawaan);
         return {
           ...b,
@@ -219,6 +225,13 @@ export default function TambahWarga() {
               </li>
             )}
           </ul>
+          {hasil.dobel?.length > 0 && (
+            <p className="text-amber-700 mt-2 text-xs">
+              ⚠ {hasil.dobel.length} nama <strong>dilewati karena sudah terdaftar</strong>:{` `}
+              {hasil.dobel.slice(0, 5).join(", ")}
+              {hasil.dobel.length > 5 && ` …(+${hasil.dobel.length - 5})`}
+            </p>
+          )}
           <div className="flex gap-2 mt-3">
             <Link href="/admin/kupon" className="tombol bg-emas text-zamrud-900 hover:bg-emas-terang text-xs px-3 py-2">
               🖨️ Cetak Kupon Sekarang
@@ -303,9 +316,15 @@ export default function TambahWarga() {
             <tbody className="divide-y divide-zamrud-50">
               {siap.slice(0, 6).map((b, i) => {
                 const k = b.kelas || kelasBawaan;
+                const dobel = sudahAda(b.nama);
                 return (
-                  <tr key={i}>
-                    <td className="px-3 py-1.5 font-medium">{b.nama}</td>
+                  <tr key={i} className={dobel ? "bg-amber-50/70" : ""}>
+                    <td className="px-3 py-1.5 font-medium">
+                      {b.nama}{" "}
+                      {dobel && (
+                        <span className="pill bg-amber-100 text-amber-700 ml-1">sudah ada — dilewati</span>
+                      )}
+                    </td>
                     <td className="px-3 py-1.5">{b.rt || "-"}</td>
                     <td className="px-3 py-1.5">{b.alamat || "-"}</td>
                     <td className="px-3 py-1.5">{k === "sponsor" ? "Sponsor" : `Kelas ${k}`}</td>
@@ -320,6 +339,11 @@ export default function TambahWarga() {
           {siap.length > 6 && (
             <p className="px-3 py-2 text-zamrud-900/50 text-xs">…dan {siap.length - 6} baris lainnya</p>
           )}
+          {siap.length !== siapBener.length && (
+            <p className="px-3 py-2 text-amber-700 text-xs border-t border-amber-100">
+              ⚠ {siap.length - siapBener.length} nama sudah terdaftar — otomatis dilewati saat ditambahkan.
+            </p>
+          )}
         </div>
       )}
 
@@ -328,14 +352,19 @@ export default function TambahWarga() {
       <div className="mt-4 flex items-center gap-3">
         <button
           onClick={kirim}
-          disabled={proses || !siap.length}
+          disabled={proses || !siapBener.length}
           className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 disabled:opacity-50"
         >
-          {proses ? "Memproses…" : `Tambah ${siap.length || ""} Warga & Buat Kupon`}
+          {proses ? "Memproses…" : `Tambah ${siapBener.length || ""} Warga & Buat Kupon`}
         </button>
-        {siap.length > 0 && (
+        {siapBener.length > 0 && (
           <span className="text-xs text-zamrud-900/60">
-            {siap.length} warga siap — tiap warga otomatis dapat kode kupon unik
+            {siapBener.length} warga siap — tiap warga otomatis dapat kode kupon unik
+          </span>
+        )}
+        {siap.length > 0 && siapBener.length === 0 && (
+          <span className="text-xs text-amber-700">
+            Semua nama sudah terdaftar — tidak ada yang perlu ditambahkan.
           </span>
         )}
       </div>
