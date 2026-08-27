@@ -1,35 +1,39 @@
 import { createClient } from "@supabase/supabase-js";
+import { listWarga, getStats, mode } from "@/lib/store";
+import { SUPABASE_URL } from "@/lib/supabase-store";
 
 export const dynamic = "force-dynamic";
 
-const URL_SB = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://zxyftqrufaxzdvfvqpfq.supabase.co";
-
-// Pemeriksa database (dilindungi sandi admin) — menampilkan error persis
-// dari setiap bentuk query, untuk menemukan akar masalah.
 export async function GET() {
-  const c = createClient(URL_SB, process.env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false },
-  });
-  const hasil = {};
+  const hasil = { mode, url_module: SUPABASE_URL };
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+  hasil.key_ada = Boolean(key);
+  try {
+    const payload = JSON.parse(Buffer.from(key.split(".")[1], "base64").toString());
+    hasil.key_role = payload.role || "?"; // anon / service_role (hanya perannya, bukan kuncinya)
+  } catch {
+    hasil.key_role = "tidak-berformat-jwt";
+  }
 
-  const t1 = await c.from("warga").select("id,nama,kelas,ancalah").limit(3);
-  hasil.tanpa_filter = {
-    error: t1.error?.message ?? null,
-    jumlah: t1.data?.length ?? 0,
-    contoh: t1.data?.slice(0, 2) ?? [],
-  };
+  // fungsi asli yang dipakai API kupon & ikhtisar:
+  try {
+    const w = await listWarga();
+    hasil.listWarga_jumlah = w.length;
+  } catch (e) {
+    hasil.listWarga_jumlah = "ERR: " + e.message;
+  }
+  try {
+    const s = await getStats();
+    hasil.stats_kk_total = s.kk_total;
+    hasil.stats_diperbarui = s.diperbarui;
+  } catch (e) {
+    hasil.stats_kk_total = "ERR: " + e.message;
+  }
 
-  const t2 = await c.from("warga").select("id").eq("aktif", true).limit(3);
-  hasil.filter_aktif = { error: t2.error?.message ?? null, jumlah: t2.data?.length ?? 0 };
-
-  const t3 = await c.from("warga").select("id,nama,kupon(*)").limit(3);
-  hasil.embed_kupon = { error: t3.error?.message ?? null, jumlah: t3.data?.length ?? 0 };
-
-  const t4 = await c.from("warga").select("id,nama").order("nama").limit(3);
-  hasil.urut_nama = { error: t4.error?.message ?? null, jumlah: t4.data?.length ?? 0 };
-
-  const t5 = await c.from("kupon").select("id,kode,status").limit(3);
-  hasil.tabel_kupon = { error: t5.error?.message ?? null, jumlah: t5.data?.length ?? 0 };
+  // query PERSIS seperti di dalam listWarga, via klien baru:
+  const c = createClient(SUPABASE_URL, key, { auth: { persistSession: false } });
+  const q = await c.from("warga").select("*, kupon(*)").eq("aktif", true).order("nama");
+  hasil.query_persis_listWarga = { error: q.error?.message ?? null, jumlah: q.data?.length ?? 0 };
 
   return Response.json(hasil);
 }
