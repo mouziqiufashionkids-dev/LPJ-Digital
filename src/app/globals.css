@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-krem text-zamrud-900 font-isi antialiased;
+}
+
+/* pola arabesque bintang-8, halus & ringan */
+.bg-ornamen {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><g fill='none' stroke='%23D4AF37' stroke-opacity='0.16' stroke-width='1.2'><path d='M36 6l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/><circle cx='36' cy='36' r='9'/></g></svg>");
+}
+
+@layer components {
+  .kartu {
+    @apply bg-white rounded-2xl border border-zamrud-100 shadow-kartu;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+  .tombol {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition;
+  }
+}
