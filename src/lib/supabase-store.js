@@ -44,22 +44,17 @@ function kuponTunggal(k) {
 
 // Ambil baris warga: coba dengan filter `aktif` dulu; kalau kolomnya
 // tidak ada di database, ulangi TANPA filter (data tetap muncul).
-function ambilWarga(select, pakaiAktif) {
-  const q = db().from("warga").select(select);
-  if (pakaiAktif) q.eq("aktif", true);
-  return q;
+function ambilWarga(select) {
+  // CATATAN: sengaja TANPA filter kolom `aktif` — di database produksi
+  // kolom itu bisa NULL padahal barisnya valid (data hasil import).
+  // Warga yang dihapus memang dihapus barisnya, jadi tidak perlu filter.
+  return db().from("warga").select(select);
 }
 
 // Coba jalankan query; kalau gagal (kolom/relasi hilang), ulangi tanpa
 // filter aktif. Mengembalikan { data, error } hasil terbaik.
-async function cobaQueryWarga(select, pakaiAktif = true) {
-  const r1 = await ambilWarga(select, pakaiAktif);
-  if (!r1.error) return r1;
-  if (pakaiAktif) {
-    const r2 = await ambilWarga(select, false);
-    if (!r2.error) return r2;
-  }
-  return r1; // error asli — pemanggil yang memutuskan
+async function cobaQueryWarga(select) {
+  return ambilWarga(select);
 }
 
 // Lampirkan kupon ke daftar warga dengan query terpisah (dipakai saat
