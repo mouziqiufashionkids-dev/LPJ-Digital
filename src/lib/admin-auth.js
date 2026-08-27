@@ -66,12 +66,20 @@ export function modePenyimpanan() {
   return "memori-url";
 }
 
-// fetch dengan token panitia otomatis terlampir
+// fetch dengan token panitia terlampir — dikirim BERLAPIS:
+// 1) parameter URL  ?t=...  (paling tahan banting: tidak ada proxy
+//    yang menyentuhnya; header bisa saja dihapus oleh proxy)
+// 2) header Authorization: Bearer ...
+// 3) cookie (credentials include)
 export async function fetchAdmin(url, opsi = {}) {
   const token = ambilToken();
   const headers = new Headers(opsi.headers || {});
-  if (token) headers.set("Authorization", `Bearer ${token}`);
-  return fetch(url, { ...opsi, headers, credentials: "include" });
+  let u = url;
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+    u += (url.includes("?") ? "&" : "?") + "t=" + encodeURIComponent(token);
+  }
+  return fetch(u, { ...opsi, headers, credentials: "include" });
 }
 
 // Perubahan kecil tampil SEKETIKA di layar (optimistic update) —

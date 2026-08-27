@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ambilToken } from "@/lib/admin-auth";
+import { ambilToken, fetchAdmin } from "@/lib/admin-auth";
 import { rupiah } from "@/lib/format";
 import TombolCetak from "@/components/TombolCetak";
 import FormLoginAdmin from "@/components/FormLoginAdmin";
@@ -34,10 +34,7 @@ export default function KuponClient() {
 
   const muat = useCallback(async () => {
     try {
-      const r = await fetch(
-        `/api/admin/kupon?status=${status}&kelas=${kelas}`,
-        { headers: { Authorization: `Bearer ${ambilToken() || ""}` }, credentials: "include" }
-      );
+      const r = await fetchAdmin(`/api/admin/kupon?status=${status}&kelas=${kelas}`);
       if (r.status === 401) {
         setPerluLogin(true);
         setData(null);
@@ -47,7 +44,7 @@ export default function KuponClient() {
       setData(d);
       setGalat("");
     } catch {
-      setGalat("Gagal memuat kupon.");
+      setGalat("Gagal memuat kupon — periksa koneksi.");
     }
   }, [status, kelas]);
 

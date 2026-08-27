@@ -28,8 +28,11 @@ export async function middleware(req) {
   const cookie = req.cookies.get("admin_t")?.value;
   const auth = req.headers.get("authorization") || "";
   const bearer = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+  // token juga bisa lewat parameter URL ?t=... — jalur paling andal
+  // karena sebagian proxy menghapus header khusus
+  const viaUrl = req.nextUrl.searchParams.get("t");
 
-  if (cookie === token || bearer === token) {
+  if (cookie === token || bearer === token || viaUrl === token) {
     return NextResponse.next();
   }
 

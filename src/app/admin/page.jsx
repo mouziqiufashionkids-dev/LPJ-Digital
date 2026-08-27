@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ambilToken, hapusToken } from "@/lib/admin-auth";
+import { ambilToken, hapusToken, fetchAdmin } from "@/lib/admin-auth";
 import { rupiah, tanggalSingkat } from "@/lib/format";
 import AksiAdmin from "@/components/AksiAdmin";
 import TambahWarga from "@/components/TambahWarga";
@@ -76,25 +76,30 @@ export default function AdminPage() {
   const [galat, setGalat] = useState("");
   const [muat, setMuat] = useState(false);
   const [punyaToken, setPunyaToken] = useState(null); // null = sedang dicek
+  const [alasanKeluar, setAlasanKeluar] = useState("");
 
   const muatUlang = useCallback(async () => {
     setMuat(true);
     try {
-      const r = await fetch("/api/admin/ikhtisar", {
-        headers: { Authorization: `Bearer ${ambilToken() || ""}` },
-        credentials: "include",
-      });
+      // token terkirim via ?t=... + header + cookie (paling tahan proxy)
+      const r = await fetchAdmin("/api/admin/ikhtisar");
       if (r.status === 401) {
         hapusToken();
+        setAlasanKeluar("Sesi tidak diterima server — silakan masuk lagi.");
         setPunyaToken(false);
         setData(null);
         return;
       }
+      if (!r.ok) throw new Error(`server ${r.status}`);
       const d = await r.json();
       setData(d);
       setGalat("");
-    } catch {
-      setGalat("Gagal memuat data — periksa koneksi lalu muat ulang.");
+    } catch (e) {
+      setGalat(
+        String(e?.message).includes("fetch")
+          ? "Koneksi terputus saat memuat — coba Muat Ulang."
+          : `Gagal memuat data (${e?.message || "?"}).`
+      );
     } finally {
       setMuat(false);
     }
@@ -133,7 +138,10 @@ export default function AdminPage() {
   if (!punyaToken) {
     return (
       <main className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-10">
-        <FormLoginAdmin onSukses={() => setPunyaToken(true)} />
+        {alasanKeluar && (
+          <p className="pill bg-amber-100 text-amber-800 mb-4">{alasanKeluar}</p>
+        )}
+        <FormLoginAdmin onSukses={() => { setAlasanKeluar(""); setPunyaToken(true); }} />
         <Link href="/" className="text-sm text-zamrud-700 hover:underline mt-6">
           ← Kembali ke halaman warga
         </Link>
