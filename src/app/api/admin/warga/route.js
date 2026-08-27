@@ -52,9 +52,11 @@ export async function DELETE(request) {
     return Response.json({ ok: false, pesan: "id wajib" }, { status: 400 });
   }
   let terhapus = 0;
+  let galat = "";
   for (const id of ids) {
     const hasil = await hapusWarga(id);
     if (hasil.ok) terhapus++;
+    else if (!galat) galat = hasil.pesan || "Gagal";
   }
-  return Response.json({ ok: true, terhapus });
+  return Response.json({ ok: terhapus > 0, terhapus, pesan: galat || null });
 }
