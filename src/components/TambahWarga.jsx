@@ -102,6 +102,7 @@ export default function TambahWarga({ namaSudahAda }) {
   const [nominal, setNominal] = useState("");
   const [teks, setTeks] = useState("");
   const [kelasBawaan, setKelasBawaan] = useState("1");
+  const [paksa, setPaksa] = useState(false); // ganti total: hapus semua data lama
   const [fileNama, setFileNama] = useState("");
   const [proses, setProses] = useState(false);
   const [gagal, setGagal] = useState("");
@@ -163,7 +164,7 @@ export default function TambahWarga({ namaSudahAda }) {
       const r = await fetchAdmin("/api/admin/warga", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rows }),
+        body: JSON.stringify({ rows, paksa }),
       });
       const d = await r.json();
       if (!d.ok) throw new Error(d.pesan || "Gagal menambah warga");
@@ -349,6 +350,24 @@ export default function TambahWarga({ namaSudahAda }) {
 
       {gagal && <p className="text-sm text-rose-600 mt-3">{gagal}</p>}
 
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <label className="flex items-center gap-2 text-sm font-semibold text-rose-700 bg-rose-50 border-2 border-rose-200 rounded-xl px-4 py-2.5 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={paksa}
+            onChange={(e) => setPaksa(e.target.checked)}
+            className="h-5 w-5 accent-rose-600"
+          />
+          🔄 Ganti Total (hapus semua data lama dulu)
+        </label>
+      </div>
+      {paksa && (
+        <p className="text-xs text-rose-700 mt-2 bg-rose-50 border border-rose-200 rounded-xl px-4 py-3">
+          ⚠ Semua data warga &amp; kupon lama akan DIHAPUS, lalu diganti isi
+          Excel/daftar ini. Catatan iuran yang sudah tercatat akan ikut hilang —
+          pastikan ini memang yang kamu mau.
+        </p>
+      )}
       <div className="mt-4 flex items-center gap-3">
         <button
           onClick={kirim}
