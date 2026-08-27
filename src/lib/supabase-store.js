@@ -6,10 +6,17 @@ import { createClient } from "@supabase/supabase-js";
 import { KONTEN_DEFAULT } from "./konten";
 
 let _db = null;
+// URL proyek Supabase — bisa dari env ATAU fallback di bawah
+// (URL ini bukan rahasia: sudah tampil publik di link foto bukti).
+export const SUPABASE_URL_FALLBACK = "https://zxyftqrufaxzdvfvqpfq.supabase.co";
+
+export const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || SUPABASE_URL_FALLBACK;
+
 function db() {
   if (!_db) {
     _db = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY,
       { auth: { persistSession: false } }
     );
@@ -195,7 +202,7 @@ export async function simpanBerkas(namaFile, buffer, tipeMime) {
     .upload(`berkas/${namaFile}`, buffer, { contentType: tipeMime, upsert: true });
   if (error) throw new Error(`Gagal mengunggah berkas: ${error.message}`);
   return {
-    url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/berkas/${namaFile}`,
+    url: `${SUPABASE_URL}/storage/v1/object/public/media/berkas/${namaFile}`,
   };
 }
 

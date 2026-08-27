@@ -5,7 +5,7 @@ import * as demo from "./demo-store";
 import * as supa from "./supabase-store";
 
 const pakaiSupabase = Boolean(
-  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+  supa.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 export const mode = pakaiSupabase ? "supabase" : "demo";
