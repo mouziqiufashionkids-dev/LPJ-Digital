@@ -20,6 +20,7 @@ export default async function Header() {
         </Link>
         <nav className="ml-auto flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-medium text-krem/90">
           <Link href="/" className="hover:text-emas-terang">Beranda</Link>
+          <Link href="/undangan" className="hover:text-emas-terang">Undangan</Link>
           <Link href="/cek-iuran" className="hover:text-emas-terang">Cek Iuran</Link>
           <Link href="/laporan" className="hover:text-emas-terang">Laporan</Link>
           <Link href="/kotak-saran" className="hover:text-emas-terang">Kotak Saran</Link>

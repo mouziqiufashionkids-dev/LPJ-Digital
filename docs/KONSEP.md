@@ -70,6 +70,16 @@ program ini dipakai **sejak masa iuran hingga laporan akhir**:
   cegah spam/ucapan tidak pantas)
 - Admin bisa menandai saran "ditindaklanjuti ✅"
 
+### E. Undangan Acara & Konfirmasi Kehadiran (RSVP)
+- Kartu undangan digital: logo masjid, nama kegiatan, tanggal, lokasi, countdown
+- Rundown acara (timeline)
+- Formulir konfirmasi: nama, RT (opsional), kehadiran
+  (insya Allah hadir / belum pasti / berhalangan), jumlah tamu, catatan
+- **Daftar "calon tamu" live** — nama yang konfirmasi langsung tampil di web
+  (yang berhalangan hanya dihitung, tidak ditampilkan — menjaga perasaan)
+- Manfaat untuk panitia: perkiraan konsumsi, jumlah kursi, santunan
+- Rekap RSVP lengkap (termasuk catatan) hanya di panel panitia
+
 ## 4. Saran Fitur Tambahan (menuju paripurna)
 
 | Prioritas | Fitur | Kenapa penting |
@@ -145,17 +155,16 @@ dokumentasi    : judul, foto_url
 ## 9. Struktur Halaman
 
 ```
-/                  → Beranda: salam, progress target, ringkasan kas,
-                     countdown, panitia, kontak bendahara
-/cek-iuran         → Cek Iuran Saya (cari nama → status + kwitansi)
-/laporan           → Rincian masuk & keluar + bukti + filter
-/kotak-saran       → Form + daftar saran yang disetujui
-/admin/login
-/admin             → Dashboard ringkas
-/admin/warga-kupon → Kelola warga, generate & cetak kupon, tandai lunas
-/admin/transaksi   → Catat pemasukan/pengeluaran + upload bukti
-/admin/kotak-saran → Moderasi saran
-/admin/pengaturan  → Target, nama kegiatan, kontak, panitia, agenda
+/                 → Beranda: salam, progress target, ringkasan kas,
+                     countdown, tiga ajakan (undangan/cek iuran/saran)
+/undangan         → Undangan acara: logo masjid, rundown, countdown,
+                     konfirmasi kehadiran (RSVP) + daftar calon tamu live
+/cek-iuran        → Cek Iuran Saya (cari nama/kode → status + kwitansi)
+/laporan          → Rincian masuk & keluar + bukti nota + filter
+/kotak-saran      → Form + daftar saran yang disetujui
+/admin            → Dashboard ringkas (tersembunyi, tanpa tautan publik)
+/admin/kupon      → Cetak kupon massal (A4, siap potong, QR per kupon)
+/admin/...        → Kelola warga & kupon, transaksi, saran, rekap RSVP
 ```
 
 ## 10. Tech Stack (kelanjutan yang sudah terbukti)
@@ -195,3 +204,7 @@ dokumentasi    : judul, foto_url
 9. ✅ **Generate kupon masal**: input manual / tempel daftar / unggah CSV
    → kupon berkode + QR otomatis → cetak A4 (10/lembar), siap potong
 10. ⏳ Login admin & proteksi: tahap berikutnya
+11. ✅ **Logo masjid asli** dipakai di header & undangan
+    (`public/logo-masjid.png`)
+12. ✅ **Undangan + RSVP live** — riset fitur web masjid referensi
+    (Istiqlal, Cut Meutia, Al Falah, Al-Azhar) ada di `docs/REFERENSI.md`

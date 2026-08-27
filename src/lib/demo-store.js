@@ -145,12 +145,33 @@ function buatDataDemo() {
     { id: "s4", nama: null, pesan: "Saran: pengeras suara diarahkan menjauh dari rumah warga yang sedang sakit.", tampil: false, ditindaklanjuti: false, created_at: "2026-08-27" },
   ];
 
+  // rundown acara (ditampilkan di halaman undangan)
+  const agenda = [
+    { id: 1, waktu: "08.00 WIB", judul: "Pembukaan & tilawah", lokasi: "Masjid", keterangan: "Dibuka oleh panitia" },
+    { id: 2, waktu: "08.15 WIB", judul: "Marhaban & Maulid Ad-Diba'i", lokasi: "Masjid", keterangan: "Dipimpin majelis taklim" },
+    { id: 3, waktu: "09.00 WIB", judul: "Taushiyah / ceramah agama", lokasi: "Masjid", keterangan: "Penceramah menyusul (mengikuti)" },
+    { id: 4, waktu: "10.00 WIB", judul: "Doa bersama & santunan", lokasi: "Masjid", keterangan: "Santunan anak yatim & dhuafa" },
+    { id: 5, waktu: "10.45 WIB", judul: "Makan bersama jamaah", lokasi: "Halaman masjid", keterangan: "" },
+  ];
+
+  // konfirmasi kehadiran (RSVP) undangan
+  const rsvp = [
+    { id: "r1", nama: "H. Rahmatullah", rt: "RT 01", kehadiran: "hadir", jumlah_tamu: 4, catatan: "", created_at: "2026-08-25" },
+    { id: "r2", nama: "Ibu Samiun", rt: "RT 02", kehadiran: "hadir", jumlah_tamu: 2, catatan: "", created_at: "2026-08-25" },
+    { id: "r3", nama: "Kang Beben", rt: "RT 03", kehadiran: "hadir", jumlah_tamu: 5, catatan: "ikut membawa anak-anak pengajian", created_at: "2026-08-26" },
+    { id: "r4", nama: "Aan Supriatna", rt: "RT 02", kehadiran: "hadir", jumlah_tamu: 3, catatan: "", created_at: "2026-08-26" },
+    { id: "r5", nama: "Euis Komariah", rt: "RT 01", kehadiran: "belum_pasti", jumlah_tamu: 2, catatan: "menunggu kabar keluarga", created_at: "2026-08-26" },
+    { id: "r6", nama: "Warga (merantau)", rt: null, kehadiran: "berhalangan", jumlah_tamu: 0, catatan: "sedang di perantauan", created_at: "2026-08-27" },
+  ];
+
   return {
     pengaturan,
     warga,
     kupon,
     transaksi,
     kotakSaran,
+    agenda,
+    rsvp,
     idWargaBerikut: warga.length + 1,
     idKuponBerikut: kupon.length + 1,
     kodeAngkaBerikut: kupon.length + 1,
@@ -159,6 +180,13 @@ function buatDataDemo() {
 
 // SATU instance untuk seluruh route (lihat penjelasan di atas)
 const S = (globalThis.__lpjDataDemo ??= buatDataDemo());
+// Saat kode diperbarui di dev (hot-reload), state lama mungkin belum punya
+// kunci baru — tambahkan otomatis agar tidak error:
+if (!Array.isArray(S.rsvp) || !Array.isArray(S.agenda)) {
+  const baru = buatDataDemo();
+  if (!Array.isArray(S.rsvp)) S.rsvp = baru.rsvp;
+  if (!Array.isArray(S.agenda)) S.agenda = baru.agenda;
+}
 
 // ------------------------- API -----------------------------------
 
@@ -335,5 +363,48 @@ export function setSaranStatus(id, { tampil, ditindaklanjuti } = {}) {
   if (!s) return { ok: false };
   if (typeof tampil === "boolean") s.tampil = tampil;
   if (typeof ditindaklanjuti === "boolean") s.ditindaklanjuti = ditindaklanjuti;
+  return { ok: true };
+}
+
+// --------------------- AGENDA & RSVP UNDANGAN ---------------------
+
+export function listAgenda() {
+  return S.agenda.map((a) => ({ ...a }));
+}
+
+export function kirimRsvp({ nama, rt, kehadiran, jumlah_tamu, catatan }) {
+  S.rsvp.unshift({
+    id: `r${Date.now()}`,
+    nama: String(nama).trim().slice(0, 80),
+    rt: rt?.trim() ? rt.trim().slice(0, 20) : null,
+    kehadiran,
+    jumlah_tamu: kehadiran === "berhalangan" ? 0 : Math.max(1, Math.min(15, Number(jumlah_tamu) || 1)),
+    catatan: catatan?.trim() ? catatan.trim().slice(0, 200) : null,
+    created_at: new Date().toISOString().slice(0, 10),
+  });
+  return { ok: true };
+}
+
+export function listRsvp() {
+  return [...S.rsvp].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+}
+
+export function getRsvpStats() {
+  const hadir = S.rsvp.filter((r) => r.kehadiran === "hadir");
+  const belum = S.rsvp.filter((r) => r.kehadiran === "belum_pasti");
+  const halang = S.rsvp.filter((r) => r.kehadiran === "berhalangan");
+  return {
+    hadir_nama: hadir.length,
+    hadir_tamu: hadir.reduce((a, r) => a + r.jumlah_tamu, 0),
+    belum_pasti_nama: belum.length,
+    belum_pasti_tamu: belum.reduce((a, r) => a + r.jumlah_tamu, 0),
+    berhalangan_nama: halang.length,
+  };
+}
+
+export function hapusRsvp(id) {
+  const i = S.rsvp.findIndex((r) => r.id === id);
+  if (i === -1) return { ok: false, pesan: "Data tidak ditemukan" };
+  S.rsvp.splice(i, 1);
   return { ok: true };
 }

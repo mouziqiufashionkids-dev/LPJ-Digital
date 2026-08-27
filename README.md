@@ -17,6 +17,8 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
 (48 KK, transaksi, saran). Coba:
 
 - Beranda: progress dana live + rekap "X dari Y KK sudah lunas"
+- `/undangan`: undangan digital + rundown + **konfirmasi kehadiran (RSVP)**
+  — nama yang konfirmasi langsung tampil live sebagai calon tamu
 - `/cek-iuran`: ketik nama (mis. *Asep*) atau kode kupon (*MLD-0001*)
   → status + kwitansi digital
 - `/laporan`: rincian kas — **klik gambar nota** untuk melihat bukti
@@ -27,6 +29,7 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
   - `/admin/kupon`: **cetak kupon massal** siap potong per A4
     (10 kupon/lembar) — QR di kupon menuju halaman cek iuran
   - Tandai kupon lunas → beranda/live update otomatis
+  - Rekap konfirmasi kehadiran (RSVP) undangan
 
 ## Beralih ke data sungguhan (Supabase — gratis)
 
@@ -49,14 +52,18 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
 
 ## Status pengembangan
 
-- [x] Konsep v2 (`docs/KONSEP.md`)
-- [x] Branding masjid di header (placeholder: Masjid Jami' Al-Hikmah)
+- [x] Konsep v2 (`docs/KONSEP.md`) + riset web masjid referensi
+      (`docs/REFERENSI.md`)
+- [x] Branding masjid di header + **logo masjid asli**
 - [x] Halaman publik: beranda live, cek iuran + kwitansi, laporan dengan
       nota bisa dilihat (klik gambar), kotak saran
+- [x] **Undangan digital + RSVP live** (rundown, konfirmasi kehadiran,
+      daftar calon tamu, rekap di admin)
 - [x] Panel panitia tersembunyi (`/admin`, tanpa tautan dari situs warga)
 - [x] Tambah warga masal (manual/tempel/CSV) → kupon otomatis
 - [x] Cetak kupon massal A4 + QR per kupon
 - [ ] Catat pengeluaran + upload bukti foto
 - [ ] Login panitia (Supabase Auth)
 - [ ] Edit warga (ubah nominal ancalah) & pengaturan lewat UI
-- [ ] Agenda acara & dokumentasi foto
+- [ ] Jadwal sholat harian (API gratis) + galeri dokumentasi
+      (lihat `docs/REFERENSI.md` untuk roadmap lengkap)

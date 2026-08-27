@@ -1,12 +1,15 @@
-export default function Logo({ className = "h-8 w-8" }) {
+// Logo asli masjid (public/logo-masjid.png) dalam lingkaran putih
+// agar kontras di latar hijau tua.
+export default function Logo({ className = "h-9 w-9" }) {
   return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
-      <circle cx="20" cy="20" r="19" fill="#0B6E4F" />
-      <path
-        d="M26 8a13 13 0 1 0 0 24 10.5 10.5 0 1 1 0-24z"
-        fill="#E8CD6B"
+    <span
+      className={`${className} inline-flex items-center justify-center rounded-full bg-white ring-2 ring-emas/50 p-[8%] shrink-0`}
+    >
+      <img
+        src="/logo-masjid.png"
+        alt="Logo masjid"
+        className="h-full w-full object-contain"
       />
-      <path d="M29 12.5l1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1z" fill="#E8CD6B" />
-    </svg>
+    </span>
   );
 }

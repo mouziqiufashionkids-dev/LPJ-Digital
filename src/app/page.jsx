@@ -136,8 +136,21 @@ export default async function Beranda() {
         </div>
       </section>
 
-      {/* ============ DUA AJAKAN ============ */}
-      <section className="mx-auto max-w-5xl px-4 mt-10 grid md:grid-cols-2 gap-5">
+      {/* ============ TIGA AJAKAN ============ */}
+      <section className="mx-auto max-w-5xl px-4 mt-10 grid md:grid-cols-3 gap-5">
+        <div className="kartu p-6 border-emas/50 bg-amber-50/60">
+          <p className="text-3xl">💌</p>
+          <h3 className="font-judul text-xl font-bold text-zamrud-800 mt-2">
+            Undangan Maulid Nabi
+          </h3>
+          <p className="text-sm text-zamrud-900/70 mt-1">
+            Lihat rundown acara dan konfirmasi kehadiran Anda — nama langsung
+            tercatat sebagai calon tamu.
+          </p>
+          <Link href="/undangan" className="tombol bg-emas text-zamrud-900 hover:bg-emas-terang mt-4">
+            Buka Undangan
+          </Link>
+        </div>
         <div className="kartu p-6 bg-zamrud-50 border-zamrud-100">
           <p className="text-3xl">✅</p>
           <h3 className="font-judul text-xl font-bold text-zamrud-800 mt-2">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getStats, listWarga, listTransaksi, listSaran } from "@/lib/store";
+import { getStats, listWarga, listTransaksi, listSaran, listRsvp, getRsvpStats } from "@/lib/store";
 import { rupiah, tanggalSingkat } from "@/lib/format";
 import AksiAdmin from "@/components/AksiAdmin";
 import LiveRefresh from "@/components/LiveRefresh";
@@ -12,11 +12,13 @@ export const metadata = {
 };
 
 export default async function AdminPage() {
-  const [st, warga, transaksi, saran] = await Promise.all([
+  const [st, warga, transaksi, saran, rsvp, rsvpStat] = await Promise.all([
     getStats(),
     listWarga(),
     listTransaksi({}),
     listSaran({ hanyaTampil: false }),
+    listRsvp(),
+    getRsvpStats(),
   ]);
   const belumLunas = warga.filter((w) => w.kupon?.status !== "lunas").length;
   const saranBaru = saran.filter((s) => !s.tampil).length;
@@ -200,6 +202,83 @@ export default async function AdminPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* konfirmasi kehadiran (RSVP) */}
+      <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
+        🤝 Konfirmasi Kehadiran (Undangan)
+      </h2>
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="kartu p-4 text-center">
+          <p className="text-xl font-bold text-zamrud-700">{rsvpStat.hadir_tamu} tamu</p>
+          <p className="text-xs text-zamrud-900/60">
+            insya Allah hadir · {rsvpStat.hadir_nama} konfirmasi
+          </p>
+        </div>
+        <div className="kartu p-4 text-center">
+          <p className="text-xl font-bold text-amber-600">{rsvpStat.belum_pasti_nama}</p>
+          <p className="text-xs text-zamrud-900/60">belum pasti</p>
+        </div>
+        <div className="kartu p-4 text-center">
+          <p className="text-xl font-bold text-zamrud-900/50">{rsvpStat.berhalangan_nama}</p>
+          <p className="text-xs text-zamrud-900/60">berhalangan</p>
+        </div>
+      </div>
+      <div className="kartu overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-zamrud-900/60 border-b border-zamrud-100">
+              <th className="px-4 py-3 font-semibold">Nama</th>
+              <th className="px-4 py-3 font-semibold">RT</th>
+              <th className="px-4 py-3 font-semibold">Kehadiran</th>
+              <th className="px-4 py-3 font-semibold">Tamu</th>
+              <th className="px-4 py-3 font-semibold hidden md:table-cell">Catatan</th>
+              <th className="px-4 py-3 font-semibold">Tanggal</th>
+              <th className="px-4 py-3 font-semibold">Aksi</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zamrud-50">
+            {rsvp.map((r) => (
+              <tr key={r.id}>
+                <td className="px-4 py-2.5 font-medium text-zamrud-900">{r.nama}</td>
+                <td className="px-4 py-2.5 text-zamrud-900/60">{r.rt || "-"}</td>
+                <td className="px-4 py-2.5">
+                  {r.kehadiran === "hadir" && (
+                    <span className="pill bg-zamrud-100 text-zamrud-700">✓ Hadir</span>
+                  )}
+                  {r.kehadiran === "belum_pasti" && (
+                    <span className="pill bg-amber-100 text-amber-700">Belum pasti</span>
+                  )}
+                  {r.kehadiran === "berhalangan" && (
+                    <span className="pill bg-zamrud-50 text-zamrud-900/50">Berhalangan</span>
+                  )}
+                </td>
+                <td className="px-4 py-2.5">{r.jumlah_tamu || "-"}</td>
+                <td className="px-4 py-2.5 text-zamrud-900/60 hidden md:table-cell max-w-[200px]">
+                  {r.catatan || "-"}
+                </td>
+                <td className="px-4 py-2.5 text-zamrud-900/60">{tanggalSingkat(r.created_at)}</td>
+                <td className="px-4 py-2.5">
+                  <AksiAdmin
+                    url="/api/admin/rsvp"
+                    method="DELETE"
+                    body={{ id: r.id }}
+                    label="Hapus"
+                    merah
+                    tanya={`Hapus konfirmasi dari ${r.nama}?`}
+                  />
+                </td>
+              </tr>
+            ))}
+            {rsvp.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-4 py-6 text-sm text-zamrud-900/60">
+                  Belum ada konfirmasi kehadiran.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </main>
   );

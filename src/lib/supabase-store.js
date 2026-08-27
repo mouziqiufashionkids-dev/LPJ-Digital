@@ -181,3 +181,47 @@ export async function setSaranStatus(id, { tampil, ditindaklanjuti } = {}) {
   await db().from("kotak_saran").update(patch).eq("id", id);
   return { ok: true };
 }
+
+// --------------------- AGENDA & RSVP UNDANGAN ---------------------
+
+export async function listAgenda() {
+  const { data } = await db().from("agenda").select("*").order("id");
+  return data || [];
+}
+
+export async function kirimRsvp({ nama, rt, kehadiran, jumlah_tamu, catatan }) {
+  const { error } = await db().from("rsvp").insert({
+    nama: nama.trim().slice(0, 80),
+    rt: rt?.trim() || null,
+    kehadiran,
+    jumlah_tamu: kehadiran === "berhalangan" ? 0 : Math.max(1, Math.min(15, Number(jumlah_tamu) || 1)),
+    catatan: catatan?.trim() || null,
+  });
+  if (error) return { ok: false, pesan: error.message };
+  return { ok: true };
+}
+
+export async function listRsvp() {
+  const { data } = await db().from("rsvp").select("*").order("created_at", { ascending: false });
+  return data || [];
+}
+
+export async function getRsvpStats() {
+  const { data } = await db().from("rsvp").select("kehadiran,jumlah_tamu");
+  const r = data || [];
+  const hadir = r.filter((x) => x.kehadiran === "hadir");
+  const belum = r.filter((x) => x.kehadiran === "belum_pasti");
+  const halang = r.filter((x) => x.kehadiran === "berhalangan");
+  return {
+    hadir_nama: hadir.length,
+    hadir_tamu: hadir.reduce((a, x) => a + x.jumlah_tamu, 0),
+    belum_pasti_nama: belum.length,
+    belum_pasti_tamu: belum.reduce((a, x) => a + x.jumlah_tamu, 0),
+    berhalangan_nama: halang.length,
+  };
+}
+
+export async function hapusRsvp(id) {
+  await db().from("rsvp").delete().eq("id", id);
+  return { ok: true };
+}

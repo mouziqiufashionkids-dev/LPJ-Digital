@@ -57,6 +57,17 @@ create table if not exists transaksi (
   created_at timestamptz not null default now()
 );
 
+-- Konfirmasi kehadiran undangan (RSVP)
+create table if not exists rsvp (
+  id bigint generated always as identity primary key,
+  nama text not null,
+  rt text,
+  kehadiran text not null check (kehadiran in ('hadir','belum_pasti','berhalangan')),
+  jumlah_tamu int not null default 1,
+  catatan text,
+  created_at timestamptz not null default now()
+);
+
 -- Kotak saran warga
 create table if not exists kotak_saran (
   id bigint generated always as identity primary key,
@@ -104,6 +115,7 @@ alter table warga        enable row level security;
 alter table kupon        enable row level security;
 alter table transaksi    enable row level security;
 alter table kotak_saran  enable row level security;
+alter table rsvp         enable row level security;
 alter table panitia      enable row level security;
 alter table agenda       enable row level security;
 alter table dokumentasi  enable row level security;
@@ -113,8 +125,10 @@ create policy "baca warga"       on warga       for select using (true);
 create policy "baca kupon"       on kupon       for select using (true);
 create policy "baca transaksi"   on transaksi   for select using (true);
 create policy "baca saran"       on kotak_saran for select using (tampil = true);
+create policy "baca rsvp"        on rsvp        for select using (kehadiran in ('hadir','belum_pasti'));
 create policy "baca panitia"     on panitia     for select using (true);
 create policy "baca agenda"      on agenda      for select using (true);
 create policy "baca dokumentasi" on dokumentasi for select using (true);
 
 create policy "kirim saran" on kotak_saran for insert with check (char_length(pesan) between 3 and 500);
+create policy "kirim rsvp"  on rsvp        for insert with check (char_length(nama) between 2 and 80);
