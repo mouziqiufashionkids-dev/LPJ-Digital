@@ -52,8 +52,8 @@ function ancalahUntuk(i) {
 function buatDataDemo() {
   const pengaturan = {
     nama_masjid: "Masjid Al-Hikmah",
-    nama_kegiatan: "Maulid Nabi ﷺ 1447 H",
-    hijriah: "12 Rabiul Awal 1447 H",
+    nama_kegiatan: "Maulid Nabi ﷺ 1448 H",
+    hijriah: "Rabiul Awal 1448 H",
     penyelenggara: "[Nama RT/RW · Kampung] — ganti di Pengaturan Admin",
     penyelenggara_singkat: "RT/RW · Kampung Anda",
     lokasi_acara: "Balai Warga & Masjid Al-Hikmah",
@@ -203,7 +203,7 @@ const warga = NAMA_WARGA.map((nama, i) => ({
 }
 
 // SATU instance untuk seluruh route (lihat penjelasan di atas)
-const VERSI_DEMO = 4; // naikkan saat struktur/isi data demo berubah
+const VERSI_DEMO = 5; // naikkan saat struktur/isi data demo berubah
 const S = (globalThis.__lpjDataDemo ??= buatDataDemo());
 // Saat kode diperbarui di dev (hot-reload), state lama mungkin berbentuk
 // lama — reset ke data terbaru jika versi berbeda:

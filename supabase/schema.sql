@@ -8,7 +8,7 @@ create table if not exists pengaturan (
   id int primary key default 1,
   nama_masjid text not null default 'Masjid Al-Hikmah',
   nama_kegiatan text not null default 'Maulid Nabi ﷺ',
-  hijriah text default '12 Rabiul Awal 1447 H',
+  hijriah text default 'Rabiul Awal 1448 H',
   penyelenggara text,
   penyelenggara_singkat text,
   lokasi_acara text,
@@ -21,7 +21,7 @@ create table if not exists pengaturan (
   qris_url text
 );
 insert into pengaturan (id, nama_masjid, nama_kegiatan, penyelenggara, penyelenggara_singkat, lokasi_acara, tanggal_acara, kontak_wa, kota_sholat, rekening_bank, rekening_no, rekening_atas_nama)
-values (1, 'Masjid Al-Hikmah', 'Maulid Nabi ﷺ 1447 H', '[Nama RT/RW · Kampung]', 'RT/RW · Kampung Anda', 'Balai Warga & Masjid Al-Hikmah', '2026-09-05 01:00:00+00', '628123456789', 'Garut', '[Nama Bank]', '[Nomor Rekening]', '[Atas Nama]')
+values (1, 'Masjid Al-Hikmah', 'Maulid Nabi ﷺ 1448 H', '[Nama RT/RW · Kampung]', 'RT/RW · Kampung Anda', 'Balai Warga & Masjid Al-Hikmah', '2026-09-05 01:00:00+00', '628123456789', 'Garut', '[Nama Bank]', '[Nomor Rekening]', '[Atas Nama]')
 on conflict (id) do nothing;
 
 -- Bucket storage publik untuk foto bukti & dokumentasi

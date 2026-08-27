@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { rupiah, tanggalID } from "@/lib/format";
 
-export default function SearchIuran() {
+export default function SearchIuran({ namaKegiatan = "Maulid Nabi ﷺ", namaMasjid = "Masjid" }) {
   const [q, setQ] = useState("");
   const [hasil, setHasil] = useState([]);
   const [memuat, setMemuat] = useState(false);
@@ -98,7 +98,8 @@ export default function SearchIuran() {
           <div className="max-w-sm mx-auto bg-white border-2 border-emas rounded-2xl overflow-hidden shadow-kartu">
             <div className="bg-zamrud-800 bg-ornamen text-krem px-4 py-3 text-center">
               <p className="text-[11px] tracking-widest text-emas-terang">KWITANSI IURAN</p>
-              <p className="font-judul font-bold">Maulid Nabi ﷺ 1447 H</p>
+              <p className="font-judul font-bold">{namaKegiatan}</p>
+              <p className="text-[10px] text-krem/60">{namaMasjid}</p>
             </div>
             <div className="p-5 text-center">
               <p className="text-sm text-zamrud-900/60">{pilih.rt}</p>

@@ -22,7 +22,7 @@ export async function getSettings() {
     data || {
       nama_masjid: "Masjid Al-Hikmah",
       nama_kegiatan: "Maulid Nabi ﷺ",
-      hijriah: "12 Rabiul Awal 1447 H",
+      hijriah: "Rabiul Awal 1448 H",
       penyelenggara: "Panitia",
       penyelenggara_singkat: "Panitia",
       lokasi_acara: "-",

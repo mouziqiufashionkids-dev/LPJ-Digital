@@ -1,22 +1,26 @@
+import { getSettings } from "@/lib/store";
 import SearchIuran from "@/components/SearchIuran";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
-  title: "Cek Iuran — LPJ Maulid Nabi",
+  title: "Cek Iuran — Masjid Al-Hikmah",
 };
 
-export default function CekIuranPage() {
+export default async function CekIuranPage() {
+  const s = await getSettings();
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
       <h1 className="font-judul text-3xl font-bold text-zamrud-800">
         🔍 Cek Iuran Saya
       </h1>
       <p className="text-zamrud-900/70 mt-2">
-        Sudah bayar iuran Maulid Nabi? Pastikan sudah diterima dan tercatat
+        Sudah bayar iuran {s.nama_kegiatan}? Pastikan sudah diterima dan tercatat
         panitia. Cukup ketik nama — tanpa login, tanpa data pribadi.
       </p>
 
       <div className="mt-8">
-        <SearchIuran />
+        <SearchIuran namaKegiatan={s.nama_kegiatan} namaMasjid={s.nama_masjid} />
       </div>
 
       <div className="mt-10 kartu p-5 text-sm text-zamrud-900/70 space-y-2">
