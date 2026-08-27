@@ -4,5 +4,7 @@ out/
 .env
 .env*.local
 .vercel
+uploads/
+public/uploads/
 *.tsbuildinfo
 next-env.d.ts

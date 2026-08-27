@@ -13,10 +13,17 @@ create table if not exists pengaturan (
   penyelenggara_singkat text,
   lokasi_acara text,
   tanggal_acara timestamptz,
-  kontak_wa text
+  kontak_wa text,
+  kota_sholat text default 'Garut'
 );
-insert into pengaturan (id, nama_masjid, nama_kegiatan, penyelenggara, penyelenggara_singkat, lokasi_acara, tanggal_acara, kontak_wa)
-values (1, 'Masjid Al-Hikmah', 'Maulid Nabi ﷺ 1447 H', '[Nama RT/RW · Kampung]', 'RT/RW · Kampung Anda', 'Balai Warga & Masjid Al-Hikmah', '2026-09-05 01:00:00+00', '628123456789')
+insert into pengaturan (id, nama_masjid, nama_kegiatan, penyelenggara, penyelenggara_singkat, lokasi_acara, tanggal_acara, kontak_wa, kota_sholat)
+values (1, 'Masjid Al-Hikmah', 'Maulid Nabi ﷺ 1447 H', '[Nama RT/RW · Kampung]', 'RT/RW · Kampung Anda', 'Balai Warga & Masjid Al-Hikmah', '2026-09-05 01:00:00+00', '628123456789', 'Garut')
+on conflict (id) do nothing;
+
+-- Bucket storage publik untuk foto bukti & dokumentasi
+-- (jika gagal lewat SQL, buat manual: Storage -> New bucket -> nama "media", Public)
+insert into storage.buckets (id, name, public)
+values ('media', 'media', true)
 on conflict (id) do nothing;
 
 -- Warga penerima ancalah (per KK)

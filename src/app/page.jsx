@@ -1,19 +1,22 @@
 import Link from "next/link";
-import { getSettings, getStats, listTransaksi } from "@/lib/store";
+import { getSettings, getStats, listTransaksi, listDokumentasi } from "@/lib/store";
 import { rupiah, tanggalID, tanggalSingkat } from "@/lib/format";
 import ProgressBar from "@/components/ProgressBar";
 import StatCard from "@/components/StatCard";
 import Countdown from "@/components/Countdown";
 import LiveRefresh from "@/components/LiveRefresh";
 import NotaImg from "@/components/NotaImg";
+import JadwalSholat from "@/components/JadwalSholat";
+import FotoGaleri from "@/components/FotoGaleri";
 
 export const dynamic = "force-dynamic";
 
 export default async function Beranda() {
-  const [s, st, keluar] = await Promise.all([
+  const [s, st, keluar, dokumentasi] = await Promise.all([
     getSettings(),
     getStats(),
     listTransaksi({ tipe: "keluar" }),
+    listDokumentasi(),
   ]);
   const terbaru = keluar.slice(0, 5);
 
@@ -102,6 +105,9 @@ export default async function Beranda() {
         </div>
       </section>
 
+      {/* ============ JADWAL SHOLAT ============ */}
+      <JadwalSholat kota={s.kota_sholat || "Garut"} />
+
       {/* ============ PENGELUARAN TERBARU ============ */}
       <section className="mx-auto max-w-5xl px-4 mt-10">
         <div className="flex items-center justify-between mb-4">
@@ -178,6 +184,18 @@ export default async function Beranda() {
           </Link>
         </div>
       </section>
+
+      {/* ============ GALERI DOKUMENTASI ============ */}
+      {dokumentasi.length > 0 && (
+        <section className="mx-auto max-w-5xl px-4 mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-judul text-2xl font-bold text-zamrud-800">
+              📷 Dokumentasi Kegiatan
+            </h2>
+          </div>
+          <FotoGaleri daftar={dokumentasi} />
+        </section>
+      )}
 
       {/* ============ VERIFIKASI ============ */}
       <section className="mx-auto max-w-5xl px-4 mt-10">

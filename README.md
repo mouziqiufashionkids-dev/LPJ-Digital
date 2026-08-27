@@ -58,20 +58,23 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
 
 - [x] Konsep v2 (`docs/KONSEP.md`) + riset web masjid referensi
       (`docs/REFERENSI.md`)
-- [x] Branding masjid di header + **logo masjid asli**
+- [x] Branding masjid di header + **logo masjid profesional**
 - [x] Halaman publik: beranda live, cek iuran + kwitansi, laporan dengan
       nota bisa dilihat (klik gambar), kotak saran
 - [x] **Undangan digital + RSVP live** (rundown, konfirmasi kehadiran,
       daftar calon tamu, rekap di admin)
 - [x] Panel panitia tersembunyi & **dilindungi sandi** (klik logo 3× →
       login, middleware `/admin/*` + `/api/admin/*`, sesi 8 jam)
-- [x] Logo masjid profesional (AI redraw dari logo asli; asli diarsipkan
-      di `public/logo-masjid-asli.png`)
-- [x] Nama masjid (Masjid Al-Hikmah) & tanggal acara (5 Sep 2026)
 - [x] Tambah warga masal (manual/tempel/CSV) → kupon otomatis
 - [x] Cetak kupon massal A4 + QR per kupon
-- [ ] Catat pengeluaran + upload bukti foto
-- [ ] Login panitia (Supabase Auth)
-- [ ] Edit warga (ubah nominal ancalah) & pengaturan lewat UI
-- [ ] Jadwal sholat harian (API gratis) + galeri dokumentasi
-      (lihat `docs/REFERENSI.md` untuk roadmap lengkap)
+- [x] **Catat transaksi (pemasukan/pengeluaran) + upload foto nota**
+      dari panel panitia
+- [x] **Jadwal sholat harian** (API gratis aladhan, metode Kemenag,
+      highlight waktu berikutnya + tanggal hijriah)
+- [x] **Galeri dokumentasi** — upload dari admin, tampil di beranda
+      dengan lightbox
+- [x] Nama masjid (Masjid Al-Hikmah) & tanggal acara (5 Sep 2026)
+- [ ] Deploy produksi — ikuti [`docs/DEPLOY.md`](docs/DEPLOY.md)
+      (Supabase + Vercel, gratis, ± 30 menit)
+- [ ] Edit warga & pengaturan lewat UI (sementara lewat database)
+- [ ] Ekspor laporan PDF/Excel untuk rapat panitia

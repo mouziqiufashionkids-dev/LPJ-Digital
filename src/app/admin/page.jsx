@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { getStats, listWarga, listTransaksi, listSaran, listRsvp, getRsvpStats } from "@/lib/store";
+import { getStats, listWarga, listTransaksi, listSaran, listRsvp, getRsvpStats, listDokumentasi } from "@/lib/store";
 import { rupiah, tanggalSingkat } from "@/lib/format";
 import AksiAdmin from "@/components/AksiAdmin";
 import LiveRefresh from "@/components/LiveRefresh";
 import TambahWarga from "@/components/TambahWarga";
 import TombolLogout from "@/components/TombolLogout";
+import FormTransaksi from "@/components/FormTransaksi";
+import FormDokumentasi from "@/components/FormDokumentasi";
 
 export const dynamic = "force-dynamic";
 
@@ -13,13 +15,14 @@ export const metadata = {
 };
 
 export default async function AdminPage() {
-  const [st, warga, transaksi, saran, rsvp, rsvpStat] = await Promise.all([
+  const [st, warga, transaksi, saran, rsvp, rsvpStat, dokumentasi] = await Promise.all([
     getStats(),
     listWarga(),
     listTransaksi({}),
     listSaran({ hanyaTampil: false }),
     listRsvp(),
     getRsvpStats(),
+    listDokumentasi(),
   ]);
   const belumLunas = warga.filter((w) => w.kupon?.status !== "lunas").length;
   const saranBaru = saran.filter((s) => !s.tampil).length;
@@ -64,6 +67,11 @@ export default async function AdminPage() {
       {/* tambah warga + generate kupon */}
       <div className="mt-8">
         <TambahWarga />
+      </div>
+
+      {/* catat transaksi */}
+      <div className="mt-8">
+        <FormTransaksi />
       </div>
 
       {/* warga & kupon */}
@@ -208,6 +216,34 @@ export default async function AdminPage() {
           </div>
         ))}
       </div>
+
+      {/* dokumentasi */}
+      <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
+        📷 Dokumentasi Kegiatan
+      </h2>
+      <FormDokumentasi />
+      {dokumentasi.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+          {dokumentasi.map((d) => (
+            <div key={d.id} className="kartu overflow-hidden">
+              <img src={d.foto_url} alt={d.judul} className="w-full aspect-[4/3] object-cover" />
+              <div className="p-2.5 flex items-start justify-between gap-2">
+                <p className="text-xs font-semibold text-zamrud-900 leading-snug">
+                  {d.judul}
+                </p>
+                <AksiAdmin
+                  url="/api/admin/dokumentasi"
+                  method="DELETE"
+                  body={{ id: d.id }}
+                  label="✕"
+                  merah
+                  tanya={`Hapus foto "${d.judul}"?`}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* konfirmasi kehadiran (RSVP) */}
       <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">

@@ -155,10 +155,38 @@ export async function listTransaksi({ tipe } = {}) {
   return data || [];
 }
 
-export async function tambahPengeluaran({ tanggal, jumlah, kategori, keterangan, buktiUrl }) {
+export async function tambahTransaksi({ tanggal, tipe, jumlah, kategori, keterangan, buktiUrl }) {
   await db().from("transaksi").insert({
-    tanggal, tipe: "keluar", jumlah, kategori, keterangan, bukti_url: buktiUrl || null,
+    tanggal, tipe, jumlah, kategori, keterangan, bukti_url: buktiUrl || null,
   });
+  return { ok: true };
+}
+
+// simpan berkas ke Supabase Storage (bucket publik "media")
+export async function simpanBerkas(namaFile, buffer, tipeMime) {
+  const { error } = await db()
+    .storage.from("media")
+    .upload(`berkas/${namaFile}`, buffer, { contentType: tipeMime, upsert: true });
+  if (error) throw new Error(`Gagal mengunggah berkas: ${error.message}`);
+  return {
+    url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/berkas/${namaFile}`,
+  };
+}
+
+// ----------------------- DOKUMENTASI -----------------------------
+
+export async function listDokumentasi() {
+  const { data } = await db().from("dokumentasi").select("*").order("created_at", { ascending: false });
+  return data || [];
+}
+
+export async function tambahDokumentasi({ judul, fotoUrl }) {
+  await db().from("dokumentasi").insert({ judul: judul?.trim() || "Kegiatan", foto_url: fotoUrl });
+  return { ok: true };
+}
+
+export async function hapusDokumentasi(id) {
+  await db().from("dokumentasi").delete().eq("id", id);
   return { ok: true };
 }
 

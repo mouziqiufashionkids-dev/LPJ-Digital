@@ -50,6 +50,7 @@ function buatDataDemo() {
     lokasi_acara: "Balai Warga & Masjid Al-Hikmah",
     tanggal_acara: "2026-09-05T08:00:00+07:00",
     kontak_wa: "628123456789", // nomor bendahara (format 62…)
+    kota_sholat: "Garut", // kota untuk jadwal sholat (metode Kemenag)
   };
 
   const warga = NAMA_WARGA.map((nama, i) => ({
@@ -164,6 +165,13 @@ function buatDataDemo() {
     { id: "r6", nama: "Warga (merantau)", rt: null, kehadiran: "berhalangan", jumlah_tamu: 0, catatan: "sedang di perantauan", created_at: "2026-08-27" },
   ];
 
+  // dokumentasi kegiatan (foto contoh — ganti dengan foto asli panitia)
+  const dokumentasi = [
+    { id: "d1", judul: "Latihan marhaban malam Jumat", foto_url: "/dokumentasi/demo-01.jpg" },
+    { id: "d2", judul: "Anak-anak belajar mengaji", foto_url: "/dokumentasi/demo-02.jpg" },
+    { id: "d3", judul: "Makan bersama persiapan Maulid", foto_url: "/dokumentasi/demo-03.jpg" },
+  ];
+
   return {
     pengaturan,
     warga,
@@ -172,6 +180,7 @@ function buatDataDemo() {
     kotakSaran,
     agenda,
     rsvp,
+    dokumentasi,
     idWargaBerikut: warga.length + 1,
     idKuponBerikut: kupon.length + 1,
     kodeAngkaBerikut: kupon.length + 1,
@@ -179,7 +188,7 @@ function buatDataDemo() {
 }
 
 // SATU instance untuk seluruh route (lihat penjelasan di atas)
-const VERSI_DEMO = 2; // naikkan saat struktur/isi data demo berubah
+const VERSI_DEMO = 3; // naikkan saat struktur/isi data demo berubah
 const S = (globalThis.__lpjDataDemo ??= buatDataDemo());
 // Saat kode diperbarui di dev (hot-reload), state lama mungkin berbentuk
 // lama — reset ke data terbaru jika versi berbeda:
@@ -326,17 +335,49 @@ export function listTransaksi({ tipe } = {}) {
   return [...rows].sort((a, b) => (a.tanggal < b.tanggal ? 1 : -1));
 }
 
-export function tambahPengeluaran({ tanggal, jumlah, kategori, keterangan, buktiUrl }) {
+export function tambahTransaksi({ tanggal, tipe, jumlah, kategori, keterangan, buktiUrl }) {
   S.transaksi.push({
     id: `t${S.transaksi.length + 1}`,
     tanggal,
-    tipe: "keluar",
+    tipe,
     jumlah,
     kategori,
     keterangan,
     bukti_url: buktiUrl || null,
     kupon_id: null,
   });
+  return { ok: true };
+}
+
+// simpan berkas (foto nota/dokumentasi) — mode demo: folder public/uploads
+export async function simpanBerkas(namaFile, buffer, tipeMime) {
+  const { mkdir, writeFile } = await import("node:fs/promises");
+  const path = await import("node:path");
+  const dir = path.join(process.cwd(), "public", "uploads");
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, namaFile), buffer);
+  return { url: `/uploads/${namaFile}` };
+}
+
+// ----------------------- DOKUMENTASI -----------------------------
+
+export function listDokumentasi() {
+  return [...S.dokumentasi];
+}
+
+export function tambahDokumentasi({ judul, fotoUrl }) {
+  S.dokumentasi.unshift({
+    id: `d${Date.now()}`,
+    judul: judul?.trim() || "Kegiatan",
+    foto_url: fotoUrl,
+  });
+  return { ok: true };
+}
+
+export function hapusDokumentasi(id) {
+  const i = S.dokumentasi.findIndex((d) => d.id === id);
+  if (i === -1) return { ok: false, pesan: "Tidak ditemukan" };
+  S.dokumentasi.splice(i, 1);
   return { ok: true };
 }
 
