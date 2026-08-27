@@ -38,6 +38,8 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
     **Sponsor** (nominal bebas) — nominal otomatis dari kelas
   - `/admin/kupon`: **cetak kupon per kelas atau khusus sponsor** (desain
     emas, dicetak terpisah) — A4, 10 kupon/lembar, QR per kupon
+  - Tombol **🔧 Perbaiki kupon hilang** di halaman kupon — membuatkan
+    kupon untuk warga yang belum punya (aman diklik kapan pun)
   - Tombol **WA kirim proposal** ke setiap sponsor (tautan otomatis
     ter-personalisasi)
   - `/admin/pengaturan`: **⚙ Pengaturan Web** — panitia mengedit sendiri:
