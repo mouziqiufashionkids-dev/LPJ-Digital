@@ -40,8 +40,11 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
     emas, dicetak terpisah) — A4, 10 kupon/lembar, QR per kupon
   - Tombol **WA kirim proposal** ke setiap sponsor (tautan otomatis
     ter-personalisasi)
-  - Catat transaksi + upload foto nota, upload dokumentasi galeri,
-    tandai kupon lunas, moderasi saran, rekap RSVP
+  - `/admin/pengaturan`: **⚙ Pengaturan Web** — panitia mengedit sendiri:
+    nama masjid/kegiatan, tanggal, **nomor WA bendahara**, **rekening & QRIS
+    donasi**, kota jadwal sholat, plus **semua kalimat utama** di tiap
+    halaman (pembuka beranda, isi undangan, teks proposal sponsor, footer,
+    dll) dengan placeholder `{masjid}`/`{kegiatan}` otomatis
 
 ## Beralih ke data sungguhan (Supabase — gratis)
 

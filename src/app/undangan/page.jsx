@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { getSettings, listAgenda, listRsvp, getRsvpStats } from "@/lib/store";
+import { getSettings, listAgenda, listRsvp, getRsvpStats, getKonten } from "@/lib/store";
 import { hariTanggalID, jamID, tanggalSingkat } from "@/lib/format";
+import { isi } from "@/lib/konten";
 import Logo from "@/components/Logo";
 import Countdown from "@/components/Countdown";
 import LiveRefresh from "@/components/LiveRefresh";
@@ -13,11 +14,12 @@ export const metadata = {
 };
 
 export default async function UndanganPage() {
-  const [s, agenda, semua, stat] = await Promise.all([
+  const [s, agenda, semua, stat, K] = await Promise.all([
     getSettings(),
     listAgenda(),
     listRsvp(),
     getRsvpStats(),
+    getKonten(),
   ]);
   // daftar publik: hanya yang hadir / belum pasti (tanpa catatan pribadi)
   const calonTamu = semua.filter((r) => r.kehadiran !== "berhalangan");
@@ -51,10 +53,7 @@ export default async function UndanganPage() {
 
         <div className="p-6 md:p-8 bg-krem/60">
           <p className="text-center text-zamrud-900/80 leading-relaxed max-w-xl mx-auto">
-            Dengan memohon rahmat dan ridha Allah ﷻ, {s.nama_masjid} mengundang
-            seluruh warga lingkungan untuk hadir dan menghadiri rangkaian
-            peringatan Maulid Nabi ﷺ. Kehadiran Anda adalah doa dan dukungan
-            terbaik untuk kebersamaan kita.
+            {isi(K["undangan.teks"], s)}
           </p>
         </div>
       </div>

@@ -9,6 +9,7 @@
 // Untuk data sungguhan: isi .env (lihat .env.example) dan jalankan
 // supabase/schema.sql — aplikasi otomatis beralih ke Supabase.
 // ===================================================================
+import { KONTEN_DEFAULT } from "./konten";
 
 const HARI_DEMO = [
   "2026-08-20", "2026-08-21", "2026-08-21", "2026-08-22", "2026-08-22",
@@ -187,6 +188,9 @@ const warga = NAMA_WARGA.map((nama, i) => ({
     { id: "d3", judul: "Makan bersama persiapan Maulid", foto_url: "/dokumentasi/demo-03.jpg" },
   ];
 
+  // teks halaman yang diedit panitia (kunci -> teks pengganti)
+  const konten = {};
+
   return {
     pengaturan,
     warga,
@@ -196,6 +200,7 @@ const warga = NAMA_WARGA.map((nama, i) => ({
     agenda,
     rsvp,
     dokumentasi,
+    konten,
     idWargaBerikut: warga.length + 1,
     idKuponBerikut: kupon.length + 1,
     kodeAngkaBerikut: kupon.length + 1,
@@ -203,7 +208,7 @@ const warga = NAMA_WARGA.map((nama, i) => ({
 }
 
 // SATU instance untuk seluruh route (lihat penjelasan di atas)
-const VERSI_DEMO = 5; // naikkan saat struktur/isi data demo berubah
+const VERSI_DEMO = 6; // naikkan saat struktur/isi data demo berubah
 const S = (globalThis.__lpjDataDemo ??= buatDataDemo());
 // Saat kode diperbarui di dev (hot-reload), state lama mungkin berbentuk
 // lama — reset ke data terbaru jika versi berbeda:
@@ -414,6 +419,38 @@ export function hapusDokumentasi(id) {
   const i = S.dokumentasi.findIndex((d) => d.id === id);
   if (i === -1) return { ok: false, pesan: "Tidak ditemukan" };
   S.dokumentasi.splice(i, 1);
+  return { ok: true };
+}
+
+// ------------------- PENGATURAN & TEKS ---------------------
+
+export function simpanPengaturan(patch = {}) {
+  const boleh = [
+    "nama_masjid", "nama_kegiatan", "hijriah", "penyelenggara",
+    "penyelenggara_singkat", "lokasi_acara", "tanggal_acara",
+    "kontak_wa", "kota_sholat", "rekening_bank", "rekening_no",
+    "rekening_atas_nama", "qris_url",
+  ];
+  for (const k of boleh) {
+    if (patch[k] !== undefined) {
+      S.pengaturan[k] = typeof patch[k] === "string" ? patch[k].slice(0, 200) : patch[k];
+    }
+  }
+  return { ok: true };
+}
+
+export function getKonten() {
+  const hasil = {};
+  for (const [k, v] of Object.entries(KONTEN_DEFAULT)) {
+    hasil[k] = S.konten[k] ?? v.nilai;
+  }
+  return hasil;
+}
+
+export function simpanKonten(ubah = {}) {
+  for (const [k, v] of Object.entries(ubah)) {
+    if (k in KONTEN_DEFAULT) S.konten[k] = String(v ?? "").slice(0, 2000);
+  }
   return { ok: true };
 }
 

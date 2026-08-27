@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { getSettings, getStats, listAgenda } from "@/lib/store";
+import { getSettings, getStats, listAgenda, getKonten } from "@/lib/store";
 import { rupiah, hariTanggalID, jamID } from "@/lib/format";
+import { isi } from "@/lib/konten";
 import Logo from "@/components/Logo";
 import ProposalCta from "@/components/ProposalCta";
 
@@ -12,7 +13,9 @@ export const metadata = {
 
 export default async function ProposalPage({ searchParams }) {
   const untuk = (searchParams?.untuk || "").trim().slice(0, 80) || null;
-  const [s, st, agenda] = await Promise.all([getSettings(), getStats(), listAgenda()]);
+  const [s, st, agenda, K] = await Promise.all([getSettings(), getStats(), listAgenda(), getKonten()]);
+  const sapaan = untuk ? `Bapak/Ibu ${untuk}. ` : "";
+  const ekstra = { sapaan };
 
   return (
     <main className="min-h-screen bg-krem pb-24">
@@ -48,20 +51,10 @@ export default async function ProposalPage({ searchParams }) {
         <section className="kartu p-6 md:p-8 -mt-8 relative z-10">
           <p className="text-right font-judul text-xl text-emas-gelap">﷽</p>
           <p className="text-sm leading-relaxed text-zamrud-900/85 mt-4">
-            Assalamu&rsquo;alaikum warahmatullahi wabarakatuh{untuk ? `, Bapak/Ibu ${untuk}` : ""}.
-            Puji syukur ke hadirat Allah ﷻ, dan shalawat bagi Nabi Muhammad ﷺ.
-            Dalam rangka memperingati hari kelahiran Rasulullah ﷺ,{" "}
-            <strong>{s.nama_masjid}</strong> bersama warga akan menyelenggarakan
-            peringatan {s.nama_kegiatan} — kegiatan yang insya Allah menjadi
-            sarana silaturahmi, syiar, dan pendidikan akhlak bagi anak-anak dan
-            warga sekitar.
+            {isi(K["proposal.salam"], s, ekstra)}
           </p>
           <p className="text-sm leading-relaxed text-zamrud-900/85 mt-3">
-            Kegiatan ini sepenuhnya digotong bersama warga melalui iuran{" "}
-            <em>ancalah</em>. Namun agar kegiatan berjalan lebih baik — konsumsi
-            jamaah, hadiah anak-anak, santunan, dan perlengkapan acara — kami
-            mengharapkan dukungan para <strong>dermawan</strong> seperti Anda.
-            Sedikit atau banyak, insya Allah berlipat pahalanya.
+            {isi(K["proposal.ajakan"], s, ekstra)}
           </p>
         </section>
 
@@ -125,11 +118,12 @@ export default async function ProposalPage({ searchParams }) {
             🤲 Titik yang Membutuhkan Dukungan
           </h2>
           <div className="kartu p-6 space-y-2.5 text-sm text-zamrud-900/85">
-            <p>🍚 Konsumsi jamaah &amp; panitia (makan bersama ratusan warga)</p>
-            <p>🎁 Hadiah perlombaan &amp; pengajian anak-anak</p>
-            <p>🤲 Santunan anak yatim &amp; warga dhuafa</p>
-            <p>🎪 Dekorasi, tenda, &amp; perlengkapan panggung</p>
-            <p>📖 Kitab, mukena, &amp; keperluan majelis</p>
+            {String(K["proposal.kebutuhan"] || "")
+              .split("\n")
+              .filter(Boolean)
+              .map((baris, i) => (
+                <p key={i}>{isi(baris, s, ekstra)}</p>
+              ))}
           </div>
           <p className="text-xs text-zamrud-900/60 mt-2">
             Boleh dukungan berupa dana maupun barang — semua dicatat amanah dan
@@ -143,11 +137,7 @@ export default async function ProposalPage({ searchParams }) {
             ✨ Keistimewaan Mendukung Maulid Nabi ﷺ
           </h2>
           <p className="text-sm text-zamrud-900/80 mt-2 leading-relaxed">
-            Rasulullah ﷺ bersabda: <em>&ldquo;Barangsiapa menghidupkan sunnahku
-            yang telah mati di tengah umatku, maka baginya pahala seperti pahala
-            seratus orang mati syahid.&rdquo;</em> Dukungan Anda ikut menghidupkan
-            syiar Islam di kampung kami — dan nama Anda akan disebut dalam doa
-            jamaah serta dicatat dalam laporan terbuka panitia.
+            {isi(K["proposal.keistimewaan"], s, ekstra)}
           </p>
         </section>
 

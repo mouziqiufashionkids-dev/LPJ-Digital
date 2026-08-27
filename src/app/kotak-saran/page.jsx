@@ -1,5 +1,6 @@
-import { listSaran } from "@/lib/store";
+import { getSettings, getKonten, listSaran } from "@/lib/store";
 import { tanggalSingkat } from "@/lib/format";
+import { isi } from "@/lib/konten";
 import SaranForm from "@/components/SaranForm";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +10,11 @@ export const metadata = {
 };
 
 export default async function KotakSaranPage() {
-  const daftar = await listSaran({ hanyaTampil: true });
+  const [s, K, daftar] = await Promise.all([
+    getSettings(),
+    getKonten(),
+    listSaran({ hanyaTampil: true }),
+  ]);
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
@@ -17,8 +22,7 @@ export default async function KotakSaranPage() {
         📮 Kotak Saran Warga
       </h1>
       <p className="text-zamrud-900/70 mt-2">
-        Sampaikan saran, masukan, atau doa untuk kegiatan Maulid Nabi ﷺ.
-        Boleh anonim. Panitia membaca semuanya.
+        {isi(K["kotaksaran.deskripsi"], s)}
       </p>
 
       <div className="mt-8">

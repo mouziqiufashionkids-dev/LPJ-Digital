@@ -204,6 +204,12 @@ export default function AdminPage() {
           🛠️ Panel Panitia
         </h1>
         <div className="flex items-center gap-2">
+          <Link
+            href="/admin/pengaturan"
+            className="text-xs font-semibold bg-emas text-zamrud-900 hover:bg-emas-terang rounded-lg px-3 py-2 transition"
+          >
+            ⚙ Pengaturan Web
+          </Link>
           <button
             onClick={muatUlang}
             className="text-xs font-semibold bg-zamrud-50 text-zamrud-700 border border-zamrud-200 hover:bg-zamrud-100 rounded-lg px-3 py-2 transition"

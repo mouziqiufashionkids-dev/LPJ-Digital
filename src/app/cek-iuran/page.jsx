@@ -1,4 +1,5 @@
-import { getSettings } from "@/lib/store";
+import { getSettings, getKonten } from "@/lib/store";
+import { isi } from "@/lib/konten";
 import SearchIuran from "@/components/SearchIuran";
 
 export const dynamic = "force-dynamic";
@@ -8,15 +9,14 @@ export const metadata = {
 };
 
 export default async function CekIuranPage() {
-  const s = await getSettings();
+  const [s, K] = await Promise.all([getSettings(), getKonten()]);
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
       <h1 className="font-judul text-3xl font-bold text-zamrud-800">
         🔍 Cek Iuran Saya
       </h1>
       <p className="text-zamrud-900/70 mt-2">
-        Sudah bayar iuran {s.nama_kegiatan}? Pastikan sudah diterima dan tercatat
-        panitia. Cukup ketik nama — tanpa login, tanpa data pribadi.
+        {isi(K["cekiuran.deskripsi"], s)}
       </p>
 
       <div className="mt-8">

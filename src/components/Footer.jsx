@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { getSettings, mode } from "@/lib/store";
+import { getSettings, getKonten, mode } from "@/lib/store";
+import { isi } from "@/lib/konten";
 import CopyLink from "./CopyLink";
 
 export default async function Footer() {
-  const s = await getSettings();
+  const [s, K] = await Promise.all([getSettings(), getKonten()]);
   return (
     <footer className="no-print mt-16 bg-zamrud-900 text-krem/80">
       <div className="bg-ornamen">
@@ -29,12 +30,12 @@ export default async function Footer() {
                 WhatsApp Panitia
               </a>
             </p>
-            <p>Dikelola oleh panitia — orang-orang yang Anda kenal.</p>
+            <p>{isi(K["footer.tagline"], s)}</p>
             <CopyLink />
           </div>
           <div className="text-sm space-y-2">
             <p className="font-semibold text-krem">Transparansi</p>
-            <p>Setiap rupiah dicatat terbuka dan bisa dicek warga kapan saja.</p>
+            <p>{isi(K["footer.transparansi"], s)}</p>
             {mode === "demo" && (
               <p className="pill bg-krem/10 text-krem/70">⚙ Mode demo — data contoh</p>
             )}

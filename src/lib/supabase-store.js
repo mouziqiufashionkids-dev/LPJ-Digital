@@ -3,6 +3,7 @@
 // Skema tabel: lihat supabase/schema.sql
 // ===================================================================
 import { createClient } from "@supabase/supabase-js";
+import { KONTEN_DEFAULT } from "./konten";
 
 let _db = null;
 function db() {
@@ -212,6 +213,49 @@ export async function tambahDokumentasi({ judul, fotoUrl }) {
 
 export async function hapusDokumentasi(id) {
   await db().from("dokumentasi").delete().eq("id", id);
+  return { ok: true };
+}
+
+// ------------------- PENGATURAN & TEKS ---------------------
+
+export async function simpanPengaturan(patch = {}) {
+  const boleh = [
+    "nama_masjid", "nama_kegiatan", "hijriah", "penyelenggara",
+    "penyelenggara_singkat", "lokasi_acara", "tanggal_acara",
+    "kontak_wa", "kota_sholat", "rekening_bank", "rekening_no",
+    "rekening_atas_nama", "qris_url",
+  ];
+  const bersih = {};
+  for (const k of boleh) {
+    if (patch[k] !== undefined) {
+      bersih[k] = typeof patch[k] === "string" ? patch[k].slice(0, 200) : patch[k];
+    }
+  }
+  if (Object.keys(bersih).length) {
+    await db().from("pengaturan").update(bersih).eq("id", 1);
+  }
+  return { ok: true };
+}
+
+export async function getKonten() {
+  const { data } = await db().from("konten").select("kunci,nilai");
+  const hasil = {};
+  for (const [k, v] of Object.entries(KONTEN_DEFAULT)) {
+    hasil[k] = v.nilai;
+  }
+  for (const baris of data || []) {
+    if (baris.kunci in hasil) hasil[baris.kunci] = baris.nilai;
+  }
+  return hasil;
+}
+
+export async function simpanKonten(ubah = {}) {
+  const baris = Object.entries(ubah)
+    .filter(([k]) => k in KONTEN_DEFAULT)
+    .map(([k, v]) => ({ kunci: k, nilai: String(v ?? "").slice(0, 2000) }));
+  if (baris.length) {
+    await db().from("konten").upsert(baris, { onConflict: "kunci" });
+  }
   return { ok: true };
 }
 

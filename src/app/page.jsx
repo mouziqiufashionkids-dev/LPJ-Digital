@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { getSettings, getStats, listTransaksi, listDokumentasi } from "@/lib/store";
+import { getSettings, getStats, listTransaksi, listDokumentasi, getKonten } from "@/lib/store";
 import { rupiah, tanggalID, tanggalSingkat } from "@/lib/format";
+import { isi } from "@/lib/konten";
 import ProgressBar from "@/components/ProgressBar";
 import StatCard from "@/components/StatCard";
 import Countdown from "@/components/Countdown";
@@ -12,11 +13,12 @@ import FotoGaleri from "@/components/FotoGaleri";
 export const dynamic = "force-dynamic";
 
 export default async function Beranda() {
-  const [s, st, keluar, dokumentasi] = await Promise.all([
+  const [s, st, keluar, dokumentasi, K] = await Promise.all([
     getSettings(),
     getStats(),
     listTransaksi({ tipe: "keluar" }),
     listDokumentasi(),
+    getKonten(),
   ]);
   const terbaru = keluar.slice(0, 5);
 
@@ -36,9 +38,7 @@ export default async function Beranda() {
             {s.nama_kegiatan}
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-krem/85 text-lg">
-            Assalamu&rsquo;alaikum warahmatullahi wabarakatuh. Laporan iuran dan
-            kas kegiatan <strong className="text-krem">{s.penyelenggara_singkat}</strong> —
-            setiap rupiah tercatat terbuka dan bisa dicek warga kapan saja.
+            {isi(K["beranda.pembuka"], s)}
           </p>
           <p className="text-sm text-krem/60 mt-2">
             {tanggalID(s.tanggal_acara)} · {s.lokasi_acara}
@@ -204,20 +204,12 @@ export default async function Beranda() {
             🛡️ Ini web resmi panitia — bukan penipuan
           </h2>
           <ul className="mt-3 space-y-2 text-sm text-zamrud-900/80 list-disc pl-5">
-            <li>Web resmi dikelola panitia {s.nama_masjid} — tautan disebar langsung pengurus di grup WhatsApp resmi RT/RW.</li>
-            <li>Dikelola oleh panitia kegiatan — orang-orang yang Anda kenal di lingkungan sendiri.</li>
-            <li>
-              Masih ragu? Hubungi bendahara langsung:{" "}
-              <a
-                href={`https://wa.me/${s.kontak_wa}`}
-                target="_blank"
-                rel="noreferrer"
-                className="font-semibold underline text-zamrud-700"
-              >
-                chat WhatsApp panitia
-              </a>
-              .
-            </li>
+            {String(K["beranda.verifikasi"] || "")
+              .split("\n")
+              .filter(Boolean)
+              .map((baris, i) => (
+                <li key={i}>{isi(baris, s)}</li>
+              ))}
           </ul>
         </div>
       </section>
