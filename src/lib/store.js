@@ -26,6 +26,7 @@ export const listDokumentasi = impl.listDokumentasi;
 export const tambahDokumentasi = impl.tambahDokumentasi;
 export const hapusDokumentasi = impl.hapusDokumentasi;
 export const simpanPengaturan = impl.simpanPengaturan;
+export const simpanAgenda = impl.simpanAgenda;
 export const getKonten = impl.getKonten;
 export const simpanKonten = impl.simpanKonten;
 export const kirimSaran = impl.kirimSaran;

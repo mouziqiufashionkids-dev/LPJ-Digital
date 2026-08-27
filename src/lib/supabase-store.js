@@ -237,6 +237,21 @@ export async function simpanPengaturan(patch = {}) {
   return { ok: true };
 }
 
+export async function simpanAgenda(daftar = []) {
+  const bersih = (Array.isArray(daftar) ? daftar : [])
+    .filter((a) => a && String(a.judul || "").trim())
+    .slice(0, 50)
+    .map((a) => ({
+      waktu: String(a.waktu || "").trim().slice(0, 20) || null,
+      judul: String(a.judul || "").trim().slice(0, 100),
+      lokasi: String(a.lokasi || "").trim().slice(0, 100) || null,
+      keterangan: String(a.keterangan || "").trim().slice(0, 160) || null,
+    }));
+  await db().from("agenda").delete().gt("id", 0);
+  if (bersih.length) await db().from("agenda").insert(bersih);
+  return { ok: true };
+}
+
 export async function getKonten() {
   const { data } = await db().from("konten").select("kunci,nilai");
   const hasil = {};

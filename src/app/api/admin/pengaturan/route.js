@@ -1,15 +1,20 @@
-import { getSettings, getKonten, simpanPengaturan, simpanKonten, mode } from "@/lib/store";
+import { getSettings, getKonten, simpanPengaturan, simpanKonten, simpanAgenda, listAgenda, mode } from "@/lib/store";
 import { KONTEN_DEFAULT } from "@/lib/konten";
 
 export const dynamic = "force-dynamic";
 
-// GET: pengaturan + teks saat ini + daftar kunci teks yang bisa diedit
+// GET: pengaturan + teks + agenda saat ini
 export async function GET() {
-  const [pengaturan, konten] = await Promise.all([getSettings(), getKonten()]);
+  const [pengaturan, konten, agenda] = await Promise.all([
+    getSettings(),
+    getKonten(),
+    listAgenda(),
+  ]);
   return Response.json({
     mode,
     pengaturan,
     konten,
+    agenda,
     daftar: Object.entries(KONTEN_DEFAULT).map(([kunci, v]) => ({
       kunci,
       label: v.label,
@@ -67,6 +72,9 @@ export async function POST(request) {
 
   if (Object.keys(bersih).length) {
     await simpanPengaturan(bersih);
+  }
+  if (Array.isArray(body?.agenda)) {
+    await simpanAgenda(body.agenda);
   }
   if (body?.konten && typeof body.konten === "object") {
     await simpanKonten(body.konten);

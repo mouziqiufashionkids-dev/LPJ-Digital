@@ -37,6 +37,7 @@ const KOLOM_KONTAK = [
 export default function PengaturanPage() {
   const [p, setP] = useState(null); // pengaturan
   const [konten, setKonten] = useState(null); // teks
+  const [agenda, setAgenda] = useState([]); // rundown
   const [proses, setProses] = useState(false);
   const [sukses, setSukses] = useState("");
   const [gagal, setGagal] = useState("");
@@ -53,11 +54,39 @@ export default function PengaturanPage() {
         const d = await r.json();
         setP(d.pengaturan);
         setKonten(d.konten);
+        setAgenda(
+          (d.agenda || []).map((a) => ({
+            waktu: a.waktu || "",
+            judul: a.judul || "",
+            lokasi: a.lokasi || "",
+            keterangan: a.keterangan || "",
+          }))
+        );
       } catch {
         setGagal("Gagal memuat pengaturan — muat ulang halaman.");
       }
     })();
   }, []);
+
+  // ---- alat bantu rundown ----
+  function ubahBaris(i, kolom, nilai) {
+    setAgenda((d) => d.map((b, x) => (x === i ? { ...b, [kolom]: nilai } : b)));
+  }
+  function tambahBaris() {
+    setAgenda((d) => [...d, { waktu: "", judul: "", lokasi: "", keterangan: "" }]);
+  }
+  function hapusBaris(i) {
+    setAgenda((d) => d.filter((_, x) => x !== i));
+  }
+  function pindah(i, arah) {
+    setAgenda((d) => {
+      const j = i + arah;
+      if (j < 0 || j >= d.length) return d;
+      const baru = [...d];
+      [baru[i], baru[j]] = [baru[j], baru[i]];
+      return baru;
+    });
+  }
 
   const grupKonten = useMemo(() => {
     const grup = {};
@@ -79,6 +108,7 @@ export default function PengaturanPage() {
         body: JSON.stringify({
           pengaturan: { ...p, tanggal_acara: p.tanggal_acara },
           konten,
+          agenda,
         }),
       });
       const d = await r.json();
@@ -145,6 +175,69 @@ export default function PengaturanPage() {
       </p>
 
       <form onSubmit={simpan} className="mt-8 space-y-8">
+        {/* rangkaian kegiatan (rundown) */}
+        <section className="kartu p-5 md:p-6">
+          <h2 className="font-judul text-xl font-bold text-zamrud-800">
+            🕌 Rangkaian Kegiatan (Rundown)
+          </h2>
+          <p className="text-xs text-zamrud-900/60 mt-1">
+            Susunan acara yang tampil di halaman Undangan &amp; Proposal.
+            Gunakan ↑↓ untuk menggeser urutan. Baris tanpa judul otomatis
+            dibuang saat disimpan.
+          </p>
+          <div className="space-y-3 mt-4">
+            {agenda.map((b, i) => (
+              <div key={i} className="rounded-xl border border-zamrud-100 bg-zamrud-50/40 p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    className="w-28 px-3 py-2 rounded-lg border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    placeholder="08.00 WIB"
+                    value={b.waktu}
+                    maxLength={20}
+                    onChange={(e) => ubahBaris(i, "waktu", e.target.value)}
+                  />
+                  <input
+                    className="flex-1 min-w-[160px] px-3 py-2 rounded-lg border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm font-semibold"
+                    placeholder="Judul acara (mis. Marhaban & Maulid Ad-Diba'i)"
+                    value={b.judul}
+                    maxLength={100}
+                    onChange={(e) => ubahBaris(i, "judul", e.target.value)}
+                  />
+                  <button type="button" onClick={() => pindah(i, -1)} title="Naik"
+                    className="h-9 w-9 rounded-lg border border-zamrud-200 text-zamrud-700 hover:bg-zamrud-100">↑</button>
+                  <button type="button" onClick={() => pindah(i, 1)} title="Turun"
+                    className="h-9 w-9 rounded-lg border border-zamrud-200 text-zamrud-700 hover:bg-zamrud-100">↓</button>
+                  <button type="button" onClick={() => hapusBaris(i)} title="Hapus baris"
+                    className="h-9 w-9 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200">✕</button>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-2 mt-2">
+                  <input
+                    className="px-3 py-2 rounded-lg border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    placeholder="Lokasi (opsional, mis. Masjid)"
+                    value={b.lokasi}
+                    maxLength={100}
+                    onChange={(e) => ubahBaris(i, "lokasi", e.target.value)}
+                  />
+                  <input
+                    className="px-3 py-2 rounded-lg border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    placeholder="Keterangan (opsional, mis. dipimpin majelis taklim)"
+                    value={b.keterangan}
+                    maxLength={160}
+                    onChange={(e) => ubahBaris(i, "keterangan", e.target.value)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={tambahBaris}
+            className="tombol border-2 border-zamrud-600 text-zamrud-700 hover:bg-zamrud-50 text-xs px-4 py-2.5 mt-4"
+          >
+            + Tambah Acara
+          </button>
+        </section>
+
         {/* identitas & acara */}
         <section className="kartu p-5 md:p-6">
           <h2 className="font-judul text-xl font-bold text-zamrud-800">

@@ -439,6 +439,20 @@ export function simpanPengaturan(patch = {}) {
   return { ok: true };
 }
 
+export function simpanAgenda(daftar = []) {
+  S.agenda = (Array.isArray(daftar) ? daftar : [])
+    .filter((a) => a && String(a.judul || "").trim())
+    .slice(0, 50)
+    .map((a, i) => ({
+      id: i + 1,
+      waktu: String(a.waktu || "").trim().slice(0, 20),
+      judul: String(a.judul || "").trim().slice(0, 100),
+      lokasi: String(a.lokasi || "").trim().slice(0, 100),
+      keterangan: String(a.keterangan || "").trim().slice(0, 160),
+    }));
+  return { ok: true };
+}
+
 export function getKonten() {
   const hasil = {};
   for (const [k, v] of Object.entries(KONTEN_DEFAULT)) {
