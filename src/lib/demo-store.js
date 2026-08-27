@@ -535,3 +535,9 @@ export function hapusRsvp(id) {
   S.rsvp.splice(i, 1);
   return { ok: true };
 }
+
+// mode demo: kupon selalu terbentuk saat warga ditambah — tak ada yg diperbaiki
+export async function perbaikiKupon() {
+  return { ok: true, dibuat: 0, kurang: 0 };
+}
+

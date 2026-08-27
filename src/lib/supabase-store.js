@@ -24,6 +24,60 @@ function db() {
   return _db;
 }
 
+// -------------------------------------------------------------------
+// BANTUAN TAHAN-BANTING (diperbaiki 2026-08-27)
+// Database produksi ternyata bisa beda tipis dari skema contoh:
+//  - kolom `aktif` tidak ada / tidak terisi
+//  - relasi kupon-warga tidak dikenali PostgREST (skema cache lama)
+//  - kupon dikembalikan sebagai ARRAY (relasi 1-ke-banyak), padahal
+//    kode lain mengharapkan SATU objek (atau null)
+// Semua dibikin otomatis menyesuaikan di bawah, tanpa perlu mengubah
+// database manual.
+// -------------------------------------------------------------------
+
+// PostgREST mengembalikan kupon sebagai array utk relasi ke-banyak.
+// Kode lain (panel, halaman cetak, cek-iuran) mengharapkan satu objek.
+function kuponTunggal(k) {
+  if (Array.isArray(k)) return k.length ? k[0] : null;
+  return k || null;
+}
+
+// Ambil baris warga: coba dengan filter `aktif` dulu; kalau kolomnya
+// tidak ada di database, ulangi TANPA filter (data tetap muncul).
+function ambilWarga(select, pakaiAktif) {
+  const q = db().from("warga").select(select);
+  if (pakaiAktif) q.eq("aktif", true);
+  return q;
+}
+
+// Coba jalankan query; kalau gagal (kolom/relasi hilang), ulangi tanpa
+// filter aktif. Mengembalikan { data, error } hasil terbaik.
+async function cobaQueryWarga(select, pakaiAktif = true) {
+  const r1 = await ambilWarga(select, pakaiAktif);
+  if (!r1.error) return r1;
+  if (pakaiAktif) {
+    const r2 = await ambilWarga(select, false);
+    if (!r2.error) return r2;
+  }
+  return r1; // error asli — pemanggil yang memutuskan
+}
+
+// Lampirkan kupon ke daftar warga dengan query terpisah (dipakai saat
+// relasi `kupon(*)` tidak dikenali database).
+async function lampirkanKuponManual(daftar) {
+  const ids = (daftar || []).map((w) => w.id);
+  if (!ids.length) return [];
+  const { data: kupons } = await db()
+    .from("kupon")
+    .select("warga_id,kode,status,tanggal_bayar,metode,petugas,nominal")
+    .in("warga_id", ids);
+  const peta = new Map((kupons || []).map((k) => [String(k.warga_id), k]));
+  return (daftar || []).map((w) => ({
+    ...w,
+    kupon: peta.get(String(w.id)) || null,
+  }));
+}
+
 export async function getSettings() {
   const { data } = await db().from("pengaturan").select("*").eq("id", 1).single();
   return (
@@ -47,7 +101,7 @@ export async function getSettings() {
 
 export async function getStats() {
   const [{ data: w }, { data: t }, { data: kp }] = await Promise.all([
-    db().from("warga").select("ancalah").eq("aktif", true),
+    cobaQueryWarga("ancalah"),
     db().from("transaksi").select("tipe,jumlah"),
     db().from("kupon").select("status"),
   ]);
@@ -71,12 +125,16 @@ export async function getStats() {
 }
 
 export async function listWarga() {
-  const { data } = await db()
-    .from("warga")
-    .select("*, kupon(*)")
-    .eq("aktif", true)
-    .order("nama");
-  return data || [];
+  // Jalur 1: satu query dengan relasi kupon (paling cepat, skema lengkap)
+  const r1 = await cobaQueryWarga("*, kupon(*)");
+  if (!r1.error) {
+    return (r1.data || []).map((w) => ({ ...w, kupon: kuponTunggal(w.kupon) }));
+  }
+  // Jalur 2: relasi tidak dikenali database -> dua query, digabung manual
+  const r2 = await cobaQueryWarga("*");
+  if (r2.error) return [];
+  const daftar = await lampirkanKuponManual(r2.data || []);
+  return daftar.sort((a, b) => String(a.nama || "").localeCompare(String(b.nama || ""), "id"));
 }
 
 export async function cariWarga(q) {
@@ -85,25 +143,63 @@ export async function cariWarga(q) {
   // pencarian lewat kode kupon (dari QR kupon cetak)
   if (/^mld-?\d{1,6}$/i.test(norm)) {
     const kode = `MLD-${String(norm.replace(/^mld-?/i, "")).padStart(4, "0")}`;
-    const { data: k } = await db()
+    const { data: k, error } = await db()
       .from("kupon")
       .select("kode,status,tanggal_bayar,warga(id,nama,rt,ancalah)")
       .eq("kode", kode)
       .maybeSingle();
-    if (!k?.warga) return [];
+    if (!error && k?.warga) {
+      return [{
+        id: k.warga.id, nama: k.warga.nama, rt: k.warga.rt,
+        nominal: k.warga.ancalah, status: k.status,
+        tanggal_bayar: k.tanggal_bayar, kode: k.kode,
+      }];
+    }
+    // jalur 2 (relasi tidak dikenali): dua query terpisah
+    const k2 = await db()
+      .from("kupon")
+      .select("kode,status,tanggal_bayar,warga_id")
+      .eq("kode", kode)
+      .maybeSingle();
+    if (k2.error || !k2.data?.warga_id) return [];
+    const w2 = await db()
+      .from("warga")
+      .select("id,nama,rt,ancalah")
+      .eq("id", k2.data.warga_id)
+      .maybeSingle();
+    if (w2.error || !w2.data) return [];
     return [{
-      id: k.warga.id, nama: k.warga.nama, rt: k.warga.rt,
-      nominal: k.warga.ancalah, status: k.status,
-      tanggal_bayar: k.tanggal_bayar, kode: k.kode,
+      id: w2.data.id, nama: w2.data.nama, rt: w2.data.rt,
+      nominal: w2.data.ancalah, status: k2.data.status,
+      tanggal_bayar: k2.data.tanggal_bayar, kode: k2.data.kode,
     }];
   }
   if (norm.length < 2) return [];
-  const { data } = await db()
+  const { data, error } = await db()
     .from("warga")
     .select("id,nama,rt,ancalah,kupon(kode,status,tanggal_bayar)")
     .ilike("nama", `%${norm}%`)
     .limit(8);
-  return (data || []).map((w) => ({
+  if (!error) {
+    return (data || []).map((w) => {
+      const k = kuponTunggal(w.kupon);
+      return {
+        id: w.id, nama: w.nama, rt: w.rt, nominal: w.ancalah,
+        status: k?.status ?? "belum",
+        tanggal_bayar: k?.tanggal_bayar ?? null,
+        kode: k?.kode ?? null,
+      };
+    });
+  }
+  // jalur 2: query warga, lalu lampirkan kupon manual
+  const w2 = await db()
+    .from("warga")
+    .select("id,nama,rt,ancalah")
+    .ilike("nama", `%${norm}%`)
+    .limit(8);
+  if (w2.error) return [];
+  const daftar = await lampirkanKuponManual(w2.data || []);
+  return daftar.map((w) => ({
     id: w.id, nama: w.nama, rt: w.rt, nominal: w.ancalah,
     status: w.kupon?.status ?? "belum",
     tanggal_bayar: w.kupon?.tanggal_bayar ?? null,
@@ -151,24 +247,66 @@ export async function tambahWargaBatch(rows) {
     nominal: w.ancalah,
     status: "belum",
   }));
-  await db().from("kupon").insert(kuponRows);
+  // PENTING: cek hasil insert kupon — kalau gagal diam-diam, warga
+  // masuk tapi kuponnya hilang (ini yang membuat halaman kupon kosong).
+  const { error: errKupon } = await db().from("kupon").insert(kuponRows);
+  let peringatan = null;
+  if (errKupon) {
+    // coba satu per satu — sebagian mungkin tetap bisa dibuat
+    let berhasil = 0;
+    for (const kr of kuponRows) {
+      const satu = await db().from("kupon").insert(kr);
+      if (!satu.error) berhasil++;
+    }
+    const gagal = kuponRows.length - berhasil;
+    if (gagal > 0) {
+      peringatan =
+        `Warga berhasil ditambah, tapi ${gagal} kupon belum terbentuk ` +
+        `(${errKupon.message}). Klik "Perbaiki kupon" di panel kupon.`;
+    }
+  }
   return {
     ok: true,
     ditambah: inserted.length,
     kupon: inserted.map((w, i) => ({ nama: w.nama, kode: kuponRows[i].kode, ancalah: w.ancalah })),
     dobel,
+    peringatan,
   };
 }
 
 export async function hapusWarga(id) {
+  // hapus kupon terkait dulu (aman walau tanpa relasi cascade di DB)
+  await db().from("kupon").delete().eq("warga_id", id);
   await db().from("warga").delete().eq("id", id);
   return { ok: true };
 }
 
 export async function tandaiLunas(wargaId, { tanggal, metode = "tunai", petugas = "Bendahara" } = {}) {
   const hari = tanggal || new Date().toISOString().slice(0, 10);
-  const { data: k } = await db().from("kupon").select("*").eq("warga_id", wargaId).single();
-  if (!k) return { ok: false, pesan: "Kupon tidak ditemukan" };
+  const { data: daftarK } = await db()
+    .from("kupon")
+    .select("*")
+    .eq("warga_id", wargaId)
+    .limit(1);
+  let k = daftarK?.[0] || null;
+  if (!k) {
+    // perbaiki otomatis: kupon belum ada (gagal dibuat saat tambah warga)
+    const w = await db().from("warga").select("id,nama,ancalah").eq("id", wargaId).maybeSingle();
+    if (!w?.data) return { ok: false, pesan: "Warga tidak ditemukan" };
+    const baru = await db()
+      .from("kupon")
+      .insert({
+        warga_id: wargaId,
+        kode: `MLD-${String(wargaId).padStart(4, "0")}`,
+        nominal: w.data.ancalah,
+        status: "belum",
+      })
+      .select();
+    if (baru.error || !baru.data?.length) {
+      return { ok: false, pesan: `Kupon tidak ditemukan (${baru.error?.message || "gagal dibuat"})` };
+    }
+    k = baru.data[0];
+  }
   if (k.status === "lunas") return { ok: false, pesan: "Kupon sudah lunas" };
   await db().from("kupon").update({ status: "lunas", tanggal_bayar: hari, metode, petugas }).eq("id", k.id);
   const { data: w } = await db().from("warga").select("*").eq("id", wargaId).single();
@@ -179,6 +317,27 @@ export async function tandaiLunas(wargaId, { tanggal, metode = "tunai", petugas 
     kupon_id: k.id,
   });
   return { ok: true };
+}
+
+// Perbaikan kupon: buatkan kupon utk setiap warga yg BELUM punya
+// (mis. insert kupon sebelumnya gagal diam-diam). Aman diulang kapan pun.
+export async function perbaikiKupon() {
+  const r = await cobaQueryWarga("*");
+  if (r.error || !r.data?.length) return { ok: true, dibuat: 0, kurang: 0 };
+  const { data: kupons } = await db().from("kupon").select("warga_id");
+  const punya = new Set((kupons || []).map((k) => String(k.warga_id)));
+  const kurang = r.data.filter((w) => !punya.has(String(w.id)));
+  let dibuat = 0;
+  for (const w of kurang) {
+    const { error } = await db().from("kupon").insert({
+      warga_id: w.id,
+      kode: `MLD-${String(w.id).padStart(4, "0")}`,
+      nominal: w.ancalah || 0,
+      status: "belum",
+    });
+    if (!error) dibuat++;
+  }
+  return { ok: true, dibuat, kurang: kurang.length - dibuat };
 }
 
 export async function listTransaksi({ tipe } = {}) {
