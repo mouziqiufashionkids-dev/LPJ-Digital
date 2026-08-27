@@ -18,10 +18,24 @@ const isi = Poppins({
 
 export async function generateMetadata() {
   const s = await getSettings();
+  const judul = `${s.nama_masjid} — Iuran & Laporan Terbuka`;
+  const deskripsi = `Laporan pertanggungjawaban digital ${s.nama_kegiatan} dari ${s.nama_masjid}: iuran ancalah, dana masuk & keluar realtime, terbuka untuk seluruh warga.`;
   return {
-    title: `${s.nama_masjid} — Iuran & Laporan Terbuka`,
-    description: `Laporan pertanggungjawaban digital ${s.nama_kegiatan} dari ${s.nama_masjid}: iuran ancalah, dana masuk & keluar realtime, terbuka untuk seluruh warga.`,
+    title: judul,
+    description: deskripsi,
     icons: { icon: "/logo-masjid.svg" },
+    openGraph: {
+      title: judul,
+      description: deskripsi,
+      type: "website",
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: judul }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: judul,
+      description: deskripsi,
+      images: ["/og-image.png"],
+    },
   };
 }
 
