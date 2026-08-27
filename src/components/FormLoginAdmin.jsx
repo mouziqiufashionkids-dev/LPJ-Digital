@@ -1,13 +1,14 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { simpanToken } from "@/lib/admin-auth";
+import { simpanToken, modePenyimpanan } from "@/lib/admin-auth";
 
-export default function FormLoginAdmin({ petunjuk }) {
+export default function FormLoginAdmin({ petunjuk, onSukses }) {
   const router = useRouter();
   const [sandi, setSandi] = useState("");
   const [proses, setProses] = useState(false);
   const [gagal, setGagal] = useState("");
+  const penyimpanan = typeof window !== "undefined" ? modePenyimpanan() : "browser";
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -23,9 +24,10 @@ export default function FormLoginAdmin({ petunjuk }) {
       const d = await r.json();
       if (!d.ok) throw new Error(d.pesan || "Sandi salah");
       simpanToken(d.token);
-      router.replace("/admin");
+      if (onSukses) onSukses();
+      else router.replace("/admin");
     } catch (err) {
-      setGagal(err.message || "Gagal masuk");
+      setGagal(err.message || "Gagal masuk — periksa koneksi");
       setProses(false);
     }
   }
@@ -60,8 +62,12 @@ export default function FormLoginAdmin({ petunjuk }) {
         {proses ? "Memeriksa…" : "Masuk"}
       </button>
 
+      <p className="text-[11px] text-zamrud-900/40 text-center mt-3">
+        Sesi disimpan via: {penyimpanan}
+        {penyimpanan === "memori-url" && " (mode preview — login ulang bila tab ditutup)"}
+      </p>
       {petunjuk && (
-        <p className="text-xs text-zamrud-900/50 text-center mt-4">{petunjuk}</p>
+        <p className="text-xs text-zamrud-900/50 text-center mt-2">{petunjuk}</p>
       )}
     </form>
   );

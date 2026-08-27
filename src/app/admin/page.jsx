@@ -40,13 +40,17 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    const ada = Boolean(ambilToken());
-    setPunyaToken(ada);
-    if (ada) muatUlang();
+    setPunyaToken(Boolean(ambilToken()));
+  }, []);
+
+  // muat data saat sesi tersedia / berubah
+  useEffect(() => {
+    if (!punyaToken) return;
+    muatUlang();
     const fn = () => muatUlang();
     window.addEventListener("lpj-admin-segar", fn);
     return () => window.removeEventListener("lpj-admin-segar", fn);
-  }, [muatUlang]);
+  }, [muatUlang, punyaToken]);
 
   // sedang memeriksa sesi
   if (punyaToken === null) {
@@ -57,11 +61,11 @@ export default function AdminPage() {
     );
   }
 
-  // belum login → tampilkan gerbang login
+  // belum login → login langsung di halaman ini (tanpa pindah halaman)
   if (!punyaToken) {
     return (
       <main className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-10">
-        <FormLoginAdmin />
+        <FormLoginAdmin onSukses={() => setPunyaToken(true)} />
         <Link href="/" className="text-sm text-zamrud-700 hover:underline mt-6">
           ← Kembali ke halaman warga
         </Link>

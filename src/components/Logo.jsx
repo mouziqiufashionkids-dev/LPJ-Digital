@@ -27,7 +27,7 @@ export default function Logo({ className = "h-9 w-9" }) {
     const n = klik.current.length;
     if (n >= 3) {
       setBerpindah(true);
-      router.push("/admin/login");
+      router.push("/admin");
       return;
     }
     setProgres(n);

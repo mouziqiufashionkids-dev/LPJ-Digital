@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ambilToken } from "@/lib/admin-auth";
 import { rupiah } from "@/lib/format";
 import TombolCetak from "@/components/TombolCetak";
+import FormLoginAdmin from "@/components/FormLoginAdmin";
 
 const FILTER_KELAS = [
   { id: "semua", label: "Semua Kelas" },
@@ -22,11 +23,13 @@ export default function KuponClient() {
   const [kelas, setKelas] = useState("semua");
   const [data, setData] = useState(null);
   const [galat, setGalat] = useState("");
+  const [perluLogin, setPerluLogin] = useState(false);
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     if (p.get("status")) setStatus(p.get("status"));
     if (p.get("kelas")) setKelas(p.get("kelas"));
+    if (!ambilToken()) setPerluLogin(true);
   }, []);
 
   const muat = useCallback(async () => {
@@ -36,7 +39,7 @@ export default function KuponClient() {
         { headers: { Authorization: `Bearer ${ambilToken() || ""}` }, credentials: "include" }
       );
       if (r.status === 401) {
-        setGalat("Sesi berakhir — silakan login ulang lewat klik logo 3× lalu kembali ke sini.");
+        setPerluLogin(true);
         setData(null);
         return;
       }
@@ -49,12 +52,9 @@ export default function KuponClient() {
   }, [status, kelas]);
 
   useEffect(() => {
-    if (!ambilToken()) {
-      setGalat("Sesi berakhir — silakan login ulang lewat klik logo 3× lalu kembali ke sini.");
-      return;
-    }
+    if (perluLogin) return;
     muat();
-  }, [muat]);
+  }, [muat, perluLogin]);
 
   function gantiFilter(param, nilai) {
     const p = new URLSearchParams(window.location.search);
@@ -69,6 +69,16 @@ export default function KuponClient() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
+      {/* gerbang login inline */}
+      {perluLogin ? (
+        <div className="min-h-[60vh] flex flex-col items-center justify-center">
+          <FormLoginAdmin onSukses={() => { setPerluLogin(false); muat(); }} />
+          <Link href="/admin" className="text-sm text-zamrud-700 hover:underline mt-6">
+            ← Panel utama
+          </Link>
+        </div>
+      ) : (
+      <>
       {/* toolbar — tidak ikut tercetak */}
       <div className="no-print">
         <div className="flex flex-wrap items-center gap-3">
@@ -210,6 +220,8 @@ export default function KuponClient() {
         <p className="kartu p-6 text-center text-zamrud-900/60 mt-6">
           Tidak ada kupon pada filter ini.
         </p>
+      )}
+      </>
       )}
     </main>
   );
