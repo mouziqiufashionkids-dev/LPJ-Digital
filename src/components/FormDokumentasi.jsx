@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { fetchAdmin, segarkanPanel } from "@/lib/admin-auth";
 
 export default function FormDokumentasi() {
-  const router = useRouter();
   const [judul, setJudul] = useState("");
   const [berkas, setBerkas] = useState(null);
   const [pratinjau, setPratinjau] = useState(null);
@@ -29,11 +28,11 @@ export default function FormDokumentasi() {
       const fd = new FormData();
       fd.set("judul", judul);
       fd.set("foto", berkas);
-      const r = await fetch("/api/admin/dokumentasi", { method: "POST", body: fd });
+      const r = await fetchAdmin("/api/admin/dokumentasi", { method: "POST", body: fd });
       const d = await r.json();
       if (!d.ok) throw new Error(d.pesan || "Gagal mengunggah");
       setJudul(""); setBerkas(null); setPratinjau(null);
-      router.refresh();
+      segarkanPanel();
     } catch (err) {
       setGagal(err.message || "Gagal mengunggah");
     } finally {

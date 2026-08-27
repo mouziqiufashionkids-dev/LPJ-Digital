@@ -1,31 +1,98 @@
+"use client";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { getStats, listWarga, listTransaksi, listSaran, listRsvp, getRsvpStats, listDokumentasi } from "@/lib/store";
+import { ambilToken, hapusToken } from "@/lib/admin-auth";
 import { rupiah, tanggalSingkat } from "@/lib/format";
 import AksiAdmin from "@/components/AksiAdmin";
-import LiveRefresh from "@/components/LiveRefresh";
 import TambahWarga from "@/components/TambahWarga";
 import TombolLogout from "@/components/TombolLogout";
 import FormTransaksi from "@/components/FormTransaksi";
 import FormDokumentasi from "@/components/FormDokumentasi";
+import FormLoginAdmin from "@/components/FormLoginAdmin";
 
-export const dynamic = "force-dynamic";
+export default function AdminPage() {
+  const [data, setData] = useState(null);
+  const [galat, setGalat] = useState("");
+  const [muat, setMuat] = useState(false);
+  const [punyaToken, setPunyaToken] = useState(null); // null = sedang dicek
 
-export const metadata = {
-  title: "Panel Panitia — LPJ Maulid Nabi",
-};
+  const muatUlang = useCallback(async () => {
+    setMuat(true);
+    try {
+      const r = await fetch("/api/admin/ikhtisar", {
+        headers: { Authorization: `Bearer ${ambilToken() || ""}` },
+        credentials: "include",
+      });
+      if (r.status === 401) {
+        hapusToken();
+        setPunyaToken(false);
+        setData(null);
+        return;
+      }
+      const d = await r.json();
+      setData(d);
+      setGalat("");
+    } catch {
+      setGalat("Gagal memuat data — periksa koneksi lalu muat ulang.");
+    } finally {
+      setMuat(false);
+    }
+  }, []);
 
-export default async function AdminPage() {
-  const [st, warga, transaksi, saran, rsvp, rsvpStat, dokumentasi] = await Promise.all([
-    getStats(),
-    listWarga(),
-    listTransaksi({}),
-    listSaran({ hanyaTampil: false }),
-    listRsvp(),
-    getRsvpStats(),
-    listDokumentasi(),
-  ]);
+  useEffect(() => {
+    const ada = Boolean(ambilToken());
+    setPunyaToken(ada);
+    if (ada) muatUlang();
+    const fn = () => muatUlang();
+    window.addEventListener("lpj-admin-segar", fn);
+    return () => window.removeEventListener("lpj-admin-segar", fn);
+  }, [muatUlang]);
+
+  // sedang memeriksa sesi
+  if (punyaToken === null) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <p className="text-zamrud-900/60 animate-pulse">Memeriksa sesi panitia…</p>
+      </main>
+    );
+  }
+
+  // belum login → tampilkan gerbang login
+  if (!punyaToken) {
+    return (
+      <main className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-10">
+        <FormLoginAdmin />
+        <Link href="/" className="text-sm text-zamrud-700 hover:underline mt-6">
+          ← Kembali ke halaman warga
+        </Link>
+      </main>
+    );
+  }
+
+  if (galat && !data) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-10">
+        <p className="kartu p-6 text-center text-rose-600">{galat}</p>
+        <button onClick={muatUlang} className="tombol bg-zamrud-600 text-white mx-auto block mt-4">
+          Muat Ulang
+        </button>
+      </main>
+    );
+  }
+
+  if (!data) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <p className="text-zamrud-900/60 animate-pulse">Memuat data panitia…</p>
+      </main>
+    );
+  }
+
+  const { stats: st, warga, transaksi, saran, rsvp, rsvpStat, dokumentasi, pengaturan: s } = data;
   const belumLunas = warga.filter((w) => w.kupon?.status !== "lunas").length;
-  const saranBaru = saran.filter((s) => !s.tampil).length;
+  const saranBaru = saran.filter((x) => !x.tampil).length;
+  const sponsor = warga.filter((w) => w.kelas === "sponsor");
+  const labelKelas = (k) => (k === "sponsor" ? "Sponsor" : `K${k || "3"}`);
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
@@ -33,18 +100,25 @@ export default async function AdminPage() {
         <h1 className="font-judul text-3xl font-bold text-zamrud-800">
           🛠️ Panel Panitia
         </h1>
-        <div className="flex items-center gap-3">
-          <LiveRefresh intervalMs={20000} />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={muatUlang}
+            className="text-xs font-semibold bg-zamrud-50 text-zamrud-700 border border-zamrud-200 hover:bg-zamrud-100 rounded-lg px-3 py-2 transition"
+          >
+            {muat ? "Memuat…" : "↻ Muat Ulang"}
+          </button>
           <TombolLogout />
         </div>
       </div>
 
       <div className="mt-4 rounded-2xl border border-zamrud-200 bg-zamrud-50 p-4 text-sm text-zamrud-900/80">
-        <strong>Panel dilindungi sandi.</strong> Halaman ini tidak ditautkan
-        dari situs warga — akses cepat lewat <strong>klik logo masjid 3×</strong>{" "}
-        di halaman mana pun. Sesi otomatis berakhir setelah 8 jam atau klik
-        <strong> Keluar</strong>. Catat pengeluaran + upload bukti foto
-        menyusul.
+        <strong>Panel dilindungi sandi.</strong> Akses cepat: klik logo masjid 3×
+        di halaman warga. Sesi 8 jam. {data.mode === "demo" && (
+          <span className="text-zamrud-900/60">
+            Mode demo aktif — sandi default{" "}
+            <code>alhikmah2026</code> (ubah lewat ADMIN_PASSWORD).
+          </span>
+        )}
       </div>
 
       {/* ringkasan */}
@@ -79,12 +153,20 @@ export default async function AdminPage() {
         <h2 className="font-judul text-2xl font-bold text-zamrud-800">
           🎟️ Warga & Kupon Ancalah
         </h2>
-        <Link
-          href="/admin/kupon"
-          className="tombol bg-emas text-zamrud-900 hover:bg-emas-terang text-xs px-4 py-2.5"
-        >
-          🖨️ Cetak Kupon ({belumLunas} belum dibagikan)
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/kupon?kelas=1" className="tombol bg-zamrud-50 text-zamrud-700 border border-zamrud-200 hover:bg-zamrud-100 text-xs px-3 py-2">
+            🖨️ Kupon Kelas 1
+          </Link>
+          <Link href="/admin/kupon?kelas=2" className="tombol bg-zamrud-50 text-zamrud-700 border border-zamrud-200 hover:bg-zamrud-100 text-xs px-3 py-2">
+            🖨️ Kelas 2
+          </Link>
+          <Link href="/admin/kupon?kelas=3" className="tombol bg-zamrud-50 text-zamrud-700 border border-zamrud-200 hover:bg-zamrud-100 text-xs px-3 py-2">
+            🖨️ Kelas 3
+          </Link>
+          <Link href="/admin/kupon?kelas=sponsor" className="tombol bg-emas text-zamrud-900 hover:bg-emas-terang text-xs px-3 py-2">
+            🖨️ Kupon Sponsor
+          </Link>
+        </div>
       </div>
       <div className="kartu overflow-x-auto">
         <table className="w-full text-sm">
@@ -93,6 +175,7 @@ export default async function AdminPage() {
               <th className="px-4 py-3 font-semibold">Nama</th>
               <th className="px-4 py-3 font-semibold">RT</th>
               <th className="px-4 py-3 font-semibold hidden md:table-cell">Alamat</th>
+              <th className="px-4 py-3 font-semibold">Kelas</th>
               <th className="px-4 py-3 font-semibold">Ancalah</th>
               <th className="px-4 py-3 font-semibold">Kupon</th>
               <th className="px-4 py-3 font-semibold">Status</th>
@@ -109,6 +192,11 @@ export default async function AdminPage() {
                   <td className="px-4 py-2.5 text-zamrud-900/60 hidden md:table-cell">
                     {w.alamat || "-"}
                   </td>
+                  <td className="px-4 py-2.5">
+                    <span className={`pill ${w.kelas === "sponsor" ? "bg-amber-100 text-amber-700" : "bg-zamrud-50 text-zamrud-700 border border-zamrud-100"}`}>
+                      {labelKelas(w.kelas)}
+                    </span>
+                  </td>
                   <td className="px-4 py-2.5">{rupiah(w.ancalah)}</td>
                   <td className="px-4 py-2.5 text-zamrud-900/60 font-mono text-xs">
                     {w.kupon?.kode || "-"}
@@ -116,7 +204,7 @@ export default async function AdminPage() {
                   <td className="px-4 py-2.5">
                     {lunas ? (
                       <span className="pill bg-zamrud-100 text-zamrud-700">
-                        ✓ Lunas {w.kupon.tanggal_bayar ? `· ${tanggalSingkat(w.kupon.tanggal_bayar)}` : ""}
+                        ✓ Lunas{w.kupon.tanggal_bayar ? ` · ${tanggalSingkat(w.kupon.tanggal_bayar)}` : ""}
                       </span>
                     ) : (
                       <span className="pill bg-amber-100 text-amber-700">Belum</span>
@@ -148,6 +236,39 @@ export default async function AdminPage() {
         </table>
       </div>
 
+      {/* sponsor: kirim proposal */}
+      {sponsor.length > 0 && (
+        <div className="mt-6 kartu p-5 border-emas/50 bg-amber-50/60">
+          <h3 className="font-judul text-lg font-bold text-zamrud-800">
+            💌 Kirim Proposal ke Sponsor ({sponsor.length})
+          </h3>
+          <p className="text-xs text-zamrud-900/70 mt-1">
+            Proposal digital interaktif — dibuka lewat HP sponsor, ada CTA donasi
+            (transfer/kas) & tombol hubungi panitia. Klik tombol WA di bawah,
+            pesan sudah berisi tautan proposal atas nama sponsor tsb.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {sponsor.map((w) => {
+              const tautan = `${typeof window !== "undefined" ? window.location.origin : ""}/proposal?untuk=${encodeURIComponent(w.nama)}`;
+              const pesan = encodeURIComponent(
+                `Assalamu'alaikum ${w.nama}. Mohon izin, kami dari Panitia Maulid Nabi ${s.nama_masjid} ingin mengirimkan proposal dukungan kegiatan. Silakan dibuka lewat tautan berikut: ${tautan}. Jazakumullah khairan.`
+              );
+              return (
+                <a
+                  key={w.id}
+                  href={`https://wa.me/?text=${pesan}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="pill bg-zamrud-600 text-white px-3 py-2 hover:bg-zamrud-700"
+                >
+                  💬 WA → {w.nama}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* transaksi terbaru */}
       <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
         💹 Transaksi Terbaru
@@ -165,54 +286,6 @@ export default async function AdminPage() {
             <span className={t.tipe === "masuk" ? "font-semibold text-zamrud-600" : "font-semibold text-rose-600"}>
               {rupiah(t.jumlah)}
             </span>
-          </div>
-        ))}
-      </div>
-
-      {/* kotak saran */}
-      <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
-        📮 Kotak Saran
-        {saranBaru > 0 && (
-          <span className="ml-2 pill bg-amber-100 text-amber-700 align-middle">
-            {saranBaru} baru
-          </span>
-        )}
-      </h2>
-      <div className="space-y-3">
-        {saran.map((s) => (
-          <div key={s.id} className="kartu p-4 flex items-start gap-3">
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-zamrud-900">
-                {s.nama || "Warga Anonim"}
-                {!s.tampil && (
-                  <span className="ml-2 pill bg-amber-100 text-amber-700">
-                    menunggu
-                  </span>
-                )}
-                {s.ditindaklanjuti && (
-                  <span className="ml-2 pill bg-zamrud-100 text-zamrud-700">
-                    ✅ ditindaklanjuti
-                  </span>
-                )}
-              </p>
-              <p className="text-sm text-zamrud-900/80 mt-1">{s.pesan}</p>
-            </div>
-            <div className="flex flex-col gap-2 shrink-0">
-              {!s.tampil && (
-                <AksiAdmin
-                  url="/api/admin/saran"
-                  body={{ id: s.id, tampil: true }}
-                  label="Tampilkan"
-                />
-              )}
-              {!s.ditindaklanjuti && (
-                <AksiAdmin
-                  url="/api/admin/saran"
-                  body={{ id: s.id, ditindaklanjuti: true }}
-                  label="Tandai Ditindaklanjuti"
-                />
-              )}
-            </div>
           </div>
         ))}
       </div>
@@ -245,7 +318,51 @@ export default async function AdminPage() {
         </div>
       )}
 
-      {/* konfirmasi kehadiran (RSVP) */}
+      {/* kotak saran */}
+      <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
+        📮 Kotak Saran
+        {saranBaru > 0 && (
+          <span className="ml-2 pill bg-amber-100 text-amber-700 align-middle">
+            {saranBaru} baru
+          </span>
+        )}
+      </h2>
+      <div className="space-y-3">
+        {saran.map((x) => (
+          <div key={x.id} className="kartu p-4 flex items-start gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-zamrud-900">
+                {x.nama || "Warga Anonim"}
+                {!x.tampil && (
+                  <span className="ml-2 pill bg-amber-100 text-amber-700">menunggu</span>
+                )}
+                {x.ditindaklanjuti && (
+                  <span className="ml-2 pill bg-zamrud-100 text-zamrud-700">✅ ditindaklanjuti</span>
+                )}
+              </p>
+              <p className="text-sm text-zamrud-900/80 mt-1">{x.pesan}</p>
+            </div>
+            <div className="flex flex-col gap-2 shrink-0">
+              {!x.tampil && (
+                <AksiAdmin
+                  url="/api/admin/saran"
+                  body={{ id: x.id, tampil: true }}
+                  label="Tampilkan"
+                />
+              )}
+              {!x.ditindaklanjuti && (
+                <AksiAdmin
+                  url="/api/admin/saran"
+                  body={{ id: x.id, ditindaklanjuti: true }}
+                  label="Tandai Ditindaklanjuti"
+                />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* RSVP */}
       <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
         🤝 Konfirmasi Kehadiran (Undangan)
       </h2>
@@ -311,13 +428,6 @@ export default async function AdminPage() {
                 </td>
               </tr>
             ))}
-            {rsvp.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-6 text-sm text-zamrud-900/60">
-                  Belum ada konfirmasi kehadiran.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>

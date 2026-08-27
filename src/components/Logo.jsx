@@ -41,7 +41,7 @@ export default function Logo({ className = "h-9 w-9" }) {
       className={`${className} relative inline-flex items-center justify-center rounded-full bg-white ring-2 ring-emas/50 p-[8%] shrink-0 transition active:scale-95`}
     >
       <img
-        src="/logo-masjid.png"
+        src="/logo-masjid.svg"
         alt="Logo Masjid Al-Hikmah"
         className="h-full w-full object-contain"
         draggable={false}

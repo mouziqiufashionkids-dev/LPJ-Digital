@@ -20,13 +20,19 @@ export async function getSettings() {
   const { data } = await db().from("pengaturan").select("*").eq("id", 1).single();
   return (
     data || {
+      nama_masjid: "Masjid Al-Hikmah",
       nama_kegiatan: "Maulid Nabi ﷺ",
-      hijriah: "12 Rabiul Awal",
+      hijriah: "12 Rabiul Awal 1447 H",
       penyelenggara: "Panitia",
       penyelenggara_singkat: "Panitia",
       lokasi_acara: "-",
       tanggal_acara: new Date().toISOString(),
       kontak_wa: "62",
+      kota_sholat: "Garut",
+      rekening_bank: null,
+      rekening_no: null,
+      rekening_atas_nama: null,
+      qris_url: null,
     }
   );
 }
@@ -107,6 +113,7 @@ export async function tambahWargaBatch(rows) {
       nama: r.nama.trim().slice(0, 80),
       rt: r.rt || null,
       alamat: r.alamat || null,
+      kelas: ["1", "2", "3", "sponsor"].includes(r.kelas) ? r.kelas : "3",
       ancalah: Number(r.ancalah) || 0,
     })))
     .select();

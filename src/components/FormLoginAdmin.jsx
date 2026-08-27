@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { simpanToken } from "@/lib/admin-auth";
 
 export default function FormLoginAdmin({ petunjuk }) {
   const router = useRouter();
@@ -21,11 +22,10 @@ export default function FormLoginAdmin({ petunjuk }) {
       });
       const d = await r.json();
       if (!d.ok) throw new Error(d.pesan || "Sandi salah");
+      simpanToken(d.token);
       router.replace("/admin");
-      router.refresh();
     } catch (err) {
       setGagal(err.message || "Gagal masuk");
-    } finally {
       setProses(false);
     }
   }

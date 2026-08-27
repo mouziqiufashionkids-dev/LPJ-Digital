@@ -1,17 +1,8 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { fetchAdmin, segarkanPanel } from "@/lib/admin-auth";
 
-export default function AksiAdmin({
-  url,
-  body,
-  label,
-  suksesLabel = "✓ Berhasil",
-  method = "POST",
-  tanya = null,
-  merah = false,
-}) {
-  const router = useRouter();
+export default function AksiAdmin({ url, body, label, suksesLabel = "✓ Berhasil", method = "POST", tanya = null, merah = false }) {
   const [proses, setProses] = useState(false);
   const [selesai, setSelesai] = useState(false);
 
@@ -19,13 +10,13 @@ export default function AksiAdmin({
     if (tanya && !window.confirm(tanya)) return;
     setProses(true);
     try {
-      await fetch(url, {
+      await fetchAdmin(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       setSelesai(true);
-      router.refresh();
+      segarkanPanel();
     } finally {
       setProses(false);
     }

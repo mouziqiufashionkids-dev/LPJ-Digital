@@ -33,11 +33,20 @@ const NAMA_WARGA = [
   "Cucu Suryana", "Deden Deni", "Farhan Maulana", "Gugun Gunawan",
 ];
 
+// kelas ancalah hasil musyawarah panitia:
+// Kelas 1 = Rp 150.000 · Kelas 2 = Rp 100.000 · Kelas 3 = Rp 75.000 · Sponsor = bebas
+function kelasUntuk(i) {
+  if (i < 10) return "1";
+  if (i < 30) return "2";
+  if (i < 44) return "3";
+  return "sponsor";
+}
 function ancalahUntuk(i) {
-  if (i < 20) return 50000;
-  if (i < 38) return 100000;
-  if (i < 44) return 150000;
-  return 200000;
+  const k = kelasUntuk(i);
+  if (k === "1") return 150000;
+  if (k === "2") return 100000;
+  if (k === "3") return 75000;
+  return 250000; // sponsor (contoh)
 }
 
 function buatDataDemo() {
@@ -51,16 +60,22 @@ function buatDataDemo() {
     tanggal_acara: "2026-09-05T08:00:00+07:00",
     kontak_wa: "628123456789", // nomor bendahara (format 62…)
     kota_sholat: "Garut", // kota untuk jadwal sholat (metode Kemenag)
+    // info donasi untuk proposal sponsor (ganti dengan rekening masjid)
+    rekening_bank: "Bank BRI",
+    rekening_no: "1234-5678-9012-345",
+    rekening_atas_nama: "Masjid Al-Hikmah",
+    qris_url: null, // contoh gambar QRIS statis: "/uploads/qris.png"
   };
 
-  const warga = NAMA_WARGA.map((nama, i) => ({
-    id: String(i + 1),
-    nama,
-    rt: `RT 0${(i % 3) + 1}`,
-    alamat: `Blok ${String.fromCharCode(65 + (i % 8))} No. ${i + 1}`,
-    ancalah: ancalahUntuk(i),
-    aktif: true,
-  }));
+const warga = NAMA_WARGA.map((nama, i) => ({
+  id: String(i + 1),
+  nama,
+  rt: `RT 0${(i % 3) + 1}`,
+  alamat: `Blok ${String.fromCharCode(65 + (i % 8))} No. ${i + 1}`,
+  kelas: kelasUntuk(i),
+  ancalah: ancalahUntuk(i),
+  aktif: true,
+}));
 
   // 29 KK pertama sudah lunas
   const kupon = warga.map((w, i) => {
@@ -188,7 +203,7 @@ function buatDataDemo() {
 }
 
 // SATU instance untuk seluruh route (lihat penjelasan di atas)
-const VERSI_DEMO = 3; // naikkan saat struktur/isi data demo berubah
+const VERSI_DEMO = 4; // naikkan saat struktur/isi data demo berubah
 const S = (globalThis.__lpjDataDemo ??= buatDataDemo());
 // Saat kode diperbarui di dev (hot-reload), state lama mungkin berbentuk
 // lama — reset ke data terbaru jika versi berbeda:
@@ -297,6 +312,7 @@ export function tambahWargaBatch(rows) {
       nama: String(r.nama).trim().slice(0, 80),
       rt: String(r.rt || "").trim().slice(0, 20),
       alamat: String(r.alamat || "").trim().slice(0, 120),
+      kelas: ["1", "2", "3", "sponsor"].includes(r.kelas) ? r.kelas : "3",
       ancalah: Number(r.ancalah) || 0,
       aktif: true,
     };

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { fetchAdmin, segarkanPanel } from "@/lib/admin-auth";
 
 const KATEGORI = {
   keluar: ["Konsumsi", "Administrasi", "Peralatan", "Acara", "Dekorasi", "Santunan", "Lainnya"],
@@ -8,7 +8,6 @@ const KATEGORI = {
 };
 
 export default function FormTransaksi() {
-  const router = useRouter();
   const hariIni = new Date().toISOString().slice(0, 10);
   const [tipe, setTipe] = useState("keluar");
   const [tanggal, setTanggal] = useState(hariIni);
@@ -51,7 +50,7 @@ export default function FormTransaksi() {
       fd.set("kategori", kategori);
       fd.set("keterangan", keterangan);
       if (berkas) fd.set("bukti", berkas);
-      const r = await fetch("/api/admin/transaksi", { method: "POST", body: fd });
+      const r = await fetchAdmin("/api/admin/transaksi", { method: "POST", body: fd });
       const d = await r.json();
       if (!d.ok) throw new Error(d.pesan || "Gagal menyimpan");
       setSukses(
@@ -60,7 +59,7 @@ export default function FormTransaksi() {
           : "✓ Pemasukan tercatat"
       );
       setJumlah(""); setKeterangan(""); setBerkas(null); setPratinjau(null);
-      router.refresh();
+      segarkanPanel();
     } catch (err) {
       setGagal(err.message || "Gagal menyimpan");
     } finally {

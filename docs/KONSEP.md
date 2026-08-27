@@ -213,3 +213,17 @@ dokumentasi    : judul, foto_url
 12. ✅ **Undangan + RSVP live** — riset fitur web masjid referensi
     (Istiqlal, Cut Meutia, Al Falah, Al-Azhar) ada di `docs/REFERENSI.md`
 13. ✅ **Tanggal acara: Sabtu, 5 September 2026**
+14. ✅ **Kelas ancalah**: Kelas 1 Rp 150.000 · Kelas 2 Rp 100.000 ·
+    Kelas 3 Rp 75.000 · **Sponsor** (nominal bebas, kupon dicetak terpisah
+    dengan desain emas) — preset otomatis saat tambah warga
+15. ✅ **Unggah Excel (.xlsx/.xls/CSV)** untuk tambah warga masal —
+    kolom Nama/RT/Alamat/Nominal/Kelas dikenali otomatis
+16. ✅ **Proposal sponsor digital** (`/proposal?untuk=Nama`) —
+    dipersonalisasi per sponsor, CTA sesuai minat (donasi uang/transfer/kas,
+    sumbang barang, tanya panitia), rekening + QRIS opsional, bilah CTA
+    melekat di bawah layar
+17. ✅ **Logo SVG presisi** (digambar manual, bukan AI) — hijau zamrud +
+    emas, tajam di semua ukuran; logo asli & percobaan AI diarsipkan
+18. ✅ **Auth tahan banting**: token di memori/localStorage/cookie,
+    dikirim via header — tetap berfungsi walau cookie diblokir
+    (mis. iframe sandbox); API `/api/admin/*` tetap dijaga middleware

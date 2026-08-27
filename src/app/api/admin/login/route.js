@@ -23,8 +23,10 @@ export async function POST(request) {
   if (!body?.sandi || String(body.sandi) !== sandi) {
     return NextResponse.json({ ok: false, pesan: "Sandi salah" }, { status: 401 });
   }
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set("admin_t", await tokenDari(sandi), {
+  const token = await tokenDari(sandi);
+  const res = NextResponse.json({ ok: true, token });
+  // cookie tetap diset (untuk lingkungan yang mengizinkan)
+  res.cookies.set("admin_t", token, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",

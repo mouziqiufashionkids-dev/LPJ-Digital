@@ -19,21 +19,29 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
 - Beranda: progress dana live + rekap "X dari Y KK sudah lunas"
 - `/undangan`: undangan digital + rundown + **konfirmasi kehadiran (RSVP)**
   — nama yang konfirmasi langsung tampil live sebagai calon tamu
+- `/proposal`: **proposal sponsor digital interaktif** — bisa dipersonalisasi
+  per sponsor (`/proposal?untuk=Nama`), CTA donasi sesuai minat
+  (donasi uang via transfer/kas, sumbang barang, atau tanya panitia dulu),
+  rekening & tombol WA panitia
 - `/cek-iuran`: ketik nama (mis. *Asep*) atau kode kupon (*MLD-0001*)
   → status + kwitansi digital
 - `/laporan`: rincian kas — **klik gambar nota** untuk melihat bukti
 - `/kotak-saran`: kirim saran (masuk moderasi dulu)
 - **Panel panitia** (dilindungi sandi):
-  - Akses: **klik logo masjid 3×** di halaman mana pun → login, atau
-    langsung buka `/admin/login`
+  - Akses: **klik logo masjid 3×** di halaman mana pun → login
   - Sandi default mode demo: `alhikmah2026` — ganti lewat `ADMIN_PASSWORD`
-    di `.env.local` / Environment Variables Vercel (sesi 8 jam)
-  - Tambah warga masal (manual / tempel daftar / unggah CSV) →
-    kupon berkode unik + QR dibuat otomatis
-  - `/admin/kupon`: **cetak kupon massal** siap potong per A4
-    (10 kupon/lembar) — QR di kupon menuju halaman cek iuran
-  - Tandai kupon lunas → beranda/live update otomatis
-  - Rekap konfirmasi kehadiran (RSVP) undangan
+  - Login tahan banting: token di memori + localStorage + cookie
+    (tetap jalan walau cookie diblokir), sesi 8 jam
+  - Tambah warga masal: **manual / tempel daftar / unggah Excel (.xlsx) atau
+    CSV** — kolom `Nama; RT; Alamat; Nominal; Kelas` dikenali otomatis
+  - **Kelas ancalah**: Kelas 1 Rp 150rb · Kelas 2 Rp 100rb · Kelas 3 Rp 75rb ·
+    **Sponsor** (nominal bebas) — nominal otomatis dari kelas
+  - `/admin/kupon`: **cetak kupon per kelas atau khusus sponsor** (desain
+    emas, dicetak terpisah) — A4, 10 kupon/lembar, QR per kupon
+  - Tombol **WA kirim proposal** ke setiap sponsor (tautan otomatis
+    ter-personalisasi)
+  - Catat transaksi + upload foto nota, upload dokumentasi galeri,
+    tandai kupon lunas, moderasi saran, rekap RSVP
 
 ## Beralih ke data sungguhan (Supabase — gratis)
 
@@ -74,6 +82,12 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
 - [x] **Galeri dokumentasi** — upload dari admin, tampil di beranda
       dengan lightbox
 - [x] Nama masjid (Masjid Al-Hikmah) & tanggal acara (5 Sep 2026)
+- [x] **Kelas ancalah** (1=150rb, 2=100rb, 3=75rb, Sponsor bebas) +
+      **unggah Excel .xlsx** (SheetJS) dengan deteksi kolom otomatis
+- [x] **Cetak kupon per kelas & kupon sponsor terpisah** (desain emas)
+- [x] **Proposal sponsor digital** `/proposal` — personal, CTA donasi
+      transfer/kas + WA panitia, rekening & QRIS opsional
+- [x] Logo SVG digambar presisi (bukan AI) — tajam di semua ukuran
 - [ ] Deploy produksi — ikuti [`docs/DEPLOY.md`](docs/DEPLOY.md)
       (Supabase + Vercel, gratis, ± 30 menit)
 - [ ] Edit warga & pengaturan lewat UI (sementara lewat database)

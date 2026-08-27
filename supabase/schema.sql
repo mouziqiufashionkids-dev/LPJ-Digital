@@ -14,10 +14,14 @@ create table if not exists pengaturan (
   lokasi_acara text,
   tanggal_acara timestamptz,
   kontak_wa text,
-  kota_sholat text default 'Garut'
+  kota_sholat text default 'Garut',
+  rekening_bank text,
+  rekening_no text,
+  rekening_atas_nama text,
+  qris_url text
 );
-insert into pengaturan (id, nama_masjid, nama_kegiatan, penyelenggara, penyelenggara_singkat, lokasi_acara, tanggal_acara, kontak_wa, kota_sholat)
-values (1, 'Masjid Al-Hikmah', 'Maulid Nabi ﷺ 1447 H', '[Nama RT/RW · Kampung]', 'RT/RW · Kampung Anda', 'Balai Warga & Masjid Al-Hikmah', '2026-09-05 01:00:00+00', '628123456789', 'Garut')
+insert into pengaturan (id, nama_masjid, nama_kegiatan, penyelenggara, penyelenggara_singkat, lokasi_acara, tanggal_acara, kontak_wa, kota_sholat, rekening_bank, rekening_no, rekening_atas_nama)
+values (1, 'Masjid Al-Hikmah', 'Maulid Nabi ﷺ 1447 H', '[Nama RT/RW · Kampung]', 'RT/RW · Kampung Anda', 'Balai Warga & Masjid Al-Hikmah', '2026-09-05 01:00:00+00', '628123456789', 'Garut', '[Nama Bank]', '[Nomor Rekening]', '[Atas Nama]')
 on conflict (id) do nothing;
 
 -- Bucket storage publik untuk foto bukti & dokumentasi
@@ -32,6 +36,7 @@ create table if not exists warga (
   nama text not null,
   rt text,
   alamat text,
+  kelas text default '3' check (kelas in ('1','2','3','sponsor')),
   ancalah bigint not null default 0,   -- rupiah, tanpa titik
   aktif boolean not null default true,
   created_at timestamptz not null default now()

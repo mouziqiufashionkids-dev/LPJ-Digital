@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 
-// Pelindung panel panitia: /admin/* dan /api/admin/* wajib sandi.
-// Token = SHA-256(sandi + garam) — disimpan sebagai cookie httpOnly.
+// Pelindung API panitia (/api/admin/*) — wajib sandi.
+// Menerima token lewat cookie ATAU header Authorization: Bearer.
+// Halaman /admin sendiri digerbangi di sisi klien (lihat admin-auth.js),
+// karena sebagian lingkungan (iframe sandbox) memblokir cookie —
+// data panitia tetap aman: SEMUA data hanya keluar lewat API ini.
 async function tokenDari(sandi) {
   const data = await crypto.subtle.digest(
     "SHA-256",
@@ -14,35 +17,28 @@ async function tokenDari(sandi) {
 
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
-  const sandi = process.env.ADMIN_PASSWORD || "alhikmah2026";
-  const token = await tokenDari(sandi);
-  const sah = req.cookies.get("admin_t")?.value === token;
 
   // login & logout bebas diakses
-  if (
-    pathname === "/admin/login" ||
-    pathname === "/api/admin/login" ||
-    pathname === "/api/admin/logout"
-  ) {
-    if (pathname === "/admin/login" && sah) {
-      return NextResponse.redirect(new URL("/admin", req.url));
-    }
+  if (pathname === "/api/admin/login" || pathname === "/api/admin/logout") {
     return NextResponse.next();
   }
 
-  if (sah) return NextResponse.next();
+  const sandi = process.env.ADMIN_PASSWORD || "alhikmah2026";
+  const token = await tokenDari(sandi);
+  const cookie = req.cookies.get("admin_t")?.value;
+  const auth = req.headers.get("authorization") || "";
+  const bearer = auth.startsWith("Bearer ") ? auth.slice(7) : null;
 
-  // API ditolak dengan 401 (bukan redirect)
-  if (pathname.startsWith("/api/")) {
-    return new NextResponse(
-      JSON.stringify({ ok: false, pesan: "Harus login panitia" }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
-    );
+  if (cookie === token || bearer === token) {
+    return NextResponse.next();
   }
 
-  return NextResponse.redirect(new URL("/admin/login", req.url));
+  return new NextResponse(
+    JSON.stringify({ ok: false, pesan: "Harus login panitia" }),
+    { status: 401, headers: { "Content-Type": "application/json" } }
+  );
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/api/admin/:path*"],
 };
