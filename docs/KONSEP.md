@@ -182,9 +182,16 @@ dokumentasi    : judul, foto_url
 
 1. ✅ **Ancalah per KK, nominal bertingkat** — beda-beda sesuai musyawarah
 2. ✅ **Banner publik**: rekap "X dari Y KK sudah lunas" (anonim).
-   **Menu "Cek Iuran"**: pencarian nama → status diterima/belum
+   **Menu "Cek Iuran"**: pencarian nama/kode → status diterima/belum
 3. ✅ **Domain**: rename project Vercel ke nama yang jelas (custom domain menyusul)
 4. ✅ Komunitas berbeda dari SIMSALABIM — **nama & tanggal kegiatan menyusul**
 5. ✅ Repo: lanjut di **LPJ-Digital**
-6. ⏳ Desain kupon: akan diulik bersama setelah kerangka jadi
-7. ⏳ Login admin & proteksi: tahap berikutnya
+6. ✅ **Header pakai nama masjid** (placeholder: Masjid Jami' Al-Hikmah)
+   — dipilih demi kepercayaan & bisa dipakai ulang untuk kegiatan masjid
+   lain (Ramadhan, qurban, iuran bulanan)
+7. ✅ **Panel admin disembunyikan** — tanpa tautan dari situs warga,
+   akses langsung lewat `/admin`; login menyusul
+8. ✅ **Nota pengeluaran tampil** seperti SIMSALABIM (klik gambar nota)
+9. ✅ **Generate kupon masal**: input manual / tempel daftar / unggah CSV
+   → kupon berkode + QR otomatis → cetak A4 (10/lembar), siap potong
+10. ⏳ Login admin & proteksi: tahap berikutnya

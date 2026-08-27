@@ -5,15 +5,15 @@ import CopyLink from "./CopyLink";
 export default async function Footer() {
   const s = await getSettings();
   return (
-    <footer className="mt-16 bg-zamrud-900 text-krem/80">
+    <footer className="no-print mt-16 bg-zamrud-900 text-krem/80">
       <div className="bg-ornamen">
         <div className="mx-auto max-w-5xl px-4 py-10 grid gap-8 md:grid-cols-3">
           <div>
             <p className="pill bg-emas/20 text-emas-terang mb-3">
               ✓ Laporan terverifikasi panitia
             </p>
-            <p className="font-semibold text-krem">{s.nama_kegiatan}</p>
-            <p className="text-sm mt-1">{s.penyelenggara}</p>
+            <p className="font-semibold text-krem">{s.nama_masjid}</p>
+            <p className="text-sm mt-1">{s.nama_kegiatan} · {s.penyelenggara_singkat}</p>
             <p className="text-sm">{s.lokasi_acara}</p>
           </div>
           <div className="text-sm space-y-2">
@@ -38,14 +38,11 @@ export default async function Footer() {
             {mode === "demo" && (
               <p className="pill bg-krem/10 text-krem/70">⚙ Mode demo — data contoh</p>
             )}
-            <Link href="/admin" className="block text-krem/50 hover:text-krem text-xs pt-2">
-              Panel Panitia →
-            </Link>
           </div>
         </div>
       </div>
       <div className="border-t border-krem/10 py-4 text-center text-xs text-krem/50">
-        © 2026 {s.penyelenggara_singkat} · Dibangun untuk warga, lapor terbuka
+        © 2026 {s.nama_masjid} · Dibangun untuk warga, lapor terbuka
       </div>
     </footer>
   );

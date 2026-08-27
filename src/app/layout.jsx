@@ -2,6 +2,7 @@ import { Amiri, Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getSettings } from "@/lib/store";
 
 const judul = Amiri({
   subsets: ["arabic", "latin"],
@@ -15,11 +16,13 @@ const isi = Poppins({
   variable: "--font-isi",
 });
 
-export const metadata = {
-  title: "LPJ Maulid Nabi — Iuran & Kas Terbuka",
-  description:
-    "Laporan pertanggungjawaban digital kegiatan Maulid Nabi ﷺ: iuran ancalah, dana masuk & keluar realtime, terbuka untuk seluruh warga.",
-};
+export async function generateMetadata() {
+  const s = await getSettings();
+  return {
+    title: `${s.nama_masjid} — Iuran & Laporan Terbuka`,
+    description: `Laporan pertanggungjawaban digital ${s.nama_kegiatan} dari ${s.nama_masjid}: iuran ancalah, dana masuk & keluar realtime, terbuka untuk seluruh warga.`,
+  };
+}
 
 export default function RootLayout({ children }) {
   return (

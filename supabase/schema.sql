@@ -6,6 +6,7 @@
 -- Pengaturan umum (satu baris, id = 1)
 create table if not exists pengaturan (
   id int primary key default 1,
+  nama_masjid text not null default 'Masjid Jami'' Al-Hikmah',
   nama_kegiatan text not null default 'Maulid Nabi ﷺ',
   hijriah text default '12 Rabiul Awal 1447 H',
   penyelenggara text,
@@ -14,8 +15,8 @@ create table if not exists pengaturan (
   tanggal_acara timestamptz,
   kontak_wa text
 );
-insert into pengaturan (id, nama_kegiatan, penyelenggara, penyelenggara_singkat, lokasi_acara, tanggal_acara, kontak_wa)
-values (1, 'Maulid Nabi ﷺ 1447 H', '[Nama RT/RW · Kampung]', 'RT/RW · Kampung Anda', 'Balai Warga & Masjid', '2026-09-03 01:00:00+00', '628123456789')
+insert into pengaturan (id, nama_masjid, nama_kegiatan, penyelenggara, penyelenggara_singkat, lokasi_acara, tanggal_acara, kontak_wa)
+values (1, 'Masjid Jami'' Al-Hikmah', 'Maulid Nabi ﷺ 1447 H', '[Nama RT/RW · Kampung]', 'RT/RW · Kampung Anda', 'Balai Warga & Masjid', '2026-09-03 01:00:00+00', '628123456789')
 on conflict (id) do nothing;
 
 -- Warga penerima ancalah (per KK)

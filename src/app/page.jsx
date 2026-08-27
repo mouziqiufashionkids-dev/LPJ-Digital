@@ -5,6 +5,7 @@ import ProgressBar from "@/components/ProgressBar";
 import StatCard from "@/components/StatCard";
 import Countdown from "@/components/Countdown";
 import LiveRefresh from "@/components/LiveRefresh";
+import NotaImg from "@/components/NotaImg";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,9 @@ export default async function Beranda() {
         <div className="mx-auto max-w-5xl px-4 pt-10 pb-20 text-center">
           <p className="pill bg-krem/10 text-emas-terang mb-4">
             ✓ Laporan terverifikasi panitia
+          </p>
+          <p className="text-sm tracking-[0.2em] uppercase text-emas-terang/90 font-semibold">
+            {s.nama_masjid}
           </p>
           <p className="font-judul text-2xl text-emas-terang">﷽</p>
           <h1 className="font-judul font-bold text-4xl md:text-5xl mt-3 leading-tight">
@@ -111,11 +115,16 @@ export default async function Beranda() {
         <div className="kartu divide-y divide-zamrud-100 overflow-hidden">
           {terbaru.map((t) => (
             <div key={t.id} className="flex items-center gap-4 px-5 py-4">
-              <span className="text-2xl">📄</span>
+              {t.bukti_url ? (
+                <NotaImg src={t.bukti_url} alt={`Nota: ${t.keterangan}`} kecil />
+              ) : (
+                <span className="text-2xl">📄</span>
+              )}
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-zamrud-900 truncate">{t.keterangan}</p>
                 <p className="text-xs text-zamrud-900/50">
-                  {t.kategori} · {tanggalSingkat(t.tanggal)} · ada bukti
+                  {t.kategori} · {tanggalSingkat(t.tanggal)} ·{" "}
+                  {t.bukti_url ? "klik nota untuk lihat bukti" : "ada bukti"}
                 </p>
               </div>
               <span className="font-bold text-rose-600 shrink-0">{rupiah(t.jumlah)}</span>
@@ -164,7 +173,7 @@ export default async function Beranda() {
             🛡️ Ini web resmi panitia — bukan penipuan
           </h2>
           <ul className="mt-3 space-y-2 text-sm text-zamrud-900/80 list-disc pl-5">
-            <li>Tautan ini disebar langsung oleh pengurus di grup WhatsApp resmi RT/RW.</li>
+            <li>Web resmi dikelola panitia {s.nama_masjid} — tautan disebar langsung pengurus di grup WhatsApp resmi RT/RW.</li>
             <li>Dikelola oleh panitia kegiatan — orang-orang yang Anda kenal di lingkungan sendiri.</li>
             <li>
               Masih ragu? Hubungi bendahara langsung:{" "}

@@ -67,6 +67,22 @@ export async function listWarga() {
 
 export async function cariWarga(q) {
   const norm = (q || "").trim().toLowerCase();
+  if (!norm) return [];
+  // pencarian lewat kode kupon (dari QR kupon cetak)
+  if (/^mld-?\d{1,6}$/i.test(norm)) {
+    const kode = `MLD-${String(norm.replace(/^mld-?/i, "")).padStart(4, "0")}`;
+    const { data: k } = await db()
+      .from("kupon")
+      .select("kode,status,tanggal_bayar,warga(id,nama,rt,ancalah)")
+      .eq("kode", kode)
+      .maybeSingle();
+    if (!k?.warga) return [];
+    return [{
+      id: k.warga.id, nama: k.warga.nama, rt: k.warga.rt,
+      nominal: k.warga.ancalah, status: k.status,
+      tanggal_bayar: k.tanggal_bayar, kode: k.kode,
+    }];
+  }
   if (norm.length < 2) return [];
   const { data } = await db()
     .from("warga")
@@ -74,14 +90,46 @@ export async function cariWarga(q) {
     .ilike("nama", `%${norm}%`)
     .limit(8);
   return (data || []).map((w) => ({
-    id: w.id,
-    nama: w.nama,
-    rt: w.rt,
-    nominal: w.ancalah,
+    id: w.id, nama: w.nama, rt: w.rt, nominal: w.ancalah,
     status: w.kupon?.status ?? "belum",
     tanggal_bayar: w.kupon?.tanggal_bayar ?? null,
     kode: w.kupon?.kode ?? null,
   }));
+}
+
+// tambah warga massal: kupon berkode unik dibuat otomatis
+export async function tambahWargaBatch(rows) {
+  const valid = (rows || []).filter((r) => r?.nama?.trim());
+  if (!valid.length) return { ok: false, pesan: "Tidak ada baris valid" };
+  const { data: inserted, error } = await db()
+    .from("warga")
+    .insert(valid.map((r) => ({
+      nama: r.nama.trim().slice(0, 80),
+      rt: r.rt || null,
+      alamat: r.alamat || null,
+      ancalah: Number(r.ancalah) || 0,
+    })))
+    .select();
+  if (error || !inserted?.length) {
+    return { ok: false, pesan: error?.message || "Gagal menambah warga" };
+  }
+  const kuponRows = inserted.map((w) => ({
+    warga_id: w.id,
+    kode: `MLD-${String(w.id).padStart(4, "0")}`,
+    nominal: w.ancalah,
+    status: "belum",
+  }));
+  await db().from("kupon").insert(kuponRows);
+  return {
+    ok: true,
+    ditambah: inserted.length,
+    kupon: inserted.map((w, i) => ({ nama: w.nama, kode: kuponRows[i].kode, ancalah: w.ancalah })),
+  };
+}
+
+export async function hapusWarga(id) {
+  await db().from("warga").delete().eq("id", id);
+  return { ok: true };
 }
 
 export async function tandaiLunas(wargaId, { tanggal, metode = "tunai", petugas = "Bendahara" } = {}) {

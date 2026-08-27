@@ -5,16 +5,16 @@ import { getSettings } from "@/lib/store";
 export default async function Header() {
   const s = await getSettings();
   return (
-    <header className="sticky top-0 z-40 bg-zamrud-800/95 backdrop-blur text-krem shadow-kartu">
+    <header className="no-print sticky top-0 z-40 bg-zamrud-800/95 backdrop-blur text-krem shadow-kartu">
       <div className="mx-auto max-w-5xl px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-2">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <Logo className="h-9 w-9" />
           <span className="leading-tight">
             <span className="block font-judul font-bold tracking-wide text-base">
-              LPJ MAULID NABI
+              {s.nama_masjid?.toUpperCase()}
             </span>
             <span className="block text-[11px] text-emas-terang">
-              {s.hijriah} · {s.penyelenggara_singkat}
+              {s.nama_kegiatan} · Iuran & Laporan Terbuka
             </span>
           </span>
         </Link>

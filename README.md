@@ -1,8 +1,10 @@
 # LPJ Digital — Maulid Nabi ﷺ
 
-Laporan pertanggungjawaban digital kegiatan Maulid Nabi: kupon iuran
-(ancalah) otomatis, progress dana live, kas keluar berbukti, dan kotak
-saran warga. Konsep lengkap: [`docs/KONSEP.md`](docs/KONSEP.md).
+Laporan pertanggungjawaban digital kegiatan Maulid Nabi di bawah **nama
+masjid** (bisa dipakai ulang untuk kegiatan lain): kupon iuran (ancalah)
+otomatis + cetak massal, progress dana live, kas keluar dengan nota
+bisa dilihat, dan kotak saran warga. Konsep lengkap:
+[`docs/KONSEP.md`](docs/KONSEP.md).
 
 ## Menjalankan (mode demo — tanpa setup)
 
@@ -15,10 +17,16 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
 (48 KK, transaksi, saran). Coba:
 
 - Beranda: progress dana live + rekap "X dari Y KK sudah lunas"
-- `/cek-iuran`: ketik nama (mis. *Asep*) → status + kwitansi digital
-- `/laporan`: rincian kas masuk & keluar
+- `/cek-iuran`: ketik nama (mis. *Asep*) atau kode kupon (*MLD-0001*)
+  → status + kwitansi digital
+- `/laporan`: rincian kas — **klik gambar nota** untuk melihat bukti
 - `/kotak-saran`: kirim saran (masuk moderasi dulu)
-- `/admin`: tandai kupon lunas → beranda/live update otomatis
+- `/admin` *(tersembunyi — tidak ada tautan dari situs warga)*:
+  - Tambah warga masal (manual / tempel daftar / unggah CSV) →
+    kupon berkode unik + QR dibuat otomatis
+  - `/admin/kupon`: **cetak kupon massal** siap potong per A4
+    (10 kupon/lembar) — QR di kupon menuju halaman cek iuran
+  - Tandai kupon lunas → beranda/live update otomatis
 
 ## Beralih ke data sungguhan (Supabase — gratis)
 
@@ -42,10 +50,13 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
 ## Status pengembangan
 
 - [x] Konsep v2 (`docs/KONSEP.md`)
-- [x] Halaman publik: beranda live, cek iuran + kwitansi, laporan, kotak saran
-- [x] Panel panitia dasar: tandai lunas, moderasi saran
-- [ ] Kelola warga ( impor daftar KK, nominal bertingkat ) + generate kupon
-- [ ] Desain & cetak kupon (A4, potong) — diulik bersama
+- [x] Branding masjid di header (placeholder: Masjid Jami' Al-Hikmah)
+- [x] Halaman publik: beranda live, cek iuran + kwitansi, laporan dengan
+      nota bisa dilihat (klik gambar), kotak saran
+- [x] Panel panitia tersembunyi (`/admin`, tanpa tautan dari situs warga)
+- [x] Tambah warga masal (manual/tempel/CSV) → kupon otomatis
+- [x] Cetak kupon massal A4 + QR per kupon
 - [ ] Catat pengeluaran + upload bukti foto
 - [ ] Login panitia (Supabase Auth)
+- [ ] Edit warga (ubah nominal ancalah) & pengaturan lewat UI
 - [ ] Agenda acara & dokumentasi foto

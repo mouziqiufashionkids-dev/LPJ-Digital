@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 330" font-family="'Courier New', monospace">
+  <rect width="240" height="330" fill="#fffdf4"/>
+  <rect x="5" y="5" width="230" height="320" fill="none" stroke="#c9c0a6" stroke-width="2"/>
+  <text x="120" y="36" text-anchor="middle" font-size="21" font-weight="bold" fill="#2e2b24">N O T A</text>
+  <text x="120" y="56" text-anchor="middle" font-size="11.5" fill="#4a463c">Warung Teh Neng</text>
+  <text x="120" y="71" text-anchor="middle" font-size="8.5" fill="#8a8474">Lingk. Masjid Al-Hikmah</text>
+  <line x1="20" y1="84" x2="220" y2="84" stroke="#b9b19b" stroke-dasharray="4 3"/>
+  <text x="24" y="104" font-size="10.5" fill="#3d3a32">Teh tubruk + gula</text><text x="216" y="104" text-anchor="end" font-size="10.5" fill="#3d3a32">Rp 35.000</text><text x="24" y="124" font-size="10.5" fill="#3d3a32">Kue kering 3 kaleng</text><text x="216" y="124" text-anchor="end" font-size="10.5" fill="#3d3a32">Rp 85.000</text>
+  <line x1="20" y1="138" x2="220" y2="138" stroke="#b9b19b" stroke-dasharray="4 3"/>
+  <text x="120" y="162" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f1d18">TOTAL  Rp 120.000</text>
+  <text x="24" y="192" font-size="9.5" fill="#5c574a">Tgl: 25 Agu 2026</text>
+  <text x="24" y="208" font-size="9.5" fill="#5c574a">Untuk: Panitia Maulid Nabi</text>
+  <g transform="rotate(-14 186 222)">
+    <circle cx="186" cy="222" r="27" fill="none" stroke="#0B6E4F" stroke-width="3.5" opacity="0.85"/>
+    <text x="186" y="228" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#0B6E4F" opacity="0.85">LUNAS</text>
+  </g>
+  <text x="120" y="315" text-anchor="middle" font-size="8" fill="#9a937f">Bukti transaksi panitia — mode demo (contoh)</text>
+</svg>

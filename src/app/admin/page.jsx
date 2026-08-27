@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { getStats, listWarga, listTransaksi, listSaran } from "@/lib/store";
 import { rupiah, tanggalSingkat } from "@/lib/format";
 import AksiAdmin from "@/components/AksiAdmin";
 import LiveRefresh from "@/components/LiveRefresh";
+import TambahWarga from "@/components/TambahWarga";
 
 export const dynamic = "force-dynamic";
 
@@ -29,10 +31,10 @@ export default async function AdminPage() {
       </div>
 
       <div className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-        <strong>Kerangka admin (tahap 1).</strong> Login & proteksi menyusul —
-        untuk sekarang jangan sebarkan tautan <code>/admin</code>. Fitur berikut
-        menyusul: kelola warga &amp; cetak kupon, catat pengeluaran + upload
-        bukti, foto dokumentasi.
+        <strong>Panel tersembunyi.</strong> Halaman ini tidak ditautkan dari situs
+        warga — akses hanya dengan mengetik alamat <code>/admin</code> langsung.
+        Login &amp; proteksi kata sandi menyusul; catat pengeluaran + upload bukti
+        foto juga menyusul.
       </div>
 
       {/* ringkasan */}
@@ -52,16 +54,30 @@ export default async function AdminPage() {
         ))}
       </div>
 
+      {/* tambah warga + generate kupon */}
+      <div className="mt-8">
+        <TambahWarga />
+      </div>
+
       {/* warga & kupon */}
-      <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
-        🎟️ Warga & Kupon Ancalah
-      </h2>
+      <div className="flex flex-wrap items-center justify-between gap-3 mt-10 mb-3">
+        <h2 className="font-judul text-2xl font-bold text-zamrud-800">
+          🎟️ Warga & Kupon Ancalah
+        </h2>
+        <Link
+          href="/admin/kupon"
+          className="tombol bg-emas text-zamrud-900 hover:bg-emas-terang text-xs px-4 py-2.5"
+        >
+          🖨️ Cetak Kupon ({belumLunas} belum dibagikan)
+        </Link>
+      </div>
       <div className="kartu overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-zamrud-900/60 border-b border-zamrud-100">
               <th className="px-4 py-3 font-semibold">Nama</th>
               <th className="px-4 py-3 font-semibold">RT</th>
+              <th className="px-4 py-3 font-semibold hidden md:table-cell">Alamat</th>
               <th className="px-4 py-3 font-semibold">Ancalah</th>
               <th className="px-4 py-3 font-semibold">Kupon</th>
               <th className="px-4 py-3 font-semibold">Status</th>
@@ -75,6 +91,9 @@ export default async function AdminPage() {
                 <tr key={w.id} className={lunas ? "bg-zamrud-50/40" : ""}>
                   <td className="px-4 py-2.5 font-medium text-zamrud-900">{w.nama}</td>
                   <td className="px-4 py-2.5 text-zamrud-900/60">{w.rt}</td>
+                  <td className="px-4 py-2.5 text-zamrud-900/60 hidden md:table-cell">
+                    {w.alamat || "-"}
+                  </td>
                   <td className="px-4 py-2.5">{rupiah(w.ancalah)}</td>
                   <td className="px-4 py-2.5 text-zamrud-900/60 font-mono text-xs">
                     {w.kupon?.kode || "-"}
@@ -89,13 +108,23 @@ export default async function AdminPage() {
                     )}
                   </td>
                   <td className="px-4 py-2.5">
-                    {!lunas && (
+                    <div className="flex items-center gap-2">
+                      {!lunas && (
+                        <AksiAdmin
+                          url="/api/admin/bayar"
+                          body={{ wargaId: w.id }}
+                          label="Lunaskan"
+                        />
+                      )}
                       <AksiAdmin
-                        url="/api/admin/bayar"
-                        body={{ wargaId: w.id }}
-                        label="Tandai Lunas"
+                        url="/api/admin/warga"
+                        method="DELETE"
+                        body={{ id: w.id }}
+                        label="Hapus"
+                        merah
+                        tanya={`Hapus ${w.nama}? Kupon & catatan iurannya juga akan dihapus.`}
                       />
-                    )}
+                    </div>
                   </td>
                 </tr>
               );

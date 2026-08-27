@@ -9,6 +9,13 @@ export default function SearchIuran() {
   const [pilih, setPilih] = useState(null);
   const timer = useRef(null);
 
+  // dukung tautan dari QR kupon: /cek-iuran?kode=MLD-0001
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const awal = p.get("kode") || p.get("q");
+    if (awal) setQ(awal);
+  }, []);
+
   useEffect(() => {
     if (q.trim().length < 2) {
       setHasil([]);
@@ -44,7 +51,7 @@ export default function SearchIuran() {
           id="cari"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Contoh: Asep"
+          placeholder="Contoh: Asep atau kode kupon MLD-0001"
           className="w-full text-lg pl-12 pr-4 py-4 rounded-2xl border-2 border-zamrud-200 bg-white focus:border-zamrud-600 focus:outline-none"
         />
       </div>

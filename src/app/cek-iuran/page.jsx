@@ -22,6 +22,7 @@ export default function CekIuranPage() {
       <div className="mt-10 kartu p-5 text-sm text-zamrud-900/70 space-y-2">
         <p className="font-semibold text-zamrud-800">Catatan:</p>
         <p>• Nama tidak ditemukan? Mungkin tercatat dengan nama lain — hubungi panitia.</p>
+        <p>• Punya kupon cetak? Pindai QR di kupon, atau ketik kodenya (mis. MLD-0001).</p>
         <p>• Status <strong>belum diterima</strong> artinya panitia belum menerima/mencatat iuran Anda.</p>
         <p>• Kwitansi digital sah sebagai bukti iuran Anda sudah masuk. 📱</p>
       </div>

@@ -11,6 +11,13 @@ body {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><g fill='none' stroke='%23D4AF37' stroke-opacity='0.16' stroke-width='1.2'><path d='M36 6l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/><circle cx='36' cy='36' r='9'/></g></svg>");
 }
 
+/* QR di dalam kupon mengikuti lebar wadahnya */
+.qr-kecil svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 @layer components {
   .kartu {
     @apply bg-white rounded-2xl border border-zamrud-100 shadow-kartu;
@@ -20,5 +27,27 @@ body {
   }
   .tombol {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition;
+  }
+}
+
+/* ============ CETAK KUPON ============ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+  body {
+    background: #fff;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .kupon {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+  }
+  .wadah-kupon {
+    gap: 4mm !important;
   }
 }

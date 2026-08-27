@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getStats, listTransaksi } from "@/lib/store";
 import { rupiah, tanggalSingkat } from "@/lib/format";
 import LiveRefresh from "@/components/LiveRefresh";
+import NotaImg from "@/components/NotaImg";
 
 export const dynamic = "force-dynamic";
 
@@ -76,12 +77,17 @@ export default async function LaporanPage({ searchParams }) {
       <div className="kartu mt-4 divide-y divide-zamrud-100 overflow-hidden">
         {rows.map((t) => (
           <div key={t.id} className="flex items-center gap-4 px-5 py-4">
-            <span className="text-2xl shrink-0">{t.tipe === "masuk" ? "💰" : "📄"}</span>
+            {t.tipe === "keluar" && t.bukti_url ? (
+              <NotaImg src={t.bukti_url} alt={`Nota: ${t.keterangan}`} />
+            ) : (
+              <span className="text-2xl shrink-0">{t.tipe === "masuk" ? "💰" : "📄"}</span>
+            )}
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-zamrud-900">{t.keterangan}</p>
               <p className="text-xs text-zamrud-900/50">
                 {t.kategori} · {tanggalSingkat(t.tanggal)}
-                {t.tipe === "keluar" && " · ada bukti"}
+                {t.tipe === "keluar" &&
+                  (t.bukti_url ? " · klik nota untuk lihat bukti" : " · ada bukti")}
               </p>
             </div>
             <span
@@ -99,8 +105,8 @@ export default async function LaporanPage({ searchParams }) {
       </div>
 
       <p className="text-xs text-zamrud-900/50 mt-4">
-        Diperbarui {st.diperbarui} · Setiap pengeluaran disertai foto bukti
-        (nota/kwitansi) yang bisa diminta warga kepada panitia.
+        Diperbarui {st.diperbarui} · Setiap pengeluaran disertai nota/bukti foto —
+        klik gambar nota untuk melihat detailnya.
       </p>
     </main>
   );

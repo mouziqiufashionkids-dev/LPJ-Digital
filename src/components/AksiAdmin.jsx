@@ -2,16 +2,25 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AksiAdmin({ url, body, label, suksesLabel = "✓ Berhasil" }) {
+export default function AksiAdmin({
+  url,
+  body,
+  label,
+  suksesLabel = "✓ Berhasil",
+  method = "POST",
+  tanya = null,
+  merah = false,
+}) {
   const router = useRouter();
   const [proses, setProses] = useState(false);
   const [selesai, setSelesai] = useState(false);
 
   async function jalankan() {
+    if (tanya && !window.confirm(tanya)) return;
     setProses(true);
     try {
       await fetch(url, {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
@@ -29,7 +38,11 @@ export default function AksiAdmin({ url, body, label, suksesLabel = "✓ Berhasi
     <button
       onClick={jalankan}
       disabled={proses}
-      className="text-xs font-semibold bg-zamrud-600 text-white rounded-lg px-3 py-1.5 hover:bg-zamrud-700 disabled:opacity-50"
+      className={`text-xs font-semibold rounded-lg px-3 py-1.5 disabled:opacity-50 ${
+        merah
+          ? "bg-rose-100 text-rose-700 hover:bg-rose-200"
+          : "bg-zamrud-600 text-white hover:bg-zamrud-700"
+      }`}
     >
       {proses ? "…" : label}
     </button>
