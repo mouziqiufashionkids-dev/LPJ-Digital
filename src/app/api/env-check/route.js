@@ -9,6 +9,7 @@ export function GET() {
     .filter((k) => /SUPABASE|ADMIN|PASSWORD/i.test(k))
     .map((k) => k.trim());
   return Response.json({
+    versi_kode: "v2-sandi",
     waktu: new Date().toISOString(),
     supabase_url_ada: Boolean(env.NEXT_PUBLIC_SUPABASE_URL),
     supabase_url_nilai: env.NEXT_PUBLIC_SUPABASE_URL || null, // bukan rahasia
