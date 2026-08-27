@@ -4,42 +4,45 @@ import { listWarga } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
+async function aman(nama, fn, hasil) {
+  try {
+    hasil[nama] = await fn();
+  } catch (e) {
+    hasil[nama] = "ERR: " + (e?.message || String(e));
+  }
+  return hasil;
+}
+
 export async function GET() {
-  const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
   const hasil = {
     env_url: process.env.NEXT_PUBLIC_SUPABASE_URL || "(tidak diset)",
     module_url: SUPABASE_URL,
-    fallback_url: SUPABASE_URL_FALLBACK,
   };
+  const klien = (u) => createClient(u, KEY, { auth: { persistSession: false } });
 
-  // hitung via jalur aplikasi (head-only, efisien)
-  const r1 = await createClient(SUPABASE_URL, KEY, { auth: { persistSession: false } })
-    .from("warga").select("id", { count: "exact", head: true });
-  hasil.hitung_app = { total: r1.count, error: r1.error?.message ?? null };
+  await aman("hitung_app", async () => {
+    const r = await klien(SUPABASE_URL).from("warga").select("id", { count: "exact", head: true });
+    return { total: r.count ?? null, error: r.error?.message ?? null };
+  }, hasil);
 
-  // listWarga (jalur panel)
-  try {
-    hasil.listWarga_jumlah = (await listWarga()).length;
-  } catch (e) {
-    hasil.listWarga_jumlah = "ERR: " + e.message;
-  }
+  await aman("listWarga_jumlah", async () => (await listWarga()).length, hasil);
 
-  // kalau env URL berbeda dari fallback, cek proyek env langsung
-  if (hasil.env_url && hasil.env_url !== SUPABASE_URL_FALLBACK) {
-    const rEnv = await createClient(hasil.env_url, KEY, { auth: { persistSession: false } })
-      .from("warga").select("id", { count: "exact", head: true });
-    hasil.proyek_env = { total: rEnv.count, error: rEnv.error?.message ?? null };
-  }
+  await aman("proyek_env", async () => {
+    if (!hasil.env_url || hasil.env_url === SUPABASE_URL_FALLBACK) return "(sama dengan fallback)";
+    const r = await klien(hasil.env_url).from("warga").select("id", { count: "exact", head: true });
+    return { total: r.count ?? null, error: r.error?.message ?? null };
+  }, hasil);
 
-  // cek proyek fallback langsung
-  const rFb = await createClient(SUPABASE_URL_FALLBACK, KEY, { auth: { persistSession: false } })
-    .from("warga").select("id", { count: "exact", head: true });
-  hasil.proyek_fallback = { total: rFb.count, error: rFb.error?.message ?? null };
+  await aman("proyek_fallback", async () => {
+    const r = await klien(SUPABASE_URL_FALLBACK).from("warga").select("id", { count: "exact", head: true });
+    return { total: r.count ?? null, error: r.error?.message ?? null };
+  }, hasil);
 
-  // 5 id tertinggi (melihat duplikasi massal)
-  const rHigh = await createClient(SUPABASE_URL, KEY, { auth: { persistSession: false } })
-    .from("warga").select("id,nama").order("id", { ascending: false }).limit(5);
-  hasil.id_tertinggi = rHigh.data || [];
+  await aman("id_tertinggi", async () => {
+    const r = await klien(SUPABASE_URL).from("warga").select("id,nama").order("id", { ascending: false }).limit(5);
+    return r.data || [];
+  }, hasil);
 
   return Response.json(hasil);
 }
