@@ -24,6 +24,8 @@ export default function KuponClient() {
   const [data, setData] = useState(null);
   const [galat, setGalat] = useState("");
   const [perluLogin, setPerluLogin] = useState(false);
+  const [memperbaiki, setMemperbaiki] = useState(false);
+  const [infoPerbaikan, setInfoPerbaikan] = useState("");
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
@@ -61,6 +63,32 @@ export default function KuponClient() {
     else setKelas(nilai);
   }
 
+  // perbaiki kupon yang gagal terbentuk (warga ada tapi kuponnya hilang)
+  async function perbaiki() {
+    setMemperbaiki(true);
+    setInfoPerbaikan("");
+    try {
+      const r = await fetchAdmin("/api/admin/perbaiki-kupon", { method: "POST" });
+      if (r.status === 401) {
+        setPerluLogin(true);
+        return;
+      }
+      const d = await r.json();
+      setInfoPerbaikan(
+        d.dibuat > 0
+          ? `✅ ${d.dibuat} kupon baru berhasil dibuat.`
+          : d.kurang > 0
+          ? `⚠️ ${d.kurang} kupon gagal dibuat — periksa database.`
+          : "✅ Semua warga sudah punya kupon."
+      );
+      muat();
+    } catch {
+      setInfoPerbaikan("Gagal menghubungi server.");
+    } finally {
+      setMemperbaiki(false);
+    }
+  }
+
   const s = data?.pengaturan || {};
   const daftar = data?.daftar || [];
 
@@ -85,7 +113,14 @@ export default function KuponClient() {
           <h1 className="font-judul text-2xl md:text-3xl font-bold text-zamrud-800">
             🖨️ Cetak Kupon Iuran
           </h1>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={perbaiki}
+              disabled={memperbaiki}
+              className="tombol bg-white border border-zamrud-300 text-zamrud-700 hover:bg-zamrud-50 text-xs px-3 py-2"
+            >
+              {memperbaiki ? "Memperbaiki…" : "🔧 Perbaiki kupon hilang"}
+            </button>
             <TombolCetak />
           </div>
         </div>
@@ -139,6 +174,9 @@ export default function KuponClient() {
             Tata cara: klik <strong>Cetak / Simpan PDF</strong> → potong garis putus-putus →
             bagikan ke juru tagih. QR di kupon menuju cek status iuran.
           </p>
+          {infoPerbaikan && (
+            <p className="mt-2 font-semibold text-zamrud-800">{infoPerbaikan}</p>
+          )}
         </div>
       </div>
 

@@ -37,3 +37,4 @@ export const kirimRsvp = impl.kirimRsvp;
 export const listRsvp = impl.listRsvp;
 export const getRsvpStats = impl.getRsvpStats;
 export const hapusRsvp = impl.hapusRsvp;
+export const perbaikiKupon = impl.perbaikiKupon;
