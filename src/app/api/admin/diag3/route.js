@@ -1,48 +1,39 @@
 import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_URL_FALLBACK } from "@/lib/supabase-store";
-import { listWarga } from "@/lib/store";
+import { SUPABASE_URL } from "@/lib/supabase-store";
 
 export const dynamic = "force-dynamic";
 
-async function aman(nama, fn, hasil) {
-  try {
-    hasil[nama] = await fn();
-  } catch (e) {
-    hasil[nama] = "ERR: " + (e?.message || String(e));
-  }
-  return hasil;
-}
-
 export async function GET() {
   const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-  const hasil = {
-    env_url: process.env.NEXT_PUBLIC_SUPABASE_URL || "(tidak diset)",
-    module_url: SUPABASE_URL,
-  };
-  const klien = (u) => createClient(u, KEY, { auth: { persistSession: false } });
+  const c = createClient(SUPABASE_URL, KEY, { auth: { persistSession: false } });
+  const hasil = {};
 
-  await aman("hitung_app", async () => {
-    const r = await klien(SUPABASE_URL).from("warga").select("id", { count: "exact", head: true });
-    return { total: r.count ?? null, error: r.error?.message ?? null };
-  }, hasil);
+  // 1) SEMUA baris — id & nama saja (data mentah, tanpa sendi)
+  const r1 = await c.from("warga").select("id,nama,kelas,ancalah,aktif").limit(200);
+  hasil.semua_baris_error = r1.error?.message ?? null;
+  hasil.total_dibaca = r1.data?.length ?? 0;
+  hasil.baris = (r1.data || []).slice(0, 10).map((x) => ({
+    id: x.id, nama: String(x.nama).slice(0, 18), kelas: x.kelas,
+    ancalah: x.ancalah, aktif: x.aktif === null ? "NULL" : x.aktif,
+  }));
+  hasil.ada_penanda = (r1.data || []).some((x) => String(x.nama).includes("PENANDA"));
 
-  await aman("listWarga_jumlah", async () => (await listWarga()).length, hasil);
+  // 2) coba HAPUS penanda — tampilkan error aslinya
+  const penanda = (r1.data || []).find((x) => String(x.nama).includes("PENANDA"));
+  if (penanda) {
+    const h = await c.from("warga").delete().eq("id", penanda.id);
+    hasil.hapus_penanda = { id: penanda.id, error: h.error?.message ?? null, sukses: !h.error };
+  } else {
+    hasil.hapus_penanda = "penanda tidak ditemukan di select *";
+  }
 
-  await aman("proyek_env", async () => {
-    if (!hasil.env_url || hasil.env_url === SUPABASE_URL_FALLBACK) return "(sama dengan fallback)";
-    const r = await klien(hasil.env_url).from("warga").select("id", { count: "exact", head: true });
-    return { total: r.count ?? null, error: r.error?.message ?? null };
-  }, hasil);
+  // 3) coba order by id (error-nya diperlihatkan)
+  const r3 = await c.from("warga").select("id").order("id", { ascending: false }).limit(3);
+  hasil.order_id = { error: r3.error?.message ?? null, jumlah: r3.data?.length ?? 0 };
 
-  await aman("proyek_fallback", async () => {
-    const r = await klien(SUPABASE_URL_FALLBACK).from("warga").select("id", { count: "exact", head: true });
-    return { total: r.count ?? null, error: r.error?.message ?? null };
-  }, hasil);
-
-  await aman("id_tertinggi", async () => {
-    const r = await klien(SUPABASE_URL).from("warga").select("id,nama").order("id", { ascending: false }).limit(5);
-    return r.data || [];
-  }, hasil);
+  // 4) jumlah kupon
+  const r4 = await c.from("kupon").select("id", { count: "exact", head: true });
+  hasil.kupon_total = r4.count ?? null;
 
   return Response.json(hasil);
 }
