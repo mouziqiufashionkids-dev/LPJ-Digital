@@ -23,7 +23,11 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
   → status + kwitansi digital
 - `/laporan`: rincian kas — **klik gambar nota** untuk melihat bukti
 - `/kotak-saran`: kirim saran (masuk moderasi dulu)
-- `/admin` *(tersembunyi — tidak ada tautan dari situs warga)*:
+- **Panel panitia** (dilindungi sandi):
+  - Akses: **klik logo masjid 3×** di halaman mana pun → login, atau
+    langsung buka `/admin/login`
+  - Sandi default mode demo: `alhikmah2026` — ganti lewat `ADMIN_PASSWORD`
+    di `.env.local` / Environment Variables Vercel (sesi 8 jam)
   - Tambah warga masal (manual / tempel daftar / unggah CSV) →
     kupon berkode unik + QR dibuat otomatis
   - `/admin/kupon`: **cetak kupon massal** siap potong per A4
@@ -59,7 +63,11 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
       nota bisa dilihat (klik gambar), kotak saran
 - [x] **Undangan digital + RSVP live** (rundown, konfirmasi kehadiran,
       daftar calon tamu, rekap di admin)
-- [x] Panel panitia tersembunyi (`/admin`, tanpa tautan dari situs warga)
+- [x] Panel panitia tersembunyi & **dilindungi sandi** (klik logo 3× →
+      login, middleware `/admin/*` + `/api/admin/*`, sesi 8 jam)
+- [x] Logo masjid profesional (AI redraw dari logo asli; asli diarsipkan
+      di `public/logo-masjid-asli.png`)
+- [x] Nama masjid (Masjid Al-Hikmah) & tanggal acara (5 Sep 2026)
 - [x] Tambah warga masal (manual/tempel/CSV) → kupon otomatis
 - [x] Cetak kupon massal A4 + QR per kupon
 - [ ] Catat pengeluaran + upload bukti foto

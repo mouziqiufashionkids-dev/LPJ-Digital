@@ -193,18 +193,23 @@ dokumentasi    : judul, foto_url
 2. ✅ **Banner publik**: rekap "X dari Y KK sudah lunas" (anonim).
    **Menu "Cek Iuran"**: pencarian nama/kode → status diterima/belum
 3. ✅ **Domain**: rename project Vercel ke nama yang jelas (custom domain menyusul)
-4. ✅ Komunitas berbeda dari SIMSALABIM — **nama & tanggal kegiatan menyusul**
+4. ✅ Komunitas berbeda dari SIMSALABIM — nama masjid **Masjid Al-Hikmah**,
+   acara **Sabtu, 5 September 2026** (lihat #13)
 5. ✅ Repo: lanjut di **LPJ-Digital**
-6. ✅ **Header pakai nama masjid** (placeholder: Masjid Jami' Al-Hikmah)
+6. ✅ **Header pakai nama masjid: Masjid Al-Hikmah**
    — dipilih demi kepercayaan & bisa dipakai ulang untuk kegiatan masjid
    lain (Ramadhan, qurban, iuran bulanan)
-7. ✅ **Panel admin disembunyikan** — tanpa tautan dari situs warga,
-   akses langsung lewat `/admin`; login menyusul
+7. ✅ **Panel admin disembunyikan + sandi**: klik logo masjid 3× di halaman
+   mana pun → halaman login (`/admin/login`). Middleware melindungi semua
+   halaman & API `/admin/*` dan `/api/admin/*`. Sandi lewat env
+   `ADMIN_PASSWORD` (default demo: `alhikmah2026`), sesi 8 jam
 8. ✅ **Nota pengeluaran tampil** seperti SIMSALABIM (klik gambar nota)
 9. ✅ **Generate kupon masal**: input manual / tempel daftar / unggah CSV
    → kupon berkode + QR otomatis → cetak A4 (10/lembar), siap potong
-10. ⏳ Login admin & proteksi: tahap berikutnya
-11. ✅ **Logo masjid asli** dipakai di header & undangan
-    (`public/logo-masjid.png`)
+10. ✅ **Login admin & proteksi: SELESAI** (lihat #7)
+11. ✅ **Logo masjid profesional** — versi AI-redraw dari logo asli
+    (garis tipis samar digambar ulang jadi emblem solid hijau+emas);
+    logo asli diarsipkan `public/logo-masjid-asli.png`
 12. ✅ **Undangan + RSVP live** — riset fitur web masjid referensi
     (Istiqlal, Cut Meutia, Al Falah, Al-Azhar) ada di `docs/REFERENSI.md`
+13. ✅ **Tanggal acara: Sabtu, 5 September 2026**

@@ -42,13 +42,13 @@ function ancalahUntuk(i) {
 
 function buatDataDemo() {
   const pengaturan = {
-    nama_masjid: "Masjid Jami' Al-Hikmah", // <- ganti dengan nama masjid Anda
+    nama_masjid: "Masjid Al-Hikmah",
     nama_kegiatan: "Maulid Nabi ﷺ 1447 H",
     hijriah: "12 Rabiul Awal 1447 H",
     penyelenggara: "[Nama RT/RW · Kampung] — ganti di Pengaturan Admin",
     penyelenggara_singkat: "RT/RW · Kampung Anda",
-    lokasi_acara: "Balai Warga & Masjid Jami' Al-Hikmah",
-    tanggal_acara: "2026-09-04T08:00:00+07:00", // konfirmasi tanggal panitia
+    lokasi_acara: "Balai Warga & Masjid Al-Hikmah",
+    tanggal_acara: "2026-09-05T08:00:00+07:00",
     kontak_wa: "628123456789", // nomor bendahara (format 62…)
   };
 
@@ -179,13 +179,12 @@ function buatDataDemo() {
 }
 
 // SATU instance untuk seluruh route (lihat penjelasan di atas)
+const VERSI_DEMO = 2; // naikkan saat struktur/isi data demo berubah
 const S = (globalThis.__lpjDataDemo ??= buatDataDemo());
-// Saat kode diperbarui di dev (hot-reload), state lama mungkin belum punya
-// kunci baru — tambahkan otomatis agar tidak error:
-if (!Array.isArray(S.rsvp) || !Array.isArray(S.agenda)) {
-  const baru = buatDataDemo();
-  if (!Array.isArray(S.rsvp)) S.rsvp = baru.rsvp;
-  if (!Array.isArray(S.agenda)) S.agenda = baru.agenda;
+// Saat kode diperbarui di dev (hot-reload), state lama mungkin berbentuk
+// lama — reset ke data terbaru jika versi berbeda:
+if (S.__versi !== VERSI_DEMO) {
+  Object.assign(S, buatDataDemo(), { __versi: VERSI_DEMO });
 }
 
 // ------------------------- API -----------------------------------

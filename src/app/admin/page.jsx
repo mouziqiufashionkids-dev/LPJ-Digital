@@ -4,6 +4,7 @@ import { rupiah, tanggalSingkat } from "@/lib/format";
 import AksiAdmin from "@/components/AksiAdmin";
 import LiveRefresh from "@/components/LiveRefresh";
 import TambahWarga from "@/components/TambahWarga";
+import TombolLogout from "@/components/TombolLogout";
 
 export const dynamic = "force-dynamic";
 
@@ -29,14 +30,18 @@ export default async function AdminPage() {
         <h1 className="font-judul text-3xl font-bold text-zamrud-800">
           🛠️ Panel Panitia
         </h1>
-        <LiveRefresh intervalMs={20000} />
+        <div className="flex items-center gap-3">
+          <LiveRefresh intervalMs={20000} />
+          <TombolLogout />
+        </div>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-        <strong>Panel tersembunyi.</strong> Halaman ini tidak ditautkan dari situs
-        warga — akses hanya dengan mengetik alamat <code>/admin</code> langsung.
-        Login &amp; proteksi kata sandi menyusul; catat pengeluaran + upload bukti
-        foto juga menyusul.
+      <div className="mt-4 rounded-2xl border border-zamrud-200 bg-zamrud-50 p-4 text-sm text-zamrud-900/80">
+        <strong>Panel dilindungi sandi.</strong> Halaman ini tidak ditautkan
+        dari situs warga — akses cepat lewat <strong>klik logo masjid 3×</strong>{" "}
+        di halaman mana pun. Sesi otomatis berakhir setelah 8 jam atau klik
+        <strong> Keluar</strong>. Catat pengeluaran + upload bukti foto
+        menyusul.
       </div>
 
       {/* ringkasan */}
