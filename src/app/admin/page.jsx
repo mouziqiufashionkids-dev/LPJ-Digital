@@ -59,6 +59,18 @@ function terapPatch(data, d) {
       kk_lunas: data.stats.kk_lunas - lunasHilang.length,
       dana_masuk: data.stats.dana_masuk - lunasHilang.reduce((a, x) => a + (x.ancalah || 0), 0),
     };
+  } else if (d.jenis === "ubahWarga" && d.id != null) {
+    baru.warga = data.warga.map((x) => (idSama(x.id, d.id) ? { ...x, ...d.data } : x));
+    const w = data.warga.find((x) => idSama(x.id, d.id));
+    if (w) {
+      const lama = w.ancalah || 0;
+      const baruN = d.data.ancalah ?? lama;
+      baru.stats = {
+        ...data.stats,
+        target_dana: data.stats.target_dana - lama + baruN,
+        ...(w.kupon?.status === "lunas" ? { dana_masuk: data.stats.dana_masuk - lama + baruN } : {}),
+      };
+    }
   } else if (d.jenis === "hapusRsvp" && d.id != null) {
     baru.rsvp = data.rsvp.filter((x) => !idSama(x.id, d.id));
   } else if (d.jenis === "hapusDok" && d.id != null) {
@@ -77,6 +89,7 @@ export default function AdminPage() {
   const [muat, setMuat] = useState(false);
   const [punyaToken, setPunyaToken] = useState(null); // null = sedang dicek
   const [alasanKeluar, setAlasanKeluar] = useState("");
+  const [editWarga, setEditWarga] = useState(null); // warga yang sedang diedit
 
   const muatUlang = useCallback(async () => {
     setMuat(true);
@@ -368,6 +381,12 @@ export default function AdminPage() {
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setEditWarga({ ...w })}
+                        className="text-xs font-semibold bg-white text-zamrud-700 border border-zamrud-300 hover:bg-zamrud-50 rounded-lg px-3 py-1.5"
+                      >
+                        Edit
+                      </button>
                       {!lunas && (
                         <AksiAdmin
                           url="/api/admin/bayar"
@@ -593,6 +612,120 @@ export default function AdminPage() {
           </tbody>
         </table>
       </div>
+          {/* ===== modal edit warga ===== */}
+      {editWarga && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          onClick={() => setEditWarga(null)}
+        >
+          <div
+            className="kartu p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-judul text-xl font-bold text-zamrud-800">
+              Edit Warga
+            </h3>
+            <p className="text-xs text-zamrud-900/60 mt-1">
+              Perbaiki nama, alamat, kelas, atau nominal ancalah.
+            </p>
+            <div className="space-y-3 mt-4">
+              <div>
+                <label className="block text-xs font-semibold text-zamrud-800 mb-1">Nama</label>
+                <input
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                  value={editWarga.nama ?? ""}
+                  maxLength={80}
+                  onChange={(e) => setEditWarga({ ...editWarga, nama: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zamrud-800 mb-1">RT</label>
+                  <input
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    value={editWarga.rt ?? ""}
+                    maxLength={20}
+                    onChange={(e) => setEditWarga({ ...editWarga, rt: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zamrud-800 mb-1">Alamat</label>
+                  <input
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    value={editWarga.alamat ?? ""}
+                    maxLength={120}
+                    onChange={(e) => setEditWarga({ ...editWarga, alamat: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zamrud-800 mb-1">Kelas</label>
+                  <select
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    value={editWarga.kelas || "3"}
+                    onChange={(e) => setEditWarga({ ...editWarga, kelas: e.target.value })}
+                  >
+                    <option value="1">Kelas 1 (150rb)</option>
+                    <option value="2">Kelas 2 (100rb)</option>
+                    <option value="3">Kelas 3 (75rb)</option>
+                    <option value="sponsor">Sponsor</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zamrud-800 mb-1">Ancalah (Rp)</label>
+                  <input
+                    inputMode="numeric"
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    value={String(editWarga.ancalah ?? 0)}
+                    onChange={(e) =>
+                      setEditWarga({
+                        ...editWarga,
+                        ancalah: Number(String(e.target.value).replace(/[^0-9]/g, "")) || 0,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <button
+                onClick={async () => {
+                  const dataKirim = {
+                    nama: editWarga.nama,
+                    rt: editWarga.rt,
+                    alamat: editWarga.alamat,
+                    kelas: editWarga.kelas,
+                    ancalah: editWarga.ancalah,
+                  };
+                  const r = await fetchAdmin("/api/admin/warga", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: editWarga.id, data: dataKirim }),
+                  });
+                  const d = await r.json();
+                  if (d.ok) {
+                    patchPanel({ jenis: "ubahWarga", id: editWarga.id, data: dataKirim });
+                    segarkanPanel();
+                    setEditWarga(null);
+                  } else {
+                    alert("Gagal menyimpan: " + (d.pesan || "?"));
+                  }
+                }}
+                className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 flex-1"
+              >
+                Simpan Perubahan
+              </button>
+              <button
+                onClick={() => setEditWarga(null)}
+                className="tombol border-2 border-zamrud-200 text-zamrud-700 hover:bg-zamrud-50"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
