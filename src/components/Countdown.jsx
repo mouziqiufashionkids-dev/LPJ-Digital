@@ -25,9 +25,9 @@ export default function Countdown({ target, label = "Menuju hari-H" }) {
   const menit = Math.floor((diff % 36e5) / 6e4);
   const detik = Math.floor((diff % 6e4) / 1e3);
   const kotak = (v, t) => (
-    <div className="bg-krem/10 border border-krem/15 rounded-xl px-3 py-2 text-center min-w-[64px]">
-      <div className="text-2xl font-bold text-krem tabular-nums">{String(v).padStart(2, "0")}</div>
-      <div className="text-[10px] uppercase tracking-wide text-krem/60">{t}</div>
+    <div className="bg-krem/10 border border-krem/15 rounded-lg sm:rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-center min-w-[48px] sm:min-w-[64px]">
+      <div className="text-lg sm:text-2xl font-bold text-krem tabular-nums">{String(v).padStart(2, "0")}</div>
+      <div className="text-[9px] sm:text-[10px] uppercase tracking-wide text-krem/60">{t}</div>
     </div>
   );
   return (

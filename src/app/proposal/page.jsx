@@ -21,7 +21,7 @@ export default async function ProposalPage({ searchParams }) {
     <main className="min-h-screen bg-krem pb-24">
       {/* ========== KEPALA PROPOSAL ========== */}
       <section className="bg-zamrud-800 bg-ornamen text-krem relative overflow-hidden">
-        <div className="mx-auto max-w-3xl px-4 pt-12 pb-14 text-center">
+        <div className="mx-auto max-w-3xl px-4 pt-6 sm:pt-12 pb-10 sm:pb-14 text-center">
           <Logo className="h-20 w-20 mx-auto" />
           <p className="pill bg-krem/10 text-emas-terang mt-5">
             Proposal Dukungan Kegiatan

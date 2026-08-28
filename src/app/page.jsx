@@ -26,7 +26,7 @@ export default async function Beranda() {
     <main>
       {/* ============ HERO ============ */}
       <section className="bg-zamrud-800 bg-ornamen text-krem relative">
-        <div className="mx-auto max-w-5xl px-4 pt-10 pb-20 text-center">
+        <div className="mx-auto max-w-5xl px-4 pt-6 pb-16 sm:pt-10 sm:pb-20 text-center">
           <p className="pill bg-krem/10 text-emas-terang mb-4">
             ✓ Laporan terverifikasi panitia
           </p>
@@ -34,19 +34,22 @@ export default async function Beranda() {
             {s.nama_masjid}
           </p>
           <p className="font-judul text-2xl text-emas-terang">﷽</p>
-          <h1 className="font-judul font-bold text-4xl md:text-5xl mt-3 leading-tight">
+          <h1 className="font-judul font-bold text-2xl sm:text-4xl md:text-5xl mt-3 leading-tight break-words">
             {s.nama_kegiatan}
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-krem/85 text-lg">
             {isi(K["beranda.pembuka"], s)}
           </p>
+          
+            p { word-wrap: break-word; overflow-wrap: break-word; }
+          `
           <p className="text-sm text-krem/60 mt-2">
             {tanggalID(s.tanggal_acara)} · {s.lokasi_acara}
           </p>
-          <div className="mt-6 flex justify-center">
+          <div className="mt-4 sm:mt-6 flex justify-center">
             <Countdown target={s.tanggal_acara} />
           </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mt-5 sm:mt-8 flex flex-wrap justify-center gap-2 sm:gap-3">
             <Link href="/cek-iuran" className="tombol bg-emas text-zamrud-900 hover:bg-emas-terang">
               🔍 Cek Iuran Saya
             </Link>
@@ -58,7 +61,7 @@ export default async function Beranda() {
       </section>
 
       {/* ============ PROGRESS DANA (menimpa hero) ============ */}
-      <section className="mx-auto max-w-5xl px-4 -mt-12 relative z-10">
+      <section className="mx-auto max-w-5xl px-4 -mt-8 sm:-mt-12 relative z-10">
         <div className="kartu p-6 md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <h2 className="font-judul text-2xl font-bold text-zamrud-800">

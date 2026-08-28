@@ -28,13 +28,13 @@ export default async function UndanganPage() {
     <main className="mx-auto max-w-3xl px-4 py-10">
       {/* ============ KARTU UNDANGAN ============ */}
       <div className="kartu overflow-hidden border-2 border-emas/60">
-        <div className="bg-zamrud-800 bg-ornamen text-krem px-6 py-10 text-center">
+        <div className="bg-zamrud-800 bg-ornamen text-krem px-4 sm:px-6 py-6 sm:py-10 text-center">
           <Logo className="h-20 w-20 mx-auto" />
           <p className="font-judul text-2xl text-emas-terang mt-5">﷽</p>
           <p className="text-[11px] tracking-[0.35em] uppercase text-emas-terang mt-3">
             Undangan
           </p>
-          <h1 className="font-judul text-3xl md:text-4xl font-bold mt-2 leading-tight">
+          <h1 className="font-judul text-2xl sm:text-3xl md:text-4xl font-bold mt-2 leading-tight break-words">
             Peringatan {s.nama_kegiatan}
           </h1>
           <p className="text-krem/80 mt-2">

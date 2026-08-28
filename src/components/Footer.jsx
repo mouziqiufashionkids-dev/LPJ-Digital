@@ -8,7 +8,7 @@ export default async function Footer() {
   return (
     <footer className="no-print mt-16 bg-zamrud-900 text-krem/80">
       <div className="bg-ornamen">
-        <div className="mx-auto max-w-5xl px-4 py-10 grid gap-8 md:grid-cols-3">
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10 grid gap-6 md:grid-cols-3">
           <div>
             <p className="pill bg-emas/20 text-emas-terang mb-3">
               ✓ Laporan terverifikasi panitia

@@ -57,7 +57,7 @@ export default async function JadwalSholat({ kota = "Garut" }) {
             <p className="text-xs text-krem/60">{tanggalHijriah}</p>
           )}
         </div>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2">
           {NAMA_WAKTU.map(([kunci, label]) => {
             const jam = (data.timings[kunci] || "").slice(0, 5);
             const [j, m] = jam.split(":").map(Number);
