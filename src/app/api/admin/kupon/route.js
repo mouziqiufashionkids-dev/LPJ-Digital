@@ -17,6 +17,7 @@ export async function GET(request) {
 
   const c = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false },
+    global: { fetch: (url, options) => fetch(url, { ...options, cache: "no-store", next: { revalidate: 0 } }) },
   });
   const [kw, kp] = await Promise.all([
     c.from("warga").select("*, kupon(*)").order("nama"),

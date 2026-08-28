@@ -9,7 +9,10 @@ export const dynamic = "force-dynamic";
 // Excel yang diperbaiki — anti-dobel akan menghalangi jika data lama masih ada.
 export async function POST() {
   const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-  const c = createClient(SUPABASE_URL, KEY, { auth: { persistSession: false } });
+  const c = createClient(SUPABASE_URL, KEY, {
+    auth: { persistSession: false },
+    global: { fetch: (u, o) => fetch(u, { ...o, cache: "no-store" }) },
+  });
 
   const h = await kosongkanWarga();
   if (!h.ok) return Response.json({ ok: false, pesan: h.pesan, sisa_warga: null, sisa_kupon: null });

@@ -2,9 +2,13 @@ import { mode } from "@/lib/store";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL } from "@/lib/supabase-store";
 
+const fetchNoStore = (url, options) =>
+  fetch(url, { ...options, cache: "no-store", next: { revalidate: 0 } });
+
 async function bacaSegar() {
   const c = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false },
+    global: { fetch: fetchNoStore },
   });
   const [p, st, w, t, s, r, rs, dk] = await Promise.all([
     c.from("pengaturan").select("*").eq("id", 1).single(),
