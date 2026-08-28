@@ -90,6 +90,7 @@ export default function AdminPage() {
   const [punyaToken, setPunyaToken] = useState(null); // null = sedang dicek
   const [alasanKeluar, setAlasanKeluar] = useState("");
   const [editWarga, setEditWarga] = useState(null); // warga yang sedang diedit
+  const [editTransaksi, setEditTransaksi] = useState(null); // transaksi yang diedit
 
   const muatUlang = useCallback(async () => {
     setMuat(true);
@@ -543,6 +544,12 @@ export default function AdminPage() {
             <span className={t.tipe === "masuk" ? "font-semibold text-zamrud-600" : "font-semibold text-rose-600"}>
               {rupiah(t.jumlah)}
             </span>
+            <button
+              onClick={() => setEditTransaksi({ ...t })}
+              className="text-xs font-semibold bg-white text-zamrud-700 border border-zamrud-300 hover:bg-zamrud-50 rounded-lg px-3 py-1.5 shrink-0"
+            >
+              Edit
+            </button>
           </div>
         ))}
       </div>
@@ -692,7 +699,102 @@ export default function AdminPage() {
           </tbody>
         </table>
       </div>
-          {/* ===== modal edit warga ===== */}
+          {/* ===== modal edit transaksi ===== */}
+      {editTransaksi && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          onClick={() => setEditTransaksi(null)}
+        >
+          <div
+            className="kartu p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-judul text-xl font-bold text-zamrud-800">
+              Edit {editTransaksi.tipe === "masuk" ? "Pemasukan" : "Pengeluaran"}
+            </h3>
+            <div className="space-y-3 mt-4">
+              <div>
+                <label className="block text-xs font-semibold text-zamrud-800 mb-1">Keterangan</label>
+                <input
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                  value={editTransaksi.keterangan ?? ""}
+                  maxLength={160}
+                  onChange={(e) => setEditTransaksi({ ...editTransaksi, keterangan: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zamrud-800 mb-1">Tanggal</label>
+                  <input
+                    type="date"
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    value={editTransaksi.tanggal ? editTransaksi.tanggal.slice(0, 10) : ""}
+                    onChange={(e) => setEditTransaksi({ ...editTransaksi, tanggal: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zamrud-800 mb-1">Jumlah (Rp)</label>
+                  <input
+                    inputMode="numeric"
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                    value={String(editTransaksi.jumlah ?? 0)}
+                    onChange={(e) =>
+                      setEditTransaksi({
+                        ...editTransaksi,
+                        jumlah: Number(String(e.target.value).replace(/[^0-9]/g, "")) || 0,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-zamrud-800 mb-1">Kategori</label>
+                <input
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-sm"
+                  value={editTransaksi.kategori ?? ""}
+                  maxLength={40}
+                  onChange={(e) => setEditTransaksi({ ...editTransaksi, kategori: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <button
+                onClick={async () => {
+                  const d = {
+                    keterangan: editTransaksi.keterangan,
+                    tanggal: editTransaksi.tanggal,
+                    jumlah: editTransaksi.jumlah,
+                    kategori: editTransaksi.kategori,
+                  };
+                  const r = await fetchAdmin("/api/admin/transaksi", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: editTransaksi.id, data: d }),
+                  });
+                  const hasil = await r.json();
+                  if (hasil.ok) {
+                    segarkanPanel();
+                    setEditTransaksi(null);
+                  } else {
+                    alert("Gagal: " + (hasil.pesan || "?"));
+                  }
+                }}
+                className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 flex-1"
+              >
+                Simpan
+              </button>
+              <button
+                onClick={() => setEditTransaksi(null)}
+                className="tombol border-2 border-zamrud-200 text-zamrud-700 hover:bg-zamrud-50"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== modal edit warga ===== */}
       {editWarga && (
         <div
           className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"

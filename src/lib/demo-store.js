@@ -403,6 +403,17 @@ export function listTransaksi({ tipe } = {}) {
   return [...rows].sort((a, b) => (a.tanggal < b.tanggal ? 1 : -1));
 }
 
+export function ubahTransaksi(id, patch = {}) {
+  const t = S.transaksi.find((x) => String(x.id) === String(id));
+  if (!t) return { ok: false, pesan: "Transaksi tidak ditemukan" };
+  if (patch.tanggal && /^\d{4}-\d{2}-\d{2}$/.test(patch.tanggal)) t.tanggal = patch.tanggal;
+  if (patch.jumlah !== undefined) t.jumlah = Math.max(0, Number(patch.jumlah) || 0);
+  if (patch.kategori !== undefined) t.kategori = String(patch.kategori).trim().slice(0, 40);
+  if (patch.keterangan !== undefined) t.keterangan = String(patch.keterangan).trim().slice(0, 160);
+  if (patch.buktiUrl !== undefined) t.bukti_url = patch.buktiUrl || null;
+  return { ok: true };
+}
+
 export function tambahTransaksi({ tanggal, tipe, jumlah, kategori, keterangan, buktiUrl }) {
   S.transaksi.push({
     id: `t${S.transaksi.length + 1}`,

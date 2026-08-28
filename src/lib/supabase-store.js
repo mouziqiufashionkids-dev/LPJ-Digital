@@ -374,6 +374,19 @@ export async function listTransaksi({ tipe } = {}) {
   return data || [];
 }
 
+export async function ubahTransaksi(id, patch = {}) {
+  const bersih = {};
+  if (patch.tanggal !== undefined && /^\d{4}-\d{2}-\d{2}$/.test(patch.tanggal)) bersih.tanggal = patch.tanggal;
+  if (patch.jumlah !== undefined) bersih.jumlah = Math.max(0, Number(patch.jumlah) || 0);
+  if (patch.kategori !== undefined) bersih.kategori = String(patch.kategori).trim().slice(0, 40);
+  if (patch.keterangan !== undefined) bersih.keterangan = String(patch.keterangan).trim().slice(0, 160);
+  if (patch.buktiUrl !== undefined) bersih.bukti_url = patch.buktiUrl || null;
+  if (!Object.keys(bersih).length) return { ok: false, pesan: "Tidak ada perubahan" };
+  const h = await db().from("transaksi").update(bersih).eq("id", id);
+  if (h.error) return { ok: false, pesan: h.error.message };
+  return { ok: true };
+}
+
 export async function tambahTransaksi({ tanggal, tipe, jumlah, kategori, keterangan, buktiUrl }) {
   await db().from("transaksi").insert({
     tanggal, tipe, jumlah, kategori, keterangan, bukti_url: buktiUrl || null,

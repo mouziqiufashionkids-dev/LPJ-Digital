@@ -37,23 +37,25 @@ export default async function Beranda() {
           <h1 className="font-judul font-bold text-2xl sm:text-4xl md:text-5xl mt-3 leading-tight break-words">
             {s.nama_kegiatan}
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-krem/85 text-lg">
+          <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-krem/85 text-sm sm:text-base md:text-lg leading-relaxed">
             {isi(K["beranda.pembuka"], s)}
           </p>
           
             p { word-wrap: break-word; overflow-wrap: break-word; }
           `
-          <p className="text-sm text-krem/60 mt-2">
-            {tanggalID(s.tanggal_acara)} · {s.lokasi_acara}
+          <p className="text-xs sm:text-sm text-krem/60 mt-2 leading-snug">
+            {tanggalID(s.tanggal_acara)}<br className="sm:hidden" />
+            <span className="hidden sm:inline"> · </span>
+            <span className="block sm:inline">{s.lokasi_acara}</span>
           </p>
           <div className="mt-4 sm:mt-6 flex justify-center">
             <Countdown target={s.tanggal_acara} />
           </div>
-          <div className="mt-5 sm:mt-8 flex flex-wrap justify-center gap-2 sm:gap-3">
-            <Link href="/cek-iuran" className="tombol bg-emas text-zamrud-900 hover:bg-emas-terang">
+          <div className="mt-5 sm:mt-8 flex flex-col sm:flex-row sm:flex-wrap justify-center gap-2 sm:gap-3 px-2">
+            <Link href="/cek-iuran" className="tombol bg-emas text-zamrud-900 hover:bg-emas-terang text-sm sm:text-base w-full sm:w-auto">
               🔍 Cek Iuran Saya
             </Link>
-            <Link href="/laporan" className="tombol border-2 border-krem/30 text-krem hover:bg-krem/10">
+            <Link href="/laporan" className="tombol border-2 border-krem/30 text-krem hover:bg-krem/10 text-sm sm:text-base w-full sm:w-auto">
               📊 Lihat Laporan
             </Link>
           </div>

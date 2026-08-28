@@ -25,11 +25,13 @@ export default function ProgressBar({ terkumpul, target, kkLunas, kkTotal }) {
         />
       </div>
 
-      <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="text-3xl md:text-4xl font-bold text-zamrud-800 tracking-tight">
+      <div className="mt-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3 gap-y-1">
+        <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-zamrud-800 tracking-tight break-all">
           {rupiah(terkumpul)}
         </span>
-        <span className="text-lg text-zamrud-900/60">dari {rupiah(target)}</span>
+        <span className="text-sm sm:text-lg text-zamrud-900/60">
+          dari {rupiah(target)}
+        </span>
       </div>
 
       <p className="mt-2 inline-flex items-center gap-2 text-sm bg-zamrud-50 text-zamrud-800 rounded-xl px-3 py-2 border border-zamrud-100">

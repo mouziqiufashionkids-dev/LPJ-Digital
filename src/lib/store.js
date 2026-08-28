@@ -23,6 +23,7 @@ export const hapusWarga = impl.hapusWarga;
 export const tandaiLunas = impl.tandaiLunas;
 export const listTransaksi = impl.listTransaksi;
 export const tambahTransaksi = impl.tambahTransaksi;
+export const ubahTransaksi = impl.ubahTransaksi;
 export const simpanBerkas = impl.simpanBerkas;
 export const listDokumentasi = impl.listDokumentasi;
 export const tambahDokumentasi = impl.tambahDokumentasi;

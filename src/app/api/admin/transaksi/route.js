@@ -1,4 +1,4 @@
-import { tambahTransaksi, simpanBerkas } from "@/lib/store";
+import { tambahTransaksi, ubahTransaksi, simpanBerkas } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -61,4 +61,19 @@ export async function POST(request) {
     tanggal, tipe, jumlah, kategori, keterangan, buktiUrl,
   });
   return Response.json({ ...hasil, buktiUrl }, { status: hasil.ok ? 200 : 400 });
+}
+
+// UBAH transaksi: perbaiki nominal/keterangan/tanggal/kategori
+export async function PATCH(request) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ ok: false, pesan: "Format salah" }, { status: 400 });
+  }
+  if (!body?.id || !body?.data) {
+    return Response.json({ ok: false, pesan: "id & data wajib" }, { status: 400 });
+  }
+  const hasil = await ubahTransaksi(body.id, body.data);
+  return Response.json(hasil, { status: hasil.ok ? 200 : 400 });
 }
