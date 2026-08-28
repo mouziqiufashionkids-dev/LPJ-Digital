@@ -49,7 +49,7 @@ export default async function ProposalPage({ searchParams }) {
       <div className="mx-auto max-w-3xl px-4">
         {/* ========== SALAM & LATAR BELAKANG ========== */}
         <section className="kartu p-6 md:p-8 -mt-8 relative z-10">
-          <p className="text-right font-judul text-xl text-emas-gelap">﷽</p>
+          <p className="text-center font-judul text-xl text-emas-gelap">﷽</p>
           <p className="text-sm leading-relaxed text-zamrud-900/85 mt-4">
             {isi(K["proposal.salam"], s, ekstra)}
           </p>
