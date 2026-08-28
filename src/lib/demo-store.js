@@ -310,6 +310,21 @@ export function tandaiLunas(wargaId, { tanggal, metode = "tunai", petugas = "Ben
 
 // tambah warga massal: tiap warga otomatis dapat kupon berkode unik.
 // nama yang sudah terdaftar OTOMATIS DILEWATI (anti data dobel).
+export function ubahWarga(id, patch = {}) {
+  const w = S.warga.find((x) => x.id === String(id));
+  if (!w) return { ok: false, pesan: "Warga tidak ditemukan" };
+  if (patch.nama !== undefined) w.nama = String(patch.nama).trim().slice(0, 80);
+  if (patch.rt !== undefined) w.rt = String(patch.rt).trim().slice(0, 20);
+  if (patch.alamat !== undefined) w.alamat = String(patch.alamat).trim().slice(0, 120);
+  if (patch.kelas !== undefined && ["1", "2", "3", "sponsor"].includes(patch.kelas)) w.kelas = patch.kelas;
+  if (patch.ancalah !== undefined) {
+    w.ancalah = Math.max(0, Number(patch.ancalah) || 0);
+    const k = S.kupon.find((x) => x.warga_id === w.id);
+    if (k) k.nominal = w.ancalah;
+  }
+  return { ok: true };
+}
+
 export function kosongkanWarga() {
   S.warga = [];
   S.kupon = [];

@@ -1,4 +1,4 @@
-import { tambahWargaBatch, hapusWarga, kosongkanWarga } from "@/lib/store";
+import { tambahWargaBatch, hapusWarga, kosongkanWarga, ubahWarga } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -66,4 +66,19 @@ export async function DELETE(request) {
     else if (!galat) galat = hasil.pesan || "Gagal";
   }
   return Response.json({ ok: terhapus > 0, terhapus, pesan: galat || null });
+}
+
+// UBAH warga: perbaiki nama/RT/alamat/kelas/nominal tanpa hapus-ulang
+export async function PATCH(request) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ ok: false, pesan: "Format salah" }, { status: 400 });
+  }
+  if (!body?.id || !body?.data) {
+    return Response.json({ ok: false, pesan: "id & data wajib" }, { status: 400 });
+  }
+  const hasil = await ubahWarga(body.id, body.data);
+  return Response.json(hasil, { status: hasil.ok ? 200 : 400 });
 }

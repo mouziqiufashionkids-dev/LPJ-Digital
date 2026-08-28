@@ -18,6 +18,7 @@ export const listWarga = impl.listWarga;
 export const cariWarga = impl.cariWarga;
 export const tambahWargaBatch = impl.tambahWargaBatch;
 export const kosongkanWarga = impl.kosongkanWarga;
+export const ubahWarga = impl.ubahWarga;
 export const hapusWarga = impl.hapusWarga;
 export const tandaiLunas = impl.tandaiLunas;
 export const listTransaksi = impl.listTransaksi;

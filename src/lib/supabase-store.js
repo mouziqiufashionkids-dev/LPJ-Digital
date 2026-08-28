@@ -204,6 +204,23 @@ export async function cariWarga(q) {
 
 // tambah warga massal: kupon berkode unik dibuat otomatis.
 // nama yang sudah terdaftar OTOMATIS DILEWATI (anti data dobel).
+export async function ubahWarga(id, patch = {}) {
+  const bersih = {};
+  if (patch.nama !== undefined) bersih.nama = String(patch.nama).trim().slice(0, 80);
+  if (patch.rt !== undefined) bersih.rt = String(patch.rt).trim().slice(0, 20);
+  if (patch.alamat !== undefined) bersih.alamat = String(patch.alamat).trim().slice(0, 120);
+  if (patch.kelas !== undefined && ["1", "2", "3", "sponsor"].includes(patch.kelas)) bersih.kelas = patch.kelas;
+  if (patch.ancalah !== undefined) bersih.ancalah = Math.max(0, Number(patch.ancalah) || 0);
+  if (!Object.keys(bersih).length) return { ok: false, pesan: "Tidak ada perubahan" };
+  const h = await db().from("warga").update(bersih).eq("id", id);
+  if (h.error) return { ok: false, pesan: h.error.message };
+  // sinkronkan nominal kupon jika ancalah berubah
+  if (bersih.ancalah !== undefined) {
+    await db().from("kupon").update({ nominal: bersih.ancalah }).eq("warga_id", id);
+  }
+  return { ok: true };
+}
+
 export async function kosongkanWarga() {
   const h1 = await db().from("kupon").delete().neq("id", -1);
   if (h1.error) return { ok: false, pesan: "Kupon: " + h1.error.message };
@@ -385,7 +402,8 @@ export async function tambahDokumentasi({ judul, fotoUrl }) {
 }
 
 export async function hapusDokumentasi(id) {
-  await db().from("dokumentasi").delete().eq("id", id);
+  const h = await db().from("dokumentasi").delete().eq("id", id);
+  if (h.error) return { ok: false, pesan: h.error.message };
   return { ok: true };
 }
 
@@ -463,7 +481,8 @@ export async function setSaranStatus(id, { tampil, ditindaklanjuti } = {}) {
   const patch = {};
   if (typeof tampil === "boolean") patch.tampil = tampil;
   if (typeof ditindaklanjuti === "boolean") patch.ditindaklanjuti = ditindaklanjuti;
-  await db().from("kotak_saran").update(patch).eq("id", id);
+  const h = await db().from("kotak_saran").update(patch).eq("id", id);
+  if (h.error) return { ok: false, pesan: h.error.message };
   return { ok: true };
 }
 
@@ -507,6 +526,7 @@ export async function getRsvpStats() {
 }
 
 export async function hapusRsvp(id) {
-  await db().from("rsvp").delete().eq("id", id);
+  const h = await db().from("rsvp").delete().eq("id", id);
+  if (h.error) return { ok: false, pesan: h.error.message };
   return { ok: true };
 }
