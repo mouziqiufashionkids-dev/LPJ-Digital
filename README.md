@@ -97,3 +97,4 @@ Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
       (Supabase + Vercel, gratis, ± 30 menit)
 - [ ] Edit warga & pengaturan lewat UI (sementara lewat database)
 - [ ] Ekspor laporan PDF/Excel untuk rapat panitia
+# trigger deploy Fri Aug 28 10:29:00 UTC 2026
