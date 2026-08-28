@@ -40,9 +40,6 @@ export default async function Beranda() {
           <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-krem/85 text-sm sm:text-base md:text-lg leading-relaxed">
             {isi(K["beranda.pembuka"], s)}
           </p>
-          
-            p { word-wrap: break-word; overflow-wrap: break-word; }
-          `
           <p className="text-xs sm:text-sm text-krem/60 mt-2 leading-snug">
             {tanggalID(s.tanggal_acara)}<br className="sm:hidden" />
             <span className="hidden sm:inline"> · </span>
