@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ambilToken, hapusToken, fetchAdmin } from "@/lib/admin-auth";
+import { ambilToken, hapusToken, fetchAdmin, patchPanel, segarkanPanel } from "@/lib/admin-auth";
 import { rupiah, tanggalSingkat } from "@/lib/format";
 import AksiAdmin from "@/components/AksiAdmin";
 import TambahWarga from "@/components/TambahWarga";
@@ -433,7 +433,7 @@ export default function AdminPage() {
               {sponsor.map((w) => {
                 const tautan = `${typeof window !== "undefined" ? window.location.origin : ""}/proposal?untuk=${encodeURIComponent(w.nama)}`;
                 const pesan = encodeURIComponent(
-                  `Assalamu'alaikum ${w.nama}. Mohon izin, kami dari Panitia Maulid Nabi ${pengaturan?.nama_masjid || "Masjid Al-Hikmah"} ingin mengirimkan proposal dukungan kegiatan. Silakan dibuka lewat tautan berikut: ${tautan}. Jazakumullah khairan.`
+                  `Assalamu'alaikum ${w.nama}. Mohon izin, kami dari Panitia Maulid Nabi ${s?.nama_masjid || "Masjid Al-Hikmah"} ingin mengirimkan proposal dukungan kegiatan. Silakan dibuka lewat tautan berikut: ${tautan}. Jazakumullah khairan.`
                 );
                 return (
                   <a
@@ -459,7 +459,7 @@ export default function AdminPage() {
           <div className="flex flex-wrap gap-2">
             <a
               href={`https://wa.me/?text=${encodeURIComponent(
-                `Assalamu'alaikum. Kami dari Panitia Maulid Nabi ${pengaturan?.nama_masjid || "Masjid Al-Hikmah"} ingin mengirimkan proposal dukungan kegiatan. Silakan dibuka lewat tautan berikut: ${typeof window !== "undefined" ? window.location.origin : ""}/proposal. Jazakumullah khairan.`
+                `Assalamu'alaikum. Kami dari Panitia Maulid Nabi ${s?.nama_masjid || "Masjid Al-Hikmah"} ingin mengirimkan proposal dukungan kegiatan. Silakan dibuka lewat tautan berikut: ${typeof window !== "undefined" ? window.location.origin : ""}/proposal. Jazakumullah khairan.`
               )}`}
               target="_blank"
               rel="noreferrer"
