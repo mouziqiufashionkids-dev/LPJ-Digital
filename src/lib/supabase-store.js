@@ -12,12 +12,18 @@ export const SUPABASE_URL_FALLBACK = "https://zxyftqrufaxzdvfvqpfq.supabase.co";
 export const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL || SUPABASE_URL_FALLBACK;
 
-// SELALU klien baru — tidak ada singleton, tidak ada data basi
+// SELALU klien baru + fetch TANPA CACHE (Next.js men-cache fetch internal!)
 function db() {
   return createClient(
     SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY,
-    { auth: { persistSession: false } }
+    {
+      auth: { persistSession: false },
+      global: {
+        fetch: (url, options) =>
+          fetch(url, { ...options, cache: "no-store", next: { revalidate: 0 } }),
+      },
+    }
   );
 }
 
