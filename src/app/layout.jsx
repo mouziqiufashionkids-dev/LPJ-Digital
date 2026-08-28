@@ -39,12 +39,18 @@ export async function generateMetadata() {
   };
 }
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="id" className={`${judul.variable} ${isi.variable}`}>
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col overflow-x-hidden">
         <Header />
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 w-full">{children}</div>
         <Footer />
       </body>
     </html>

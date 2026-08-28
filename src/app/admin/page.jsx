@@ -413,6 +413,86 @@ export default function AdminPage() {
         </table>
       </div>
 
+      {/* bagikan proposal: untuk sponsor terdaftar & umum */}
+      <div className="mt-6 kartu p-5 border-emas/50 bg-amber-50/60">
+        <h3 className="font-judul text-lg font-bold text-zamrud-800">
+          Bagikan Proposal Donasi
+        </h3>
+        <p className="text-xs text-zamrud-900/70 mt-1">
+          Proposal digital interaktif — dibuka lewat HP calon donatur, ada
+          tombol donasi (transfer/kas) &amp; hubungi panitia.
+        </p>
+
+        {/* per sponsor terdaftar */}
+        {sponsor.length > 0 && (
+          <div className="mt-3">
+            <p className="text-xs font-semibold text-zamrud-800 mb-2">
+              📋 Khusus untuk sponsor terdaftar ({sponsor.length}):
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {sponsor.map((w) => {
+                const tautan = `${typeof window !== "undefined" ? window.location.origin : ""}/proposal?untuk=${encodeURIComponent(w.nama)}`;
+                const pesan = encodeURIComponent(
+                  `Assalamu'alaikum ${w.nama}. Mohon izin, kami dari Panitia Maulid Nabi ${pengaturan?.nama_masjid || "Masjid Al-Hikmah"} ingin mengirimkan proposal dukungan kegiatan. Silakan dibuka lewat tautan berikut: ${tautan}. Jazakumullah khairan.`
+                );
+                return (
+                  <a
+                    key={w.id}
+                    href={`https://wa.me/?text=${pesan}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="pill bg-zamrud-600 text-white px-3 py-2 hover:bg-zamrud-700"
+                  >
+                    WA {w.nama}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* umum — untuk donatur di luar daftar sponsor */}
+        <div className="mt-4 pt-3 border-t border-emas/30">
+          <p className="text-xs font-semibold text-zamrud-800 mb-2">
+            📢 Bagikan ke donatur umum (tanpa nama spesifik):
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                `Assalamu'alaikum. Kami dari Panitia Maulid Nabi ${pengaturan?.nama_masjid || "Masjid Al-Hikmah"} ingin mengirimkan proposal dukungan kegiatan. Silakan dibuka lewat tautan berikut: ${typeof window !== "undefined" ? window.location.origin : ""}/proposal. Jazakumullah khairan.`
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+              className="pill bg-emas text-zamrud-900 px-4 py-2 hover:bg-emas-terang"
+            >
+              WhatsApp
+            </a>
+            <a
+              href={`${typeof window !== "undefined" ? window.location.origin : ""}/proposal`}
+              target="_blank"
+              rel="noreferrer"
+              className="pill bg-white text-zamrud-700 border border-zamrud-300 px-4 py-2 hover:bg-zamrud-50"
+            >
+              Buka Proposal
+            </a>
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/proposal`;
+                if (navigator.share) {
+                  navigator.share({ title: "Proposal Maulid Nabi", url }).catch(() => {});
+                } else {
+                  navigator.clipboard.writeText(url);
+                  alert("Tautan proposal tersalin!");
+                }
+              }}
+              className="pill bg-zamrud-50 text-zamrud-700 border border-zamrud-200 px-4 py-2 hover:bg-zamrud-100"
+            >
+              Bagikan / Salin
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* sponsor: kirim proposal */}
       {sponsor.length > 0 && (
         <div className="mt-6 kartu p-5 border-emas/50 bg-amber-50/60">

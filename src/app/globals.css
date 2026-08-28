@@ -30,6 +30,19 @@ body {
   }
 }
 
+/* ============ KUPON RESPONSIVE di HP ============ */
+@media screen and (max-width: 640px) {
+  .wadah-kupon {
+    justify-content: center;
+  }
+  .kupon {
+    width: 100% !important;
+    max-width: 92mm;
+    height: auto !important;
+    min-height: 54mm;
+  }
+}
+
 /* ============ CETAK KUPON ============ */
 @media print {
   @page {
