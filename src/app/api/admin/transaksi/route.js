@@ -75,8 +75,19 @@ export async function POST(request) {
     } catch {}
   }
 
+  // Sertakan stats & nama untuk notifikasi grup
+  let statsUntukNotif = null;
+  let namaMasjid = null;
+  if (hasil.ok) {
+    try {
+      const [st, set] = await Promise.all([getStats(), getSettings()]);
+      statsUntukNotif = st;
+      namaMasjid = set.nama_masjid;
+    } catch {}
+  }
+
   return Response.json(
-    { ...hasil, buktiUrl, notifWA: notifTerkirim },
+    { ...hasil, buktiUrl, notifWA: notifTerkirim, stats: statsUntukNotif, namaMasjid },
     { status: hasil.ok ? 200 : 400 }
   );
 }

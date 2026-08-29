@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { fetchAdmin, segarkanPanel } from "@/lib/admin-auth";
+import NotifWAGrup from "./NotifWAGrup";
 
 const KATEGORI = {
   keluar: ["Konsumsi", "Administrasi", "Peralatan", "Acara", "Dekorasi", "Santunan", "Lainnya"],
@@ -19,6 +20,7 @@ export default function FormTransaksi() {
   const [proses, setProses] = useState(false);
   const [sukses, setSukses] = useState("");
   const [hasilNotif, setHasilNotif] = useState(null);
+  const [notifGrup, setNotifGrup] = useState(null); // {tipe, jumlah, keterangan, kategori, stats, namaMasjid}
   const [gagal, setGagal] = useState("");
 
   const inputCls =
@@ -60,6 +62,13 @@ export default function FormTransaksi() {
           : "✓ Pemasukan tercatat"
       );
       setHasilNotif(d.notifWA === true);
+      if (d.ok) {
+        setNotifGrup({
+          tipe, jumlah: nilai, keterangan, kategori,
+          stats: d.stats || null,
+          namaMasjid: d.namaMasjid || null,
+        });
+      }
       setJumlah(""); setKeterangan(""); setBerkas(null); setPratinjau(null);
       segarkanPanel();
     } catch (err) {
