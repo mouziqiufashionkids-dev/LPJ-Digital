@@ -305,7 +305,7 @@ export function tandaiLunas(wargaId, { tanggal, metode = "tunai", petugas = "Ben
     bukti_url: null,
     kupon_id: k.id,
   });
-  return { ok: true };
+  return { ok: true, nama: w.nama, nominal: k.nominal, tanggal: hari };
 }
 
 // tambah warga massal: tiap warga otomatis dapat kupon berkode unik.

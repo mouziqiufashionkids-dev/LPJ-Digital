@@ -343,7 +343,7 @@ export async function tandaiLunas(wargaId, { tanggal, metode = "tunai", petugas 
     keterangan: `Iuran Maulid Nabi · ${w?.nama ?? ""} (${w?.rt ?? ""}) · kupon ${k.kode}`,
     kupon_id: k.id,
   });
-  return { ok: true };
+  return { ok: true, nama: w?.nama || "", nominal: k.nominal || 0, tanggal: hari };
 }
 
 // Perbaikan kupon: buatkan kupon utk setiap warga yg BELUM punya

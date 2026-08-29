@@ -27,9 +27,9 @@ export async function POST(request) {
     try {
       const [stats, settings] = await Promise.all([getStats(), getSettings()]);
       const pesan = formatNotifikasiLunas({
-        nama: body.nama || "Warga",
-        nominal: hasil.nominal,
-        tanggal: body.tanggal || new Date().toISOString().slice(0, 10),
+        nama: hasil.nama || body.nama || "Warga",
+        nominal: hasil.nominal || 0,
+        tanggal: hasil.tanggal || body.tanggal || new Date().toISOString().slice(0, 10),
         stats,
         namaMasjid: settings.nama_masjid,
       });
