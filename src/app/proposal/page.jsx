@@ -4,6 +4,7 @@ import { rupiah, hariTanggalID, jamID } from "@/lib/format";
 import { isi } from "@/lib/konten";
 import Logo from "@/components/Logo";
 import ProposalCta from "@/components/ProposalCta";
+import TabelAnggaran from "@/components/TabelAnggaran";
 
 export const dynamic = "force-dynamic";
 
@@ -130,6 +131,13 @@ export default async function ProposalPage({ searchParams }) {
             dilaporkan terbuka.
           </p>
         </section>
+
+        {/* ========== RENCANA ANGGARAN ========== */}
+        <TabelAnggaran
+          judul={K["anggaran.judul"]}
+          isi={K["anggaran.isi"]}
+          totalDanaTersedia={st.dana_masuk}
+        />
 
         {/* ========== KEISTIMEWAAN DUKUNGAN ========== */}
         <section className="mt-8 kartu p-6 bg-zamrud-50 border-zamrud-100">

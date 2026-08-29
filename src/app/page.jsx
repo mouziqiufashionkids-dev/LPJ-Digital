@@ -8,6 +8,7 @@ import Countdown from "@/components/Countdown";
 import LiveRefresh from "@/components/LiveRefresh";
 import NotaImg from "@/components/NotaImg";
 import JadwalSholat from "@/components/JadwalSholat";
+import TabelAnggaran from "@/components/TabelAnggaran";
 import FotoGaleri from "@/components/FotoGaleri";
 
 export const dynamic = "force-dynamic";
@@ -106,6 +107,13 @@ export default async function Beranda() {
           </p>
         </div>
       </section>
+
+      {/* ============ RENCANA ANGGARAN ============ */}
+      <TabelAnggaran
+        judul={K["anggaran.judul"]}
+        isi={K["anggaran.isi"]}
+        totalDanaTersedia={st.dana_masuk}
+      />
 
       {/* ============ JADWAL SHOLAT ============ */}
       <JadwalSholat kota={s.kota_sholat || "Garut"} />

@@ -174,6 +174,27 @@ export default function PengaturanPage() {
         Placeholder <code>{"{masjid}"}</code> / <code>{"{kegiatan}"}</code> terisi otomatis.
       </p>
 
+      {/* Info rencana anggaran */}
+      <div className="kartu p-5 border-zamrud-200 bg-zamrud-50/60">
+        <h3 className="font-judul text-lg font-bold text-zamrud-800">
+          Rencana Anggaran Kegiatan
+        </h3>
+        <p className="text-xs text-zamrud-900/70 mt-1">
+          Daftar kebutuhan &amp; biaya yang akan tampil di Beranda, Proposal
+          Sponsor, dan LPJ Cetak. Warga bisa lihat alokasi dana secara transparan.
+        </p>
+        <div className="mt-3 text-xs bg-white rounded-xl p-3 border border-zamrud-100">
+          <p className="font-bold text-zamrud-800 mb-1">Format:</p>
+          <pre className="bg-zamrud-50 rounded-lg p-3 text-[11px] leading-relaxed overflow-x-auto">Konsumsi jamaah &amp; panitia | Rp 3.000.000
+Hadiah perlombaan anak-anak | Rp 1.500.000
+Santunan anak yatim &amp; dhuafa | Rp 1.000.000</pre>
+          <p className="mt-2 text-zamrud-900/50">
+            Satu kebutuhan per baris. Gunakan tanda <code className="bg-zamrud-50 px-1 rounded">|</code> sebagai pemisah
+            keterangan dan nominal.
+          </p>
+        </div>
+      </div>
+
       {/* Info notifikasi WA Grup via Fonnte */}
       <div className="kartu p-5 border-emas/50 bg-amber-50/70">
         <h3 className="font-judul text-lg font-bold text-zamrud-800">

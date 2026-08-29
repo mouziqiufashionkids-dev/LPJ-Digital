@@ -103,6 +103,18 @@ export const KONTEN_DEFAULT = {
     jenis: "pendek",
     nilai: "",
   },
+  "anggaran.judul": {
+    halaman: "Rencana Anggaran (Proposal & LPJ)",
+    label: "Judul bagian anggaran",
+    jenis: "pendek",
+    nilai: "Rencana Anggaran Kegiatan",
+  },
+  "anggaran.isi": {
+    halaman: "Rencana Anggaran (Proposal & LPJ)",
+    label: "Daftar kebutuhan & biaya (satu per baris, format: keterangan | Rp nominal)",
+    jenis: "baris",
+    nilai: "Konsumsi jamaah & panitia | Rp 3.000.000\nHadiah perlombaan anak-anak | Rp 1.500.000\nSantunan anak yatim & dhuafa | Rp 1.000.000\nDekorasi, tenda & panggung | Rp 1.500.000\nKitab, mukena & perlengkapan majelis | Rp 500.000\nOperasional & tak terduga | Rp 500.000",
+  },
   "footer.copyright": {
     halaman: "Footer (kaki semua halaman)",
     label: "Teks copyright (nama pembuat, versi, tahun, dedikasi)",

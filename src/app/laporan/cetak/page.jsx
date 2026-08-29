@@ -1,5 +1,7 @@
 import { getSettings, getStats, listTransaksi, listWarga } from "@/lib/store";
 import { rupiah, tanggalID, tanggalSingkat } from "@/lib/format";
+import TabelAnggaran from "@/components/TabelAnggaran";
+import { getKonten } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +11,12 @@ export const metadata = {
 
 // Halaman khusus CETAK LPJ — buka lalu Ctrl+P → Save as PDF
 export default async function CetakLPJPage() {
-  const [s, st, transaksi, warga] = await Promise.all([
+  const [s, st, transaksi, warga, K] = await Promise.all([
     getSettings(),
     getStats(),
     listTransaksi({}),
     listWarga(),
+    getKonten(),
   ]);
 
   const masuk = transaksi.filter((t) => t.tipe === "masuk");
@@ -72,6 +75,13 @@ export default async function CetakLPJPage() {
           </tbody>
         </table>
       </section>
+
+      {/* RENCANA ANGGARAN */}
+      <TabelAnggaran
+        judul={K["anggaran.judul"]}
+        isi={K["anggaran.isi"]}
+        totalDanaTersedia={st.dana_masuk}
+      />
 
       {/* RINCIAN PEMASUKAN */}
       <section className="mb-6">
