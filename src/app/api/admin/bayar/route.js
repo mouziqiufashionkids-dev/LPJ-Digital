@@ -1,4 +1,5 @@
-import { tandaiLunas } from "@/lib/store";
+import { tandaiLunas, getStats, getSettings } from "@/lib/store";
+import { kirimNotifikasiWA, formatNotifikasiLunas } from "@/lib/notif-wa";
 
 export const dynamic = "force-dynamic";
 
@@ -19,5 +20,26 @@ export async function POST(request) {
     metode: body.metode,
     petugas: body.petugas,
   });
-  return Response.json(hasil, { status: hasil.ok ? 200 : 409 });
+
+  // Notifikasi WhatsApp otomatis saat kupon lunas
+  let notifTerkirim = false;
+  if (hasil.ok) {
+    try {
+      const [stats, settings] = await Promise.all([getStats(), getSettings()]);
+      const pesan = formatNotifikasiLunas({
+        nama: body.nama || "Warga",
+        nominal: hasil.nominal,
+        tanggal: body.tanggal || new Date().toISOString().slice(0, 10),
+        stats,
+        namaMasjid: settings.nama_masjid,
+      });
+      const notif = await kirimNotifikasiWA(pesan);
+      notifTerkirim = notif.terkirim;
+    } catch {}
+  }
+
+  return Response.json(
+    { ...hasil, notifWA: notifTerkirim },
+    { status: hasil.ok ? 200 : 409 }
+  );
 }

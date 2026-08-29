@@ -1,4 +1,5 @@
-import { tambahTransaksi, ubahTransaksi, simpanBerkas } from "@/lib/store";
+import { tambahTransaksi, ubahTransaksi, simpanBerkas, getStats, getSettings } from "@/lib/store";
+import { kirimNotifikasiWA, formatNotifikasiTransaksi } from "@/lib/notif-wa";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +61,24 @@ export async function POST(request) {
   const hasil = await tambahTransaksi({
     tanggal, tipe, jumlah, kategori, keterangan, buktiUrl,
   });
-  return Response.json({ ...hasil, buktiUrl }, { status: hasil.ok ? 200 : 400 });
+
+  // Kirim notifikasi WhatsApp otomatis (tidak blokir jika gagal)
+  let notifTerkirim = false;
+  if (hasil.ok) {
+    try {
+      const [stats, settings] = await Promise.all([getStats(), getSettings()]);
+      const pesan = formatNotifikasiTransaksi({
+        tipe, jumlah, keterangan, kategori, stats, namaMasjid: settings.nama_masjid,
+      });
+      const notif = await kirimNotifikasiWA(pesan);
+      notifTerkirim = notif.terkirim;
+    } catch {}
+  }
+
+  return Response.json(
+    { ...hasil, buktiUrl, notifWA: notifTerkirim },
+    { status: hasil.ok ? 200 : 400 }
+  );
 }
 
 // UBAH transaksi: perbaiki nominal/keterangan/tanggal/kategori

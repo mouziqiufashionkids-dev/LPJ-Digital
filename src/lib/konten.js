@@ -85,6 +85,24 @@ export const KONTEN_DEFAULT = {
     jenis: "pendek",
     nilai: "Setiap rupiah dicatat terbuka dan bisa dicek warga kapan saja.",
   },
+  "notif.wa_aktif": {
+    halaman: "Notifikasi WhatsApp Otomatis",
+    label: "Aktifkan notifikasi WA (isi: ya / tidak)",
+    jenis: "pendek",
+    nilai: "tidak",
+  },
+  "notif.wa_nomor": {
+    halaman: "Notifikasi WhatsApp Otomatis",
+    label: "Nomor WA penerima (format 62...)",
+    jenis: "pendek",
+    nilai: "",
+  },
+  "notif.wa_apikey": {
+    halaman: "Notifikasi WhatsApp Otomatis",
+    label: "API Key CallMeBot (daftar gratis: kirim 'I allow callmebot to send me messages' ke +34 644 51 95 23)",
+    jenis: "pendek",
+    nilai: "",
+  },
   "footer.copyright": {
     halaman: "Footer (kaki semua halaman)",
     label: "Teks copyright (nama pembuat, versi, tahun, dedikasi)",

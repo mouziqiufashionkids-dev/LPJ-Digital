@@ -18,6 +18,7 @@ export default function FormTransaksi() {
   const [pratinjau, setPratinjau] = useState(null);
   const [proses, setProses] = useState(false);
   const [sukses, setSukses] = useState("");
+  const [hasilNotif, setHasilNotif] = useState(null);
   const [gagal, setGagal] = useState("");
 
   const inputCls =
@@ -58,6 +59,7 @@ export default function FormTransaksi() {
           ? "✓ Pengeluaran tercatat" + (d.buktiUrl ? " — nota tersimpan" : "")
           : "✓ Pemasukan tercatat"
       );
+      setHasilNotif(d.notifWA === true);
       setJumlah(""); setKeterangan(""); setBerkas(null); setPratinjau(null);
       segarkanPanel();
     } catch (err) {
@@ -160,6 +162,13 @@ export default function FormTransaksi() {
       )}
 
       {sukses && <p className="text-sm text-zamrud-700 font-semibold mt-3">{sukses}</p>}
+      {hasilNotif !== null && (
+        <p className={`text-xs mt-1 ${hasilNotif ? "text-zamrud-600" : "text-amber-600"}`}>
+          {hasilNotif
+            ? "✅ Notifikasi WhatsApp terkirim ke bendahara"
+            : "⚠ Notifikasi WA belum aktif (atur di ⚙ Pengaturan Web)"}
+        </p>
+      )}
       {gagal && <p className="text-sm text-rose-600 mt-3">{gagal}</p>}
 
       <button
