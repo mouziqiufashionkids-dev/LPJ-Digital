@@ -26,9 +26,11 @@ export default function KirimKupon({ kupon, pengaturan, tipeKupon = "iuron" }) {
       alert("Isi nomor WhatsApp dulu (misal: 62812345678)");
       return;
     }
+    // Pakai location.href — di HP langsung buka aplikasi WA
+    // (window.open sering diblokir popup blocker / buka tab lalu tutup)
     const url = `https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`;
-    window.open(url, "_blank");
     setBuka(false);
+    window.location.href = url;
   }
 
   return (
@@ -84,23 +86,42 @@ export default function KirimKupon({ kupon, pengaturan, tipeKupon = "iuron" }) {
               <pre className="whitespace-pre-wrap font-sans">{pesan}</pre>
             </div>
 
-            <div className="flex gap-2 mt-4">
-              <button
-                onClick={kirim}
-                className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 flex-1 text-sm"
+            <div className="flex flex-col gap-2 mt-4">
+              <a
+                href={`https://wa.me/${nomorWA.replace(/[^0-9]/g, "") || "X"}?text=${encodeURIComponent(pesan)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  const nomor = nomorWA.replace(/[^0-9]/g, "");
+                  if (!nomor) {
+                    e.preventDefault();
+                    alert("Isi nomor WhatsApp dulu (misal: 62812345678)");
+                    return;
+                  }
+                  setBuka(false);
+                }}
+                className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 text-center text-sm"
+                style={{ textDecoration: "none" }}
               >
-                Kirim via WA
-              </button>
+                Kirim via WhatsApp
+              </a>
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(pesan);
-                  alert("Pesan tersalin! Bisa ditempel manual di WA.");
+                  navigator.clipboard.writeText(pesan).then(() => {
+                    alert("Pesan tersalin! Buka WA, pilih kontak, tempel pesan.");
+                  }).catch(() => {
+                    // fallback: tampilkan pesan untuk salin manual
+                  });
                 }}
                 className="tombol border-2 border-zamrud-300 text-zamrud-700 text-sm"
               >
-                Salin
+                Salin Pesan (Tempel Manual)
               </button>
             </div>
+            <p className="text-[10px] text-zamrud-900/40 text-center mt-2 leading-snug">
+              Tombol "Kirim via WhatsApp" akan membuka aplikasi WA di HP Anda.
+              Jika tidak terbuka otomatis, gunakan "Salin Pesan" lalu tempel di WA.
+            </p>
             <button
               onClick={() => setBuka(false)}
               className="w-full text-xs text-zamrud-900/50 hover:underline mt-3"
