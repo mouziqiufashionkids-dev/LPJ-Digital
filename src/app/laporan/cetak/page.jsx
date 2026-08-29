@@ -25,14 +25,14 @@ export default async function CetakLPJPage() {
   const belum = warga.filter((w) => w.kupon?.status !== "lunas");
 
   return (
-    <main className="bg-white text-black min-h-screen p-6 md:p-10 max-w-4xl mx-auto print:p-0 print:max-w-none">
+    <main className="bg-white text-black min-h-screen p-3 sm:p-6 md:p-10 max-w-4xl mx-auto overflow-x-hidden print:p-6 print:overflow-visible print:max-w-none">
       {/* KOP LAPORAN */}
       <div className="text-center border-b-4 border-double border-black pb-4 mb-6">
-        <h1 className="text-xl md:text-2xl font-bold uppercase tracking-wide">
+        <h1 className="text-base sm:text-xl md:text-2xl font-bold uppercase tracking-wide">
           {s.nama_masjid}
         </h1>
         <p className="text-sm mt-1">{s.penyelenggara || s.penyelenggara_singkat}</p>
-        <h2 className="text-lg font-bold mt-4 uppercase">
+        <h2 className="text-sm sm:text-lg font-bold mt-3 sm:mt-4 uppercase">
           Laporan Pertanggungjawaban
         </h2>
         <p className="text-sm">{s.nama_kegiatan} · {s.hijriah}</p>
@@ -46,30 +46,30 @@ export default async function CetakLPJPage() {
         <h3 className="font-bold text-sm uppercase border-b border-black pb-1 mb-3">
           A. Ringkasan Keuangan
         </h3>
-        <table className="w-full text-sm border-collapse">
+        <table className="w-full text-xs sm:text-sm border-collapse">
           <tbody>
             <tr className="border-b border-gray-300">
-              <td className="py-2 pr-4 font-medium">Total Pemasukan</td>
-              <td className="py-2 text-right font-bold">{rupiah(st.dana_masuk)}</td>
+              <td className="py-1.5 sm:py-2 pr-2 sm:pr-4 font-medium break-all">Total Pemasukan</td>
+              <td className="py-1.5 sm:py-2 text-right font-bold text-xs sm:text-sm break-all">{rupiah(st.dana_masuk)}</td>
             </tr>
             <tr className="border-b border-gray-300">
-              <td className="py-2 pr-4 font-medium">Total Pengeluaran</td>
-              <td className="py-2 text-right font-bold">{rupiah(st.dana_keluar)}</td>
+              <td className="py-1.5 sm:py-2 pr-2 sm:pr-4 font-medium break-all">Total Pengeluaran</td>
+              <td className="py-1.5 sm:py-2 text-right font-bold text-xs sm:text-sm break-all">{rupiah(st.dana_keluar)}</td>
             </tr>
             <tr className="border-b-2 border-black">
               <td className="py-2 pr-4 font-bold">Sisa Kas</td>
-              <td className="py-2 text-right font-bold">{rupiah(st.sisa)}</td>
+              <td className="py-1.5 sm:py-2 text-right font-bold text-xs sm:text-sm break-all">{rupiah(st.sisa)}</td>
             </tr>
             <tr>
-              <td className="py-2 pr-4 font-medium">Target Dana (Ancalah)</td>
+              <td className="py-1.5 sm:py-2 pr-2 sm:pr-4 font-medium break-all">Target Dana (Ancalah)</td>
               <td className="py-2 text-right">{rupiah(st.target_dana)}</td>
             </tr>
             <tr>
-              <td className="py-2 pr-4 font-medium">Pencapaian</td>
+              <td className="py-1.5 sm:py-2 pr-2 sm:pr-4 font-medium break-all">Pencapaian</td>
               <td className="py-2 text-right">{st.persen}%</td>
             </tr>
             <tr>
-              <td className="py-2 pr-4 font-medium">KK Lunas / Total</td>
+              <td className="py-1.5 sm:py-2 pr-2 sm:pr-4 font-medium break-all">KK Lunas / Total</td>
               <td className="py-2 text-right">{st.kk_lunas} / {st.kk_total} KK</td>
             </tr>
           </tbody>
@@ -85,10 +85,32 @@ export default async function CetakLPJPage() {
 
       {/* RINCIAN PEMASUKAN */}
       <section className="mb-6">
-        <h3 className="font-bold text-sm uppercase border-b border-black pb-1 mb-3">
+        <h3 className="font-bold text-xs sm:text-sm uppercase border-b border-black pb-1 mb-3">
           B. Rincian Pemasukan ({masuk.length} transaksi)
         </h3>
-        <table className="w-full text-xs border-collapse">
+        
+        {/* Mobile: kartu */}
+        <div className="sm:hidden print:hidden space-y-2">
+          {masuk.map((t, i) => (
+            <div key={t.id} className="border border-gray-300 rounded-lg p-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] text-gray-500">{i + 1}. {tanggalSingkat(t.tanggal)}</p>
+                  <p className="text-xs font-medium leading-snug">{t.keterangan}</p>
+                  <p className="text-[10px] text-gray-500">{t.kategori}</p>
+                </div>
+                <p className="text-xs font-bold shrink-0">{rupiah(t.jumlah)}</p>
+              </div>
+            </div>
+          ))}
+          <div className="border-t-2 border-black pt-2 flex justify-between">
+            <span className="text-xs font-bold">TOTAL PEMASUKAN</span>
+            <span className="text-xs font-bold">{rupiah(st.dana_masuk)}</span>
+          </div>
+        </div>
+
+        {/* Desktop: tabel */}
+        <table className="hidden sm:table print:table w-full text-xs border-collapse">
           <thead>
             <tr className="border-b-2 border-black bg-gray-100">
               <th className="py-1.5 px-2 text-left">No</th>
@@ -118,10 +140,32 @@ export default async function CetakLPJPage() {
 
       {/* RINCIAN PENGELUARAN */}
       <section className="mb-6">
-        <h3 className="font-bold text-sm uppercase border-b border-black pb-1 mb-3">
+        <h3 className="font-bold text-xs sm:text-sm uppercase border-b border-black pb-1 mb-3">
           C. Rincian Pengeluaran ({keluar.length} transaksi)
         </h3>
-        <table className="w-full text-xs border-collapse">
+        
+        {/* Mobile: kartu */}
+        <div className="sm:hidden print:hidden space-y-2">
+          {keluar.map((t, i) => (
+            <div key={t.id} className="border border-gray-300 rounded-lg p-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] text-gray-500">{i + 1}. {tanggalSingkat(t.tanggal)}</p>
+                  <p className="text-xs font-medium leading-snug">{t.keterangan}</p>
+                  <p className="text-[10px] text-gray-500">{t.kategori} · bukti: {t.bukti_url ? "ada" : "-"}</p>
+                </div>
+                <p className="text-xs font-bold shrink-0">{rupiah(t.jumlah)}</p>
+              </div>
+            </div>
+          ))}
+          <div className="border-t-2 border-black pt-2 flex justify-between">
+            <span className="text-xs font-bold">TOTAL PENGELUARAN</span>
+            <span className="text-xs font-bold">{rupiah(st.dana_keluar)}</span>
+          </div>
+        </div>
+
+        {/* Desktop: tabel */}
+        <table className="hidden sm:table print:table w-full text-xs border-collapse">
           <thead>
             <tr className="border-b-2 border-black bg-gray-100">
               <th className="py-1.5 px-2 text-left">No</th>
@@ -153,10 +197,32 @@ export default async function CetakLPJPage() {
 
       {/* DAFTAR WARGA & STATUS */}
       <section className="mb-6">
-        <h3 className="font-bold text-sm uppercase border-b border-black pb-1 mb-3">
+        <h3 className="font-bold text-xs sm:text-sm uppercase border-b border-black pb-1 mb-3">
           D. Daftar Iuran Warga ({warga.length} KK)
         </h3>
-        <table className="w-full text-xs border-collapse">
+        
+        {/* Mobile: kartu */}
+        <div className="sm:hidden space-y-1.5">
+          {warga.map((w, i) => (
+            <div key={w.id} className={`border rounded-lg p-2 flex items-center justify-between gap-2 ${w.kupon?.status === "lunas" ? "border-green-600 bg-green-50" : "border-gray-300"}`}>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium leading-snug">{i + 1}. {w.nama}</p>
+                <p className="text-[10px] text-gray-500">
+                  {w.rt || "-"} · {w.kelas === "sponsor" ? "Sponsor" : `K${w.kelas}`}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-xs font-semibold">{rupiah(w.ancalah)}</p>
+                <p className={`text-[10px] font-bold ${w.kupon?.status === "lunas" ? "text-green-700" : "text-gray-400"}`}>
+                  {w.kupon?.status === "lunas" ? "LUNAS" : "belum"}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: tabel */}
+        <table className="hidden sm:table print:table w-full text-xs border-collapse">
           <thead>
             <tr className="border-b-2 border-black bg-gray-100">
               <th className="py-1.5 px-2 text-left">No</th>
@@ -190,7 +256,7 @@ export default async function CetakLPJPage() {
 
       {/* PENGESAHAN */}
       <section className="mt-10">
-        <div className="grid grid-cols-3 gap-4 text-center text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-xs">
           <div>
             <p className="mb-12">Ketua Panitia</p>
             <div className="border-t border-black mx-8 pt-1 font-semibold">
