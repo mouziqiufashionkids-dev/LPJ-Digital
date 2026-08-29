@@ -1,5 +1,5 @@
 import { tandaiLunas, getStats, getSettings } from "@/lib/store";
-import { kirimNotifikasiWA, formatNotifikasiLunas } from "@/lib/notif-wa";
+import { kirimKeGrupWA, formatNotifikasiLunas } from "@/lib/notif-wa";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +33,7 @@ export async function POST(request) {
         stats,
         namaMasjid: settings.nama_masjid,
       });
-      const notif = await kirimNotifikasiWA(pesan);
+      const notif = await kirimKeGrupWA(pesan);
       notifTerkirim = notif.terkirim;
     } catch {}
   }

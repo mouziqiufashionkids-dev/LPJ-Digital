@@ -174,22 +174,31 @@ export default function PengaturanPage() {
         Placeholder <code>{"{masjid}"}</code> / <code>{"{kegiatan}"}</code> terisi otomatis.
       </p>
 
-      {/* Info notifikasi WA */}
+      {/* Info notifikasi WA Grup via Fonnte */}
       <div className="kartu p-5 border-emas/50 bg-amber-50/70">
         <h3 className="font-judul text-lg font-bold text-zamrud-800">
-          🔔 Notifikasi WhatsApp Otomatis
+          🔔 Notifikasi OTOMATIS ke Grup WA
         </h3>
         <p className="text-xs text-zamrud-900/70 mt-1">
-          Setiap pemasukan/pengeluaran &amp; kupon lunas akan otomatis terkirim ke
-          WhatsApp bendahara. Aktifkan di bagian "Kalimat-Kalimat Halaman" di bawah.
+          Setiap pemasukan/pengeluaran &amp; kupon lunas akan <strong>OTOMATIS
+          terkirim ke grup WhatsApp</strong> panitia — tanpa perlu forward manual.
         </p>
-        <div className="mt-3 text-xs bg-white rounded-xl p-4 border border-zamrud-100 space-y-1.5">
-          <p className="font-bold text-zamrud-800">Cara aktivasi (gratis, 2 menit):</p>
-          <p>1. Simpan kontak <b>+34 644 51 95 23</b> di HP kamu</p>
-          <p>2. Kirim pesan <code className="bg-zamrud-50 px-2 py-0.5 rounded">I allow callmebot to send me messages</code> ke nomor itu</p>
-          <p>3. Kamu akan menerima API Key — salin</p>
-          <p>4. Isi di bawah: nomor WA kamu (62...) + API Key + ubah "tidak" jadi "ya"</p>
-          <p>5. Simpan → setiap transaksi otomatis terkirim! ✅</p>
+        <div className="mt-3 text-xs bg-white rounded-xl p-4 border border-zamrud-100 space-y-2">
+          <p className="font-bold text-zamrud-800 text-sm">Cara aktivasi (gratis, 5 menit):</p>
+          <div className="space-y-1.5 pl-2">
+            <p><b>1.</b> Buka <a href="https://fonnte.com" target="_blank" className="underline text-zamrud-700 font-semibold">fonnte.com</a> → Daftar (pakai nomor WA bendahara)</p>
+            <p><b>2.</b> Di dashboard Fonnte → scan QR code dengan WhatsApp HP</p>
+            <p><b>3.</b> Salin <b>Token</b> dari dashboard</p>
+            <p><b>4.</b> Tambahkan nomor bot Fonnte ke <b>grup WA panitia</b></p>
+            <p><b>5.</b> Kirim pesan apa saja di grup → buka dashboard Fonnte → salin <b>Group ID</b> (format: 1234567890@g.us)</p>
+            <p><b>6.</b> Isi Token + Group ID di bawah → ubah "tidak" jadi "ya" → Simpan</p>
+          </div>
+          <div className="mt-2 pt-2 border-t border-zamrud-100">
+            <p className="font-semibold text-zamrud-700">Hasilnya:</p>
+            <p>💰 Catat pemasukan → <b>otomatis muncul di grup WA</b> dengan rekap lengkap ✅</p>
+            <p>💸 Catat pengeluaran → <b>otomatis muncul di grup WA</b> ✅</p>
+            <p>✅ Tandai kupon lunas → <b>otomatis muncul di grup WA</b> ✅</p>
+          </div>
         </div>
       </div>
 

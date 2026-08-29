@@ -1,5 +1,5 @@
 import { tambahTransaksi, ubahTransaksi, simpanBerkas, getStats, getSettings } from "@/lib/store";
-import { kirimNotifikasiWA, formatNotifikasiTransaksi } from "@/lib/notif-wa";
+import { kirimKeGrupWA, formatNotifikasiTransaksi } from "@/lib/notif-wa";
 
 export const dynamic = "force-dynamic";
 
@@ -70,7 +70,7 @@ export async function POST(request) {
       const pesan = formatNotifikasiTransaksi({
         tipe, jumlah, keterangan, kategori, stats, namaMasjid: settings.nama_masjid,
       });
-      const notif = await kirimNotifikasiWA(pesan);
+      const notif = await kirimKeGrupWA(pesan);
       notifTerkirim = notif.terkirim;
     } catch {}
   }

@@ -85,21 +85,21 @@ export const KONTEN_DEFAULT = {
     jenis: "pendek",
     nilai: "Setiap rupiah dicatat terbuka dan bisa dicek warga kapan saja.",
   },
-  "notif.wa_aktif": {
-    halaman: "Notifikasi WhatsApp Otomatis",
-    label: "Aktifkan notifikasi WA (isi: ya / tidak)",
+  "notif.fonnte_aktif": {
+    halaman: "Notifikasi WhatsApp Grup (Fonnte)",
+    label: "Aktifkan notifikasi ke grup WA (isi: ya / tidak)",
     jenis: "pendek",
     nilai: "tidak",
   },
-  "notif.wa_nomor": {
-    halaman: "Notifikasi WhatsApp Otomatis",
-    label: "Nomor WA penerima (format 62...)",
+  "notif.fonnte_token": {
+    halaman: "Notifikasi WhatsApp Grup (Fonnte)",
+    label: "Fonnte Token (dari dashboard fonnte.com setelah scan QR)",
     jenis: "pendek",
     nilai: "",
   },
-  "notif.wa_apikey": {
-    halaman: "Notifikasi WhatsApp Otomatis",
-    label: "API Key CallMeBot (daftar gratis: kirim 'I allow callmebot to send me messages' ke +34 644 51 95 23)",
+  "notif.fonnte_target": {
+    halaman: "Notifikasi WhatsApp Grup (Fonnte)",
+    label: "Group ID WA (format: 1234567890@g.us — dari dashboard Fonnte)",
     jenis: "pendek",
     nilai: "",
   },
