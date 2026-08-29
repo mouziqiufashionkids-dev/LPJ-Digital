@@ -17,8 +17,8 @@ export default function KirimKupon({ kupon, pengaturan, tipeKupon = "iuron" }) {
   const label = tipeKupon === "sponsor" ? "SPONSOR" : "iuran";
 
   const pesan = proposalan
-    ? `Assalamu'alaikum ${kupon.nama}.\n\nBerikut kupon ${label} Anda untuk kegiatan ${namaKegiatan} di ${namaMasjid}.\n\nKode kupon: ${kupon.kode}\nNominal: Rp ${nominal}\nLokasi: ${kupon.alamat || "-"} ${kupon.rt || ""}\n\nCek status iuran: ${linkCek}\n\nJazakumullah khairan atas dukungannya.\n\nPanitia ${namaMasjid}`
-    : `Assalamu'alaikum ${kupon.nama}.\n\nBerikut kupon ${label} Anda:\n\nKode: ${kupon.kode}\nNominal: Rp ${nominal}\n\nCek status: ${linkCek}\n\nJazakumullah khairan.\n\nPanitia ${namaMasjid}`;
+    ? `Assalamu'alaikum ${kupon.nama}.\n\nBerikut kupon ${label} Anda untuk kegiatan ${namaKegiatan} di ${namaMasjid}.\n\nKode kupon: ${kupon.kode}\nNominal: Rp ${nominal}\nLokasi: ${kupon.alamat || "-"} ${kupon.rt || ""}\n\nCek status iuran:\n${linkCek}\n\nProposal dukungan (silakan dibuka):\n${linkProposal}\n\nJazakumullah khairan atas dukungannya.\n\nPanitia ${namaMasjid}`
+    : `Assalamu'alaikum ${kupon.nama}.\n\nBerikut kupon ${label} Anda:\n\nKode: ${kupon.kode}\nNominal: Rp ${nominal}\n\nCek status:\n${linkCek}\n\nJazakumullah khairan.\n\nPanitia ${namaMasjid}`;
 
   function kirim() {
     const nomor = nomorWA.replace(/[^0-9]/g, "");
