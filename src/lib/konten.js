@@ -109,6 +109,13 @@ export const KONTEN_DEFAULT = {
     jenis: "pendek",
     nilai: "Rencana Anggaran Kegiatan",
   },
+  "anggaran.catatan": {
+    halaman: "Rencana Anggaran (Proposal & LPJ)",
+    label: "Catatan kecil di bawah tabel anggaran (disclaimer transparansi)",
+    jenis: "panjang",
+    nilai:
+      "Rencana ini bersifat estimasi awal dan dapat menyesuaikan situasi, kondisi, serta ketersediaan dana. Setiap realisasi pengeluaran akan dilaporkan secara terbuka dengan bukti nota yang dapat dilihat semua warga.",
+  },
   "anggaran.isi": {
     halaman: "Rencana Anggaran (Proposal & LPJ)",
     label: "Daftar kebutuhan & biaya (satu per baris, format: keterangan | Rp nominal)",

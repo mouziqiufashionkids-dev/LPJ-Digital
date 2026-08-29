@@ -1,7 +1,7 @@
 // Tabel rencana anggaran biaya — ditampilkan di Proposal & LPJ Cetak
 import { rupiah } from "@/lib/format";
 
-export default function TabelAnggaran({ judul, isi, totalDanaTersedia }) {
+export default function TabelAnggaran({ judul, isi, catatan, totalDanaTersedia }) {
   if (!isi || !isi.trim()) return null;
 
   const baris = isi
@@ -80,6 +80,16 @@ export default function TabelAnggaran({ judul, isi, totalDanaTersedia }) {
           </tbody>
         </table>
       </div>
+
+      {/* Catatan disclaimer */}
+      {catatan && catatan.trim() && (
+        <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+          <p className="text-[11px] sm:text-xs text-amber-800 leading-relaxed flex items-start gap-2">
+            <span className="shrink-0 mt-0.5">📝</span>
+            <span>{catatan}</span>
+          </p>
+        </div>
+      )}
 
       {/* Perbandingan dengan dana tersedia */}
       {totalDanaTersedia > 0 && (

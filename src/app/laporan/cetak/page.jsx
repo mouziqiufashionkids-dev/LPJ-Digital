@@ -80,6 +80,7 @@ export default async function CetakLPJPage() {
       <TabelAnggaran
         judul={K["anggaran.judul"]}
         isi={K["anggaran.isi"]}
+        catatan={K["anggaran.catatan"]}
         totalDanaTersedia={st.dana_masuk}
       />
 
