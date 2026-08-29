@@ -19,7 +19,7 @@ export default async function ProposalPage({ searchParams }) {
   const ekstra = { sapaan };
 
   return (
-    <main className="min-h-screen bg-krem pb-24">
+    <main className="min-h-screen bg-krem pb-20 sm:pb-24">
       {/* ========== KEPALA PROPOSAL ========== */}
       <section className="bg-zamrud-800 bg-ornamen text-krem relative overflow-hidden">
         <div className="mx-auto max-w-3xl px-4 pt-6 sm:pt-12 pb-10 sm:pb-14 text-center">
@@ -27,7 +27,7 @@ export default async function ProposalPage({ searchParams }) {
           <p className="pill bg-krem/10 text-emas-terang mt-5">
             Proposal Dukungan Kegiatan
           </p>
-          <h1 className="font-judul text-3xl md:text-4xl font-bold mt-3 leading-tight">
+          <h1 className="font-judul text-2xl sm:text-3xl md:text-4xl font-bold mt-3 leading-tight break-words">
             Peringatan {s.nama_kegiatan}
           </h1>
           <p className="text-krem/80 mt-2">

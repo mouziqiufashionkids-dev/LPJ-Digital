@@ -75,7 +75,7 @@ export default async function Beranda() {
             kkLunas={st.kk_lunas}
             kkTotal={st.kk_total}
           />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 sm:mt-6">
             <StatCard
               ikon="💰"
               label="Dana Masuk"

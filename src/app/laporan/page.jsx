@@ -22,7 +22,7 @@ export default async function LaporanPage({ searchParams }) {
   const rows = tipe === "semua" ? semua : semua.filter((t) => t.tipe === tipe);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-3 sm:px-4 py-6 sm:py-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-judul text-3xl font-bold text-zamrud-800">
           📊 Laporan Kas Panitia
@@ -35,22 +35,22 @@ export default async function LaporanPage({ searchParams }) {
       </p>
 
       {/* ringkasan */}
-      <div className="grid grid-cols-3 gap-3 mt-6">
-        <div className="kartu p-4 text-center">
-          <p className="text-xs font-semibold text-zamrud-700">MASUK</p>
-          <p className="text-lg md:text-xl font-bold text-zamrud-800">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-6">
+        <div className="kartu p-3 sm:p-4 text-center">
+          <p className="text-[10px] sm:text-xs font-semibold text-zamrud-700 uppercase tracking-wide">Masuk</p>
+          <p className="text-sm sm:text-lg md:text-xl font-bold text-zamrud-800 break-all leading-tight mt-0.5">
             {rupiah(st.dana_masuk)}
           </p>
         </div>
-        <div className="kartu p-4 text-center">
-          <p className="text-xs font-semibold text-rose-600">KELUAR</p>
-          <p className="text-lg md:text-xl font-bold text-rose-600">
+        <div className="kartu p-3 sm:p-4 text-center">
+          <p className="text-[10px] sm:text-xs font-semibold text-rose-600 uppercase tracking-wide">Keluar</p>
+          <p className="text-sm sm:text-lg md:text-xl font-bold text-rose-600 break-all leading-tight mt-0.5">
             {rupiah(st.dana_keluar)}
           </p>
         </div>
-        <div className="kartu p-4 text-center border-emas/40">
-          <p className="text-xs font-semibold text-emas-gelap">SISA</p>
-          <p className="text-lg md:text-xl font-bold text-zamrud-800">
+        <div className="kartu p-3 sm:p-4 text-center border-emas/40">
+          <p className="text-[10px] sm:text-xs font-semibold text-emas-gelap uppercase tracking-wide">Sisa</p>
+          <p className="text-sm sm:text-lg md:text-xl font-bold text-zamrud-800 break-all leading-tight mt-0.5">
             {rupiah(st.sisa)}
           </p>
         </div>

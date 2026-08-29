@@ -7,7 +7,7 @@ export default async function Header() {
   const s = await getSettings();
   return (
     <header className="no-print sticky top-0 z-40 bg-zamrud-800/95 backdrop-blur text-krem shadow-kartu">
-      <div className="mx-auto max-w-5xl px-3 sm:px-4 py-2 sm:py-3">
+      <div className="mx-auto max-w-5xl px-3 sm:px-4 py-2 sm:py-3 min-w-0">
         <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
           <Logo className="h-8 w-8 sm:h-9 sm:w-9 shrink-0" />
           <ToggleGelap />

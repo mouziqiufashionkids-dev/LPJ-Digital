@@ -41,7 +41,7 @@ export default async function UndanganPage() {
             diselenggarakan oleh <strong className="text-krem">{s.nama_masjid}</strong>
           </p>
 
-          <div className="mt-6 inline-flex flex-col gap-2 bg-krem/10 border border-krem/15 rounded-2xl px-6 py-4 text-left text-sm">
+          <div className="mt-6 inline-flex flex-col gap-2 bg-krem/10 border border-krem/15 rounded-2xl px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm">
             <p>📅 <strong>{hariTanggalID(s.tanggal_acara)}</strong> · {jamID(s.tanggal_acara)}</p>
             <p>🕌 {s.lokasi_acara}</p>
           </div>

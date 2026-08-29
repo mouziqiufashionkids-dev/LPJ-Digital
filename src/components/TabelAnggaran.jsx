@@ -28,11 +28,33 @@ export default function TabelAnggaran({ judul, isi, totalDanaTersedia }) {
         📋 {judul || "Rencana Anggaran"}
       </h2>
 
-      <div className="kartu overflow-hidden">
+      {/* Mobile: kartu per item */}
+      <div className="sm:hidden space-y-2">
+        {baris.map((b, i) => (
+          <div key={i} className="kartu p-3">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-xs text-zamrud-900/50 shrink-0 mt-0.5">{i + 1}.</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-zamrud-900 leading-snug">{b.keterangan}</p>
+                <p className="text-sm font-bold text-zamrud-800 mt-0.5">{rupiah(b.nominal)}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+        <div className="kartu p-3 bg-zamrud-50 border-zamrud-200">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-zamrud-800 uppercase">Total</p>
+            <p className="text-base font-bold text-zamrud-800">{rupiah(totalAnggaran)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop: tabel */}
+      <div className="hidden sm:block kartu overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-zamrud-800 text-krem text-left">
-              <th className="px-4 py-3 font-semibold">No</th>
+              <th className="px-4 py-3 font-semibold w-12">No</th>
               <th className="px-4 py-3 font-semibold">Kebutuhan / Biaya</th>
               <th className="px-4 py-3 font-semibold text-right">Estimasi Biaya</th>
             </tr>
@@ -68,12 +90,12 @@ export default function TabelAnggaran({ judul, isi, totalDanaTersedia }) {
               : "border-rose-200 bg-rose-50"
           }`}
         >
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-zamrud-900/70">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-1.5 sm:gap-2">
+            <span className="text-xs sm:text-sm text-zamrud-900/70 break-all">
               Dana terkumpul: <strong className="text-zamrud-800">{rupiah(totalDanaTersedia)}</strong>
             </span>
             <span
-              className={`font-bold ${
+              className={`text-xs sm:text-sm font-bold ${
                 selisih >= 0 ? "text-zamrud-700" : "text-rose-600"
               }`}
             >
