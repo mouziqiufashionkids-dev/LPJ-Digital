@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ambilToken, fetchAdmin } from "@/lib/admin-auth";
 import { rupiah } from "@/lib/format";
 import TombolCetak from "@/components/TombolCetak";
+import KirimKupon from "@/components/KirimKupon";
 import FormLoginAdmin from "@/components/FormLoginAdmin";
 
 const FILTER_KELAS = [
@@ -245,6 +246,9 @@ export default function KuponClient() {
                   <div className="qr-kecil w-[15mm] mt-0.5" dangerouslySetInnerHTML={{ __html: w.qr }} />
                 )}
                 <p className="text-[7.5px] font-mono font-bold text-zamrud-900/80">{w.kode}</p>
+                <div className="no-print mt-1">
+                  <KirimKupon kupon={w} pengaturan={data?.pengaturan || {}} tipeKupon={kelas === "sponsor" ? "sponsor" : "iuron"} />
+                </div>
               </div>
             </div>
           );

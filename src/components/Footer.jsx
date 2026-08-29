@@ -5,6 +5,7 @@ import CopyLink from "./CopyLink";
 
 export default async function Footer() {
   const [s, K] = await Promise.all([getSettings(), getKonten()]);
+  const copyright = K["footer.copyright"] || "";
   return (
     <footer className="no-print mt-16 bg-zamrud-900 text-krem/80">
       <div className="bg-ornamen">
@@ -42,8 +43,8 @@ export default async function Footer() {
           </div>
         </div>
       </div>
-      <div className="border-t border-krem/10 py-4 text-center text-xs text-krem/50">
-        © 2026 {s.nama_masjid} · Dibangun untuk warga, lapor terbuka
+      <div className="border-t border-krem/10 py-4 text-center text-xs text-krem/50 leading-relaxed px-4">
+        {copyright || `© 2026 ${s.nama_masjid} · Dibangun untuk warga, lapor terbuka`}
       </div>
     </footer>
   );

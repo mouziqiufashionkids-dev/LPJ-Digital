@@ -85,6 +85,13 @@ export const KONTEN_DEFAULT = {
     jenis: "pendek",
     nilai: "Setiap rupiah dicatat terbuka dan bisa dicek warga kapan saja.",
   },
+  "footer.copyright": {
+    halaman: "Footer (kaki semua halaman)",
+    label: "Teks copyright (nama pembuat, versi, tahun, dedikasi)",
+    jenis: "panjang",
+    nilai:
+      "Dibangun dengan penuh dedikasi untuk warga · v1.0 · 2026 · Panitia DKM Masjid Al-Hikmah",
+  },
 };
 
 // ganti placeholder {masjid} / {kegiatan} / {sapaan} dengan nilai asli
