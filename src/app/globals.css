@@ -56,6 +56,10 @@ body {
   @apply text-krem/40;
 }
 
+/* hide scrollbar untuk marquee */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* pola arabesque bintang-8, halus & ringan */
 .bg-ornamen {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><g fill='none' stroke='%23D4AF37' stroke-opacity='0.16' stroke-width='1.2'><path d='M36 6l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/><circle cx='36' cy='36' r='9'/></g></svg>");

@@ -9,6 +9,8 @@ import LiveRefresh from "@/components/LiveRefresh";
 import NotaImg from "@/components/NotaImg";
 import JadwalSholat from "@/components/JadwalSholat";
 import TabelAnggaran from "@/components/TabelAnggaran";
+import TamuTicker from "@/components/TamuTicker";
+import SaranMarquee from "@/components/SaranMarquee";
 import FotoGaleri from "@/components/FotoGaleri";
 
 export const dynamic = "force-dynamic";
@@ -108,6 +110,9 @@ export default async function Beranda() {
         </div>
       </section>
 
+      {/* ============ SOCIAL PROOF: TAMU TICKER ============ */}
+      <TamuTicker />
+
       {/* ============ RENCANA ANGGARAN ============ */}
       <TabelAnggaran
         judul={K["anggaran.judul"]}
@@ -194,6 +199,9 @@ export default async function Beranda() {
           </Link>
         </div>
       </section>
+
+      {/* ============ SOCIAL PROOF: SARAN WARGA ============ */}
+      <SaranMarquee />
 
       {/* ============ GALERI DOKUMENTASI ============ */}
       {dokumentasi.length > 0 && (

@@ -29,26 +29,40 @@ export default async function KotakSaranPage() {
         <SaranForm />
       </div>
 
-      <h2 className="font-judul text-xl font-bold text-zamrud-800 mt-12 mb-4">
-        Saran dari warga
+      <h2 className="font-judul text-xl font-bold text-zamrud-800 mt-12 mb-2">
+        Saran dari Warga
       </h2>
-      <div className="space-y-3">
-        {daftar.map((s) => (
-          <div key={s.id} className="kartu p-5">
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-semibold text-zamrud-900">
-                {s.nama || "Warga Anonim"}
+      <p className="text-xs text-zamrud-900/50 mb-4">
+        {daftar.length} saran sudah disetujui panitia
+      </p>
+      <div className="columns-1 sm:columns-2 gap-4 space-y-4">
+        {daftar.map((s, i) => (
+          <div key={s.id} className={`kartu p-5 break-inside-avoid relative ${i % 3 === 0 ? "border-l-4 border-l-emas" : i % 3 === 1 ? "border-l-4 border-l-zamrud-400" : "border-l-4 border-l-rose-300"}`}>
+            <span className="absolute top-1 right-3 text-4xl text-zamrud-100 font-judul leading-none select-none">
+              &ldquo;
+            </span>
+            <div className="flex items-center gap-2.5 mb-3">
+              <span className="h-9 w-9 rounded-full bg-zamrud-100 text-zamrud-700 text-sm font-bold flex items-center justify-center shrink-0">
+                {(s.nama || "W").trim().charAt(0).toUpperCase()}
+              </span>
+              <div className="min-w-0">
+                <p className="font-semibold text-zamrud-900 text-sm truncate">
+                  {s.nama || "Warga Anonim"}
+                </p>
+                <p className="text-[10px] text-emas-gelap">{"★".repeat(5)}</p>
+              </div>
+            </div>
+            <p className="text-sm text-zamrud-900/80 leading-relaxed">{s.pesan}</p>
+            <div className="flex items-center justify-between mt-3">
+              <p className="text-xs text-zamrud-900/40">
+                {tanggalSingkat(s.created_at)}
               </p>
               {s.ditindaklanjuti && (
-                <span className="pill bg-zamrud-100 text-zamrud-700">
-                  ✅ Ditindaklanjuti panitia
+                <span className="pill bg-zamrud-100 text-zamrud-700 text-[10px]">
+                  ✅ Ditindaklanjuti
                 </span>
               )}
             </div>
-            <p className="text-sm text-zamrud-900/80 mt-2">{s.pesan}</p>
-            <p className="text-xs text-zamrud-900/40 mt-2">
-              {tanggalSingkat(s.created_at)}
-            </p>
           </div>
         ))}
         {daftar.length === 0 && (

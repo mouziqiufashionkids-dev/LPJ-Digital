@@ -129,34 +129,32 @@ export default async function UndanganPage() {
         </div>
       </div>
 
-      <div className="kartu mt-4 divide-y divide-zamrud-100">
+      <div className="grid sm:grid-cols-2 gap-3 mt-4">
         {calonTamu.map((r) => (
-          <div key={r.id} className="flex items-center gap-3 px-5 py-3.5">
-            <span className="h-9 w-9 rounded-full bg-zamrud-100 text-zamrud-700 font-bold text-sm flex items-center justify-center shrink-0">
+          <div key={r.id} className={`kartu p-4 flex items-center gap-3 ${r.kehadiran === "hadir" ? "border-zamrud-200" : "border-amber-200"}`}>
+            <span className={`h-11 w-11 rounded-full ${r.kehadiran === "hadir" ? "bg-zamrud-100 text-zamrud-700" : "bg-amber-100 text-amber-700"} font-bold text-sm flex items-center justify-center shrink-0`}>
               {r.nama.trim().charAt(0).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-zamrud-900 truncate">
+              <p className="font-semibold text-zamrud-900 truncate text-sm">
                 {r.nama}
-                {r.rt && <span className="font-normal text-zamrud-900/50"> · {r.rt}</span>}
               </p>
-              <p className="text-xs text-zamrud-900/50">
-                {tanggalSingkat(r.created_at)}
+              <p className="text-[11px] text-zamrud-900/50">
+                {r.rt ? `${r.rt} · ` : ""}{tanggalSingkat(r.created_at)}
               </p>
+              {r.kehadiran === "hadir" && (
+                <span className="text-[11px] font-bold text-zamrud-600">
+                  membawa {r.jumlah_tamu} orang
+                </span>
+              )}
             </div>
-            {r.kehadiran === "hadir" ? (
-              <span className="pill bg-zamrud-100 text-zamrud-700 shrink-0">
-                ✓ Hadir · {r.jumlah_tamu} org
-              </span>
-            ) : (
-              <span className="pill bg-amber-100 text-amber-700 shrink-0">
-                Belum pasti
-              </span>
-            )}
+            <span className={`text-xl shrink-0 ${r.kehadiran === "hadir" ? "" : "opacity-50"}`}>
+              {r.kehadiran === "hadir" ? "🤝" : "🤔"}
+            </span>
           </div>
         ))}
         {calonTamu.length === 0 && (
-          <p className="px-5 py-6 text-sm text-zamrud-900/60">
+          <p className="kartu p-6 text-sm text-zamrud-900/60 sm:col-span-2 text-center">
             Belum ada konfirmasi. Jadilah yang pertama! 🤲
           </p>
         )}
