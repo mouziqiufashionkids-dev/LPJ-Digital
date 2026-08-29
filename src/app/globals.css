@@ -6,6 +6,56 @@ body {
   @apply bg-krem text-zamrud-900 font-isi antialiased;
 }
 
+/* ===== MODE GELAP ===== */
+.dark body {
+  @apply bg-zamrud-900 text-krem;
+}
+.dark .kartu {
+  @apply bg-zamrud-800 border-zamrud-700;
+}
+.dark .bg-krem {
+  @apply bg-zamrud-900;
+}
+.dark .text-zamrud-900 {
+  @apply text-krem;
+}
+.dark .text-zamrud-800 {
+  @apply text-krem;
+}
+.dark .text-zamrud-700 {
+  @apply text-zamrud-300;
+}
+.dark .bg-white {
+  @apply bg-zamrud-800;
+}
+.dark .bg-zamrud-50 {
+  @apply bg-zamrud-800/50;
+}
+.dark .bg-zamrud-100 {
+  @apply bg-zamrud-700/50;
+}
+.dark .border-zamrud-100 {
+  @apply border-zamrud-700;
+}
+.dark .border-zamrud-200 {
+  @apply border-zamrud-700;
+}
+.dark .bg-amber-50 {
+  @apply bg-zamrud-800;
+}
+.dark .text-zamrud-900\/70 {
+  @apply text-krem/70;
+}
+.dark .text-zamrud-900\/60 {
+  @apply text-krem/60;
+}
+.dark .text-zamrud-900\/50 {
+  @apply text-krem/50;
+}
+.dark .text-zamrud-900\/40 {
+  @apply text-krem/40;
+}
+
 /* pola arabesque bintang-8, halus & ringan */
 .bg-ornamen {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><g fill='none' stroke='%23D4AF37' stroke-opacity='0.16' stroke-width='1.2'><path d='M36 6l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/><circle cx='36' cy='36' r='9'/></g></svg>");

@@ -56,6 +56,17 @@ export default async function LaporanPage({ searchParams }) {
         </div>
       </div>
 
+      {/* tombol cetak LPJ lengkap */}
+      <div className="mb-4">
+        <Link
+          href="/laporan/cetak"
+          target="_blank"
+          className="tombol bg-zamrud-700 text-white hover:bg-zamrud-800 text-sm"
+        >
+          📄 Cetak LPJ Lengkap (PDF)
+        </Link>
+      </div>
+
       {/* tab */}
       <div className="flex flex-wrap gap-2 mt-8">
         {TAB.map((t) => (

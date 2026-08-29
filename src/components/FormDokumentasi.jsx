@@ -69,6 +69,7 @@ export default function FormDokumentasi() {
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
+              capture="environment"
               onChange={pilihBerkas}
               className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-zamrud-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-zamrud-700 hover:file:bg-zamrud-100"
             />
@@ -76,16 +77,26 @@ export default function FormDokumentasi() {
               <img src={pratinjau} alt="Pratinjau" className="h-14 w-14 object-cover rounded-lg border border-zamrud-200" />
             )}
           </div>
+          <p className="text-[10px] text-zamrud-900/40 mt-1">
+            Langsung buka kamera HP — foto langsung tampil di galeri web untuk warga
+          </p>
         </div>
       </div>
       {gagal && <p className="text-sm text-rose-600 mt-3">{gagal}</p>}
-      <button
-        type="submit"
-        disabled={proses || !berkas}
-        className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 disabled:opacity-50 mt-4"
-      >
-        {proses ? "Mengunggah…" : "Unggah ke Galeri"}
-      </button>
+      <div className="flex gap-2 mt-4">
+        <button
+          type="submit"
+          disabled={proses || !berkas}
+          className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 disabled:opacity-50 flex-1"
+        >
+          {proses ? "Mengunggah…" : "📸 Unggah ke Galeri LIVE"}
+        </button>
+      </div>
+      {proses && (
+        <div className="mt-2 h-2 bg-zamrud-100 rounded-full overflow-hidden">
+          <div className="h-full bg-zamrud-600 animate-pulse w-full" />
+        </div>
+      )}
     </form>
   );
 }

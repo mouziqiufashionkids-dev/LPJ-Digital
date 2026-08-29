@@ -494,6 +494,69 @@ export default function AdminPage() {
         </div>
       </div>
 
+      {/* rekap per RT */}
+      <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
+        Rekap per RT (Juru Tagih)
+      </h2>
+      <div className="grid md:grid-cols-2 gap-4">
+        {Object.entries(
+          warga.reduce((acc, w) => {
+            const rt = w.rt || "Tanpa RT";
+            if (!acc[rt]) acc[rt] = { total: 0, lunas: 0, belum: 0, target: 0, daftarBelum: [] };
+            acc[rt].total++;
+            acc[rt].target += w.ancalah || 0;
+            if (w.kupon?.status === "lunas") {
+              acc[rt].lunas++;
+            } else {
+              acc[rt].belum++;
+              acc[rt].daftarBelum.push(w.nama);
+            }
+            return acc;
+          }, {})
+        ).map(([rt, data]) => (
+          <div key={rt} className="kartu p-5">
+            <div className="flex items-center justify-between">
+              <h3 className="font-judul text-lg font-bold text-zamrud-800">{rt}</h3>
+              <span className={`pill ${data.belum === 0 ? "bg-zamrud-100 text-zamrud-700" : "bg-amber-100 text-amber-700"}`}>
+                {data.belum === 0 ? "Lunas semua!" : `${data.belum} belum bayar`}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-3 text-center text-xs">
+              <div className="bg-zamrud-50 rounded-xl p-2">
+                <p className="font-bold text-zamrud-800">{data.lunas}/{data.total}</p>
+                <p className="text-zamrud-900/50">Lunas</p>
+              </div>
+              <div className="bg-amber-50 rounded-xl p-2">
+                <p className="font-bold text-amber-700">{data.belum}</p>
+                <p className="text-zamrud-900/50">Belum</p>
+              </div>
+              <div className="bg-krem rounded-xl p-2">
+                <p className="font-bold text-zamrud-800">{rupiah(data.target)}</p>
+                <p className="text-zamrud-900/50">Target</p>
+              </div>
+            </div>
+            {data.daftarBelum.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs font-semibold text-zamrud-800 mb-1">Belum bayar:</p>
+                <p className="text-xs text-zamrud-900/60 leading-relaxed">
+                  {data.daftarBelum.slice(0, 6).join(", ")}
+                  {data.daftarBelum.length > 6 && ` ...+${data.daftarBelum.length - 6}`}
+                </p>
+                <button
+                  onClick={() => {
+                    const pesan = `*REKAP ${rt} — Iuran Maulid Nabi 1448 H*\n\nBelum bayar: ${data.belum} orang\nSudah lunas: ${data.lunas}/${data.total} KK\n\nDaftar yang belum bayar:\n${data.daftarBelum.map((n, i) => `${i + 1}. ${n}`).join("\n")}\n\nMohon segera diselesaikan sebelum hari H. Terima kasih.\n\nPanitia Masjid Al-Hikmah`;
+                    window.location.href = `https://wa.me/?text=${encodeURIComponent(pesan)}`;
+                  }}
+                  className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 text-xs px-3 py-2 mt-2"
+                >
+                  Kirim ke Grup {rt}
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
       {/* sponsor: kirim proposal */}
       {sponsor.length > 0 && (
         <div className="mt-6 kartu p-5 border-emas/50 bg-amber-50/60">
