@@ -320,7 +320,14 @@ export function ubahWarga(id, patch = {}) {
   if (patch.ancalah !== undefined) {
     w.ancalah = Math.max(0, Number(patch.ancalah) || 0);
     const k = S.kupon.find((x) => x.warga_id === w.id);
-    if (k) k.nominal = w.ancalah;
+    if (k) {
+      k.nominal = w.ancalah;
+      // sinkron transaksi jika lunas
+      if (k.status === "lunas") {
+        const t = S.transaksi.find((x) => x.kupon_id === k.id);
+        if (t) t.jumlah = w.ancalah;
+      }
+    }
   }
   return { ok: true };
 }

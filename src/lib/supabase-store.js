@@ -217,9 +217,15 @@ export async function ubahWarga(id, patch = {}) {
   if (!Object.keys(bersih).length) return { ok: false, pesan: "Tidak ada perubahan" };
   const h = await db().from("warga").update(bersih).eq("id", id);
   if (h.error) return { ok: false, pesan: h.error.message };
-  // sinkronkan nominal kupon jika ancalah berubah
+  // sinkronkan nominal kupon + transaksi jika ancalah berubah
   if (bersih.ancalah !== undefined) {
     await db().from("kupon").update({ nominal: bersih.ancalah }).eq("warga_id", id);
+    // jika kupon sudah lunas, sinkronkan juga transaksi yang ter-link
+    const { data: k } = await db().from("kupon").select("id,status").eq("warga_id", id).limit(1);
+    const kp = k?.[0];
+    if (kp && kp.status === "lunas") {
+      await db().from("transaksi").update({ jumlah: bersih.ancalah }).eq("kupon_id", kp.id);
+    }
   }
   return { ok: true };
 }
