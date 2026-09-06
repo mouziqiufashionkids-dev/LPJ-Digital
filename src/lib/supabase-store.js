@@ -100,7 +100,7 @@ export async function getSettings() {
 export async function getStats() {
   const [{ data: w }, { data: t }, { data: kp }] = await Promise.all([
     cobaQueryWarga("ancalah"),
-    db().from("transaksi").select("tipe,jumlah"),
+    db().from("transaksi").select("tipe,jumlah,kategori"),
     db().from("kupon").select("status"),
   ]);
   const semuaMasuk = (t || []).filter((x) => x.tipe === "masuk");
