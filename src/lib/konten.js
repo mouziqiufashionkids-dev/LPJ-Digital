@@ -122,6 +122,13 @@ export const KONTEN_DEFAULT = {
     jenis: "baris",
     nilai: "Konsumsi jamaah & panitia | Rp 3.000.000\nHadiah perlombaan anak-anak | Rp 1.500.000\nSantunan anak yatim & dhuafa | Rp 1.000.000\nDekorasi, tenda & panggung | Rp 1.500.000\nKitab, mukena & perlengkapan majelis | Rp 500.000\nOperasional & tak terduga | Rp 500.000",
   },
+  "marquee.teks": {
+    halaman: "Teks Berjalan (Semua Halaman)",
+    label: "Ucapan terima kasih yang berjalan di bawah header",
+    jenis: "panjang",
+    nilai:
+      "Jazakumullah khairan kathira kepada seluruh warga yang telah membantu terselenggaranya Maulid Nabi \uFDFA 1448 H ini — baik bantuan uang, barang, maupun tenaga. Semoga dicatat sebagai amal kebaikan oleh Allah SWT dan menjadi amal jariyah yang terus mengalir. Aamiin.",
+  },
   "footer.copyright": {
     halaman: "Footer (kaki semua halaman)",
     label: "Teks copyright (nama pembuat, versi, tahun, dedikasi)",

@@ -80,7 +80,7 @@ export default async function Beranda() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 sm:mt-6">
             <StatCard
               ikon="💰"
-              label="Dana Masuk"
+              label="Dana Masuk (Kas)"
               nilai={rupiah(st.dana_masuk)}
               catatan={`${st.transaksi_masuk} catatan iuran & infak`}
             />
@@ -95,10 +95,19 @@ export default async function Beranda() {
               ikon="🧮"
               label="Sisa Kas Panitia"
               nilai={rupiah(st.sisa)}
-              catatan="masuk − keluar, realtime"
+              catatan="kas masuk − kas keluar"
               aksen="emas"
             />
           </div>
+          {st.donasi_barang > 0 && (
+            <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-800 flex items-center gap-2">
+              <span>📦</span>
+              <span>
+                <strong>Donasi Barang (non-kas):</strong> {rupiah(st.donasi_barang)} —
+                berupa barang, tidak dihitung dalam kas uang
+              </span>
+            </div>
+          )}
           <p className="text-xs text-zamrud-900/50 mt-4">
             Diperbarui {st.diperbarui} · Sumber: iuran ancalah warga + infak
             sukarela. Rincian lengkap di{" "}

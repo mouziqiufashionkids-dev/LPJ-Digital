@@ -239,7 +239,13 @@ export function getSettings() {
 
 export function getStats() {
   const targetDana = S.warga.reduce((a, w) => a + w.ancalah, 0);
-  const masuk = S.transaksi.filter((t) => t.tipe === "masuk").reduce((a, t) => a + t.jumlah, 0);
+  const semuaMasuk = S.transaksi.filter((t) => t.tipe === "masuk");
+  const donasiBarang = semuaMasuk
+    .filter((t) => t.kategori === "Donasi Barang")
+    .reduce((a, t) => a + t.jumlah, 0);
+  const masuk = semuaMasuk
+    .filter((t) => t.kategori !== "Donasi Barang")
+    .reduce((a, t) => a + t.jumlah, 0);
   const keluar = S.transaksi.filter((t) => t.tipe === "keluar").reduce((a, t) => a + t.jumlah, 0);
   const kkLunas = S.kupon.filter((k) => k.status === "lunas").length;
   return {
@@ -247,6 +253,7 @@ export function getStats() {
     dana_masuk: masuk,
     dana_keluar: keluar,
     sisa: masuk - keluar,
+    donasi_barang: donasiBarang,
     persen: Math.round((masuk / targetDana) * 100),
     kk_total: S.warga.length,
     kk_lunas: kkLunas,

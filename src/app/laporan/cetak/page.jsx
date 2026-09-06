@@ -76,6 +76,19 @@ export default async function CetakLPJPage() {
         </table>
       </section>
 
+      {/* DONASI BARANG (NON-KAS) */}
+      {st.donasi_barang > 0 && (
+        <section className="mb-6">
+          <h3 className="font-bold text-xs sm:text-sm uppercase border-b border-black pb-1 mb-3">
+            Donasi Barang (Non-Kas): {rupiah(st.donasi_barang)}
+          </h3>
+          <p className="text-xs text-gray-600">
+            Sumbangan berupa barang — tidak dihitung dalam arus kas uang.
+            Tersebut sebagai apresiasi dan transparansi.
+          </p>
+        </section>
+      )}
+
       {/* RENCANA ANGGARAN */}
       <TabelAnggaran
         judul={K["anggaran.judul"]}

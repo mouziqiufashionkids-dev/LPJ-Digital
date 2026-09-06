@@ -1,6 +1,7 @@
 import { Amiri, Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import TeksBerjalan from "@/components/TeksBerjalan";
 import Footer from "@/components/Footer";
 import { getSettings } from "@/lib/store";
 
@@ -50,6 +51,7 @@ export default function RootLayout({ children }) {
     <html lang="id" className={`${judul.variable} ${isi.variable}`}>
       <body className="min-h-screen flex flex-col overflow-x-hidden">
         <Header />
+        <TeksBerjalan />
         <div className="flex-1 w-full">{children}</div>
         <Footer />
       </body>

@@ -56,6 +56,24 @@ body {
   @apply text-krem/40;
 }
 
+/* animasi teks berjalan */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 60s linear infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+    overflow-x: auto;
+    white-space: normal;
+  }
+}
+
 /* hide scrollbar untuk marquee */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

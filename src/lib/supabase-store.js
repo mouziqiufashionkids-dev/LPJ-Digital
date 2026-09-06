@@ -103,7 +103,14 @@ export async function getStats() {
     db().from("transaksi").select("tipe,jumlah"),
     db().from("kupon").select("status"),
   ]);
-  const masuk = (t || []).filter((x) => x.tipe === "masuk").reduce((a, x) => a + x.jumlah, 0);
+  const semuaMasuk = (t || []).filter((x) => x.tipe === "masuk");
+  // Donasi barang TIDAK dihitung sebagai kas uang (non-kas)
+  const donasiBarang = semuaMasuk
+    .filter((x) => x.kategori === "Donasi Barang")
+    .reduce((a, x) => a + x.jumlah, 0);
+  const masuk = semuaMasuk
+    .filter((x) => x.kategori !== "Donasi Barang")
+    .reduce((a, x) => a + x.jumlah, 0);
   const keluar = (t || []).filter((x) => x.tipe === "keluar").reduce((a, x) => a + x.jumlah, 0);
   const target = (w || []).reduce((a, x) => a + x.ancalah, 0);
   return {
@@ -111,6 +118,7 @@ export async function getStats() {
     dana_masuk: masuk,
     dana_keluar: keluar,
     sisa: masuk - keluar,
+    donasi_barang: donasiBarang,
     persen: target ? Math.round((masuk / target) * 100) : 0,
     kk_total: (w || []).length,
     kk_lunas: (kp || []).filter((x) => x.status === "lunas").length,

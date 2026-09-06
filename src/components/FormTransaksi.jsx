@@ -5,7 +5,7 @@ import NotifWAGrup from "./NotifWAGrup";
 
 const KATEGORI = {
   keluar: ["Konsumsi", "Administrasi", "Peralatan", "Acara", "Dekorasi", "Santunan", "Lainnya"],
-  masuk: ["Infak Sukarela", "Donasi", "Iuran Manual", "Lainnya"],
+  masuk: ["Infak Sukarela", "Donasi", "Iuran Manual", "Donasi Barang", "Lainnya"],
 };
 
 export default function FormTransaksi() {

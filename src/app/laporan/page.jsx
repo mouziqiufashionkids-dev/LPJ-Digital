@@ -84,6 +84,19 @@ export default async function LaporanPage({ searchParams }) {
         ))}
       </div>
 
+      {/* donasi barang (non-kas) */}
+      {st.donasi_barang > 0 && (
+        <div className="kartu mt-4 p-4 bg-amber-50 border-amber-200">
+          <p className="text-sm font-bold text-amber-800">
+            📦 Donasi Barang (Non-Kas): {rupiah(st.donasi_barang)}
+          </p>
+          <p className="text-xs text-amber-700 mt-1">
+            Berupa barang/sumbangan non-uang — tidak dihitung dalam arus kas uang.
+            Tercantum sebagai apresiasi dan transparansi.
+          </p>
+        </div>
+      )}
+
       {/* daftar transaksi */}
       <div className="kartu mt-4 divide-y divide-zamrud-100 overflow-hidden">
         {rows.map((t) => (
