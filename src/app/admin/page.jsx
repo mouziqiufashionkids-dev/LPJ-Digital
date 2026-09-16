@@ -91,6 +91,9 @@ export default function AdminPage() {
   const [alasanKeluar, setAlasanKeluar] = useState("");
   const [editWarga, setEditWarga] = useState(null); // warga yang sedang diedit
   const [editTransaksi, setEditTransaksi] = useState(null); // transaksi yang diedit
+  const [pratinjauPenutup, setPratinjauPenutup] = useState(null); // isi pratinjau pesan penutup
+  const [penutupSibuk, setPenutupSibuk] = useState(false); // anti dobel-klik kirim penutup
+  const [statusPenutup, setStatusPenutup] = useState(""); // hasil kirim pesan penutup
 
   const muatUlang = useCallback(async () => {
     setMuat(true);
@@ -555,6 +558,80 @@ export default function AdminPage() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* pesan penutup maulid — kirim manual ke grup WA */}
+      <div className="mt-6 kartu p-5 border-2 border-emas/50 bg-gradient-to-br from-amber-50/80 to-krem">
+        <h3 className="font-judul text-lg font-bold text-zamrud-800">
+          🌙 Pesan Penutup Maulid Nabi ﷺ
+        </h3>
+        <p className="text-xs text-zamrud-900/70 mt-1">
+          Ucapan terima kasih + laporan akhir kas, terkirim otomatis ke grup WA
+          panitia lewat Fonnte. Rekap harian sudah berhenti sendiri sejak acara
+          selesai — pesan ini dikirim kapan pun Panitia siap.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            onClick={async () => {
+              try {
+                const r = await fetchAdmin(
+                  "/api/cron/rekap-harian?kirim=penutup&pratinjau=1"
+                );
+                const hasil = await r.json();
+                setPratinjauPenutup(
+                  hasil.ok
+                    ? hasil.pesan
+                    : "Gagal memuat pratinjau: " + (hasil.pesan || "?")
+                );
+              } catch (e) {
+                setPratinjauPenutup("Gagal memuat pratinjau: " + e.message);
+              }
+            }}
+            className="tombol border-2 border-zamrud-300 text-zamrud-700 text-xs px-4 py-2"
+          >
+            👁 Pratinjau Pesan
+          </button>
+          <button
+            disabled={penutupSibuk}
+            onClick={async () => {
+              if (
+                !confirm(
+                  "Kirim pesan penutup ke grup WA panitia SEKARANG?\n\nIsinya: terima kasih + laporan akhir kas + Barakallahu fiikum.\nDikirim lewat Fonnte — mohon pastikan sinyal bot aktif."
+                )
+              )
+                return;
+              setPenutupSibuk(true);
+              setStatusPenutup("⏳ Mengirim…");
+              try {
+                const r = await fetchAdmin("/api/cron/rekap-harian?kirim=penutup");
+                const hasil = await r.json();
+                if (hasil.notifTerkirim) {
+                  setStatusPenutup("✅ Terkirim ke grup WA");
+                  setPratinjauPenutup(null);
+                } else {
+                  setStatusPenutup(
+                    "⚠️ Belum terkirim — cek Pengaturan Web (token Fonnte & target grup), lalu coba lagi. " +
+                      (hasil.detail || hasil.pesan || "")
+                  );
+                }
+              } catch (e) {
+                setStatusPenutup("❌ Gagal: " + e.message);
+              }
+              setPenutupSibuk(false);
+            }}
+            className="tombol bg-zamrud-600 text-white hover:bg-zamrud-700 text-xs px-4 py-2 disabled:opacity-50"
+          >
+            {penutupSibuk ? "⏳ Mengirim…" : "🌙 Kirim Pesan Penutup"}
+          </button>
+          {statusPenutup && (
+            <span className="text-xs text-zamrud-900/70">{statusPenutup}</span>
+          )}
+        </div>
+        {pratinjauPenutup && (
+          <pre className="mt-3 bg-white/80 rounded-xl p-4 text-xs whitespace-pre-wrap border border-zamrud-100 text-zamrud-900 max-h-72 overflow-y-auto">
+            {pratinjauPenutup}
+          </pre>
+        )}
       </div>
 
       {/* sponsor: kirim proposal */}

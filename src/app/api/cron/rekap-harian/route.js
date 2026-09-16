@@ -109,6 +109,10 @@ export async function GET(request) {
         );
       }
       const pesan = await susunPesanPenutup();
+      // pratinjau: kembalikan isi pesan TANPA mengirim ke grup
+      if (url.searchParams.get("pratinjau") === "1") {
+        return Response.json({ ok: true, jenis: "pratinjau", pesan });
+      }
       const hasil = await kirimKeGrupWA(pesan);
       return Response.json({
         ok: hasil.terkirim,
