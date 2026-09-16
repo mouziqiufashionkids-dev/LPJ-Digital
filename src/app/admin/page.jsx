@@ -94,6 +94,9 @@ export default function AdminPage() {
   const [pratinjauPenutup, setPratinjauPenutup] = useState(null); // isi pratinjau pesan penutup
   const [penutupSibuk, setPenutupSibuk] = useState(false); // anti dobel-klik kirim penutup
   const [statusPenutup, setStatusPenutup] = useState(""); // hasil kirim pesan penutup
+  const [tampilSemuaTransaksi, setTampilSemuaTransaksi] = useState(false); // 8 terbaru ↔ semua
+  const [filterTipeTransaksi, setFilterTipeTransaksi] = useState("semua"); // semua|masuk|keluar
+  const [cariTransaksi, setCariTransaksi] = useState(""); // cari keterangan/kategori
 
   const muatUlang = useCallback(async () => {
     setMuat(true);
@@ -667,31 +670,77 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* transaksi terbaru */}
+      {/* transaksi terbaru — semua bisa diedit/dihapus */}
       <h2 className="font-judul text-2xl font-bold text-zamrud-800 mt-10 mb-3">
-        💹 Transaksi Terbaru
+        💹 Transaksi {tampilSemuaTransaksi || cariTransaksi || filterTipeTransaksi !== "semua" ? `(${totalTersaring} dari ${transaksi.length})` : "Terbaru"}
       </h2>
-      <div className="kartu divide-y divide-zamrud-100">
-        {transaksi.slice(0, 8).map((t) => (
-          <div key={t.id} className="flex items-center gap-3 px-4 py-3 text-sm">
-            <span>{t.tipe === "masuk" ? "💰" : "💸"}</span>
-            <span className="flex-1 min-w-0">
-              <span className="font-medium text-zamrud-900">{t.keterangan}</span>
-              <span className="block text-xs text-zamrud-900/50">
-                {tanggalSingkat(t.tanggal)} · {t.kategori}
-              </span>
-            </span>
-            <span className={t.tipe === "masuk" ? "font-semibold text-zamrud-600" : "font-semibold text-rose-600"}>
-              {rupiah(t.jumlah)}
-            </span>
+      <div className="kartu overflow-hidden">
+        <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b border-zamrud-100 bg-zamrud-50/50">
+          <input
+            value={cariTransaksi}
+            onChange={(e) => {
+              setCariTransaksi(e.target.value);
+              setTampilSemuaTransaksi(true);
+            }}
+            placeholder="🔍 Cari keterangan / kategori…"
+            className="flex-1 min-w-[150px] px-3 py-1.5 rounded-lg border-2 border-zamrud-200 focus:border-zamrud-600 focus:outline-none text-xs bg-white"
+          />
+          {[
+            { id: "semua", label: "Semua" },
+            { id: "masuk", label: "💰 Masuk" },
+            { id: "keluar", label: "💸 Keluar" },
+          ].map((f) => (
             <button
-              onClick={() => setEditTransaksi({ ...t })}
-              className="text-xs font-semibold bg-white text-zamrud-700 border border-zamrud-300 hover:bg-zamrud-50 rounded-lg px-3 py-1.5 shrink-0"
+              key={f.id}
+              onClick={() => setFilterTipeTransaksi(f.id)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold border-2 transition-colors ${
+                filterTipeTransaksi === f.id
+                  ? "bg-zamrud-600 text-white border-zamrud-600"
+                  : "bg-white text-zamrud-700 border-zamrud-200 hover:border-zamrud-400"
+              }`}
             >
-              Edit
+              {f.label}
             </button>
-          </div>
-        ))}
+          ))}
+        </div>
+        <div className="divide-y divide-zamrud-100 max-h-[26rem] overflow-y-auto">
+          {transaksiTersaring.map((t) => (
+            <div key={t.id} className="flex items-center gap-3 px-4 py-3 text-sm">
+              <span>{t.tipe === "masuk" ? "💰" : "💸"}</span>
+              <span className="flex-1 min-w-0">
+                <span className="font-medium text-zamrud-900">{t.keterangan}</span>
+                <span className="block text-xs text-zamrud-900/50">
+                  {tanggalSingkat(t.tanggal)} · {t.kategori}
+                  {t.bukti_url ? " · 📎 bukti" : ""}
+                </span>
+              </span>
+              <span className={t.tipe === "masuk" ? "font-semibold text-zamrud-600" : "font-semibold text-rose-600"}>
+                {rupiah(t.jumlah)}
+              </span>
+              <button
+                onClick={() => setEditTransaksi({ ...t })}
+                className="text-xs font-semibold bg-white text-zamrud-700 border border-zamrud-300 hover:bg-zamrud-50 rounded-lg px-3 py-1.5 shrink-0"
+              >
+                Edit
+              </button>
+            </div>
+          ))}
+          {transaksiTersaring.length === 0 && (
+            <p className="px-4 py-8 text-center text-xs text-zamrud-900/50">
+              Tidak ada transaksi yang cocok.
+            </p>
+          )}
+        </div>
+        <div className="px-4 py-2.5 border-t border-zamrud-100 text-center bg-zamrud-50/50">
+          <button
+            onClick={() => setTampilSemuaTransaksi((v) => !v)}
+            className="text-xs font-semibold text-zamrud-700 hover:underline"
+          >
+            {tampilSemuaTransaksi
+              ? "▲ Sembunyikan (tampilkan 8 terbaru)"
+              : `▼ Tampilkan semua ${transaksi.length} transaksi — edit & hapus`}
+          </button>
+        </div>
       </div>
 
       {/* dokumentasi */}
