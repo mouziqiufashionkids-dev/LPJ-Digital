@@ -823,6 +823,32 @@ export default function AdminPage() {
             <div className="flex gap-2 mt-5">
               <button
                 onClick={async () => {
+                  if (
+                    !confirm(
+                      `Hapus permanen transaksi "${editTransaksi.keterangan}"?\n\nTindakan ini TIDAK bisa dibatalkan.`
+                    )
+                  )
+                    return;
+                  const r = await fetchAdmin("/api/admin/transaksi", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: editTransaksi.id }),
+                  });
+                  const hasil = await r.json();
+                  if (hasil.ok) {
+                    segarkanPanel();
+                    setEditTransaksi(null);
+                  } else {
+                    alert("Gagal: " + (hasil.pesan || "?"));
+                  }
+                }}
+                className="tombol border-2 border-rose-200 text-rose-600 hover:bg-rose-50"
+                title="Hapus transaksi permanen"
+              >
+                🗑 Hapus
+              </button>
+              <button
+                onClick={async () => {
                   const d = {
                     keterangan: editTransaksi.keterangan,
                     tanggal: editTransaksi.tanggal,
