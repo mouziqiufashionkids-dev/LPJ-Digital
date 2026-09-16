@@ -194,6 +194,25 @@ export default function AdminPage() {
   const sponsor = warga.filter((w) => w.kelas === "sponsor");
   const labelKelas = (k) => (k === "sponsor" ? "Sponsor" : `K${k || "3"}`);
 
+  // ------ daftar transaksi: filter tipe + pencarian + batas tampil ------
+  const saringTransaksi = (daftar) => {
+    let hasil = daftar || [];
+    if (filterTipeTransaksi !== "semua") hasil = hasil.filter((t) => t.tipe === filterTipeTransaksi);
+    const q = cariTransaksi.trim().toLowerCase();
+    if (q) {
+      hasil = hasil.filter(
+        (t) =>
+          String(t.keterangan || "").toLowerCase().includes(q) ||
+          String(t.kategori || "").toLowerCase().includes(q)
+      );
+    }
+    return hasil;
+  };
+  const transaksiTersaring = tampilSemuaTransaksi
+    ? saringTransaksi(transaksi)
+    : saringTransaksi(transaksi).slice(0, 8);
+  const totalTersaring = saringTransaksi(transaksi).length;
+
   // ------ deteksi data dobel (nama sama) ------
   const normNama = (n) => String(n || "").toLowerCase().replace(/\s+/g, " ").trim();
   const grupNama = {};
