@@ -106,3 +106,25 @@ export async function PATCH(request) {
   const hasil = await ubahTransaksi(body.id, body.data);
   return Response.json(hasil, { status: hasil.ok ? 200 : 400 });
 }
+
+// HAPUS transaksi permanen
+export async function DELETE(request) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ ok: false, pesan: "Format salah" }, { status: 400 });
+  }
+  if (!body?.id) {
+    return Response.json({ ok: false, pesan: "id wajib" }, { status: 400 });
+  }
+  const { createClient } = await import("@supabase/supabase-js");
+  const { SUPABASE_URL } = await import("@/lib/supabase-store");
+  const c = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false },
+    global: { fetch: (u, o) => fetch(u, { ...o, cache: "no-store" }) },
+  });
+  const h = await c.from("transaksi").delete().eq("id", body.id);
+  if (h.error) return Response.json({ ok: false, pesan: h.error.message }, { status: 500 });
+  return Response.json({ ok: true });
+}
