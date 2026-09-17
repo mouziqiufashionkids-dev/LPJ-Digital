@@ -1,4 +1,4 @@
-import { tambahTransaksi, ubahTransaksi, simpanBerkas, getStats, getSettings } from "@/lib/store";
+import { tambahTransaksi, ubahTransaksi, hapusTransaksi, simpanBerkas, getStats, getSettings } from "@/lib/store";
 import { kirimKeGrupWA, formatNotifikasiTransaksi } from "@/lib/notif-wa";
 
 export const dynamic = "force-dynamic";
@@ -118,13 +118,6 @@ export async function DELETE(request) {
   if (!body?.id) {
     return Response.json({ ok: false, pesan: "id wajib" }, { status: 400 });
   }
-  const { createClient } = await import("@supabase/supabase-js");
-  const { SUPABASE_URL } = await import("@/lib/supabase-store");
-  const c = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false },
-    global: { fetch: (u, o) => fetch(u, { ...o, cache: "no-store" }) },
-  });
-  const h = await c.from("transaksi").delete().eq("id", body.id);
-  if (h.error) return Response.json({ ok: false, pesan: h.error.message }, { status: 500 });
-  return Response.json({ ok: true });
+  const hasil = await hapusTransaksi(body.id);
+  return Response.json(hasil, { status: hasil.ok ? 200 : 400 });
 }

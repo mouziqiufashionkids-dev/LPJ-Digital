@@ -28,7 +28,7 @@ Sekarang web masih pakai **data contoh** — perlu database agar data asli tersi
 
 1. Buka **supabase.com** → klik **Start your project** → login dengan GitHub
 2. Klik **New project**:
-   - Name: `lpj-alhikmah`
+   - Name: `lpj-masjidku`
    - Database Password: buat sandi → **CATAT/SAVE sandi ini**
    - Region: pilih **Singapore** (terdekat)
    - Klik **Create new project** → tunggu ± 2 menit
@@ -220,9 +220,9 @@ create policy "kirim rsvp"  on rsvp        for insert with check (char_length(na
 
 1. Masih di Settings → klik **General** (paling atas menu kiri)
 2. Cari tulisan **Project Name** → klik **Edit**
-3. Hapus `lpj-digital`, ketik: **`dkm-alhikmah`**
+3. Hapus nama lama, ketik: **`dkm-masjidku`**
 4. Klik **Save**
-5. Selesai! Domain baru: **`dkm-alhikmah.vercel.app`**
+5. Selesai! Domain baru: **`dkm-masjidku.vercel.app`**
    (domain lama lpj-digital.vercel.app otomatis nonaktif)
 
 ---
@@ -240,7 +240,7 @@ Supaya sandi baru + database terbaca:
 
 ## F. VERIFIKASI & MULAI PAKAI (5 menit)
 
-Buka **dkm-alhikmah.vercel.app**, cek:
+Buka domain web-mu, cek:
 
 - [ ] Footer TIDAK lagi ada tulisan "Mode demo — data contoh"
 - [ ] Klik logo 3× → login pakai **sandi baru** (bukan alhikmah2026)

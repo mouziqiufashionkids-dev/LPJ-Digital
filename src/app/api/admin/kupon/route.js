@@ -1,10 +1,10 @@
 import QRCode from "qrcode";
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL } from "@/lib/supabase-store";
+import { listWarga, getSettings } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
 // Daftar kupon + QR untuk halaman cetak (dilindungi middleware).
+// Menggunakan lapisan store — jalan juga di mode demo.
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status") || "belum"; // belum | lunas | semua
@@ -15,19 +15,7 @@ export async function GET(request) {
   const proto = host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https";
   const base = `${proto}://${host}`;
 
-  const c = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false },
-    global: { fetch: (url, options) => fetch(url, { ...options, cache: "no-store", next: { revalidate: 0 } }) },
-  });
-  const [kw, kp] = await Promise.all([
-    c.from("warga").select("*, kupon(*)").order("nama"),
-    c.from("pengaturan").select("*").eq("id", 1).single(),
-  ]);
-  const semua = (kw.data || []).map((w) => ({
-    ...w,
-    kupon: Array.isArray(w.kupon) ? (w.kupon[0] || null) : w.kupon,
-  }));
-  const pengaturan = kp.data || {};
+  const [semua, pengaturan] = await Promise.all([listWarga(), getSettings()]);
   const daftar = semua.filter((w) => {
     const okStatus =
       status === "semua" ? true : (w.kupon?.status || "belum") === status;

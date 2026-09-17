@@ -1,5 +1,5 @@
 {
-  "name": "lpj-maulid-nabi",
+  "name": "lpj-digital-masjid",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -20,5 +20,25 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14"
+  },
+  "description": "LPJ Digital — platform laporan pertanggungjawaban transparan untuk masjid & DKM: iuran warga, kupon ber-QR, kas realtime, notifikasi WhatsApp, undangan RSVP, dan LPJ siap cetak.",
+  "keywords": [
+    "masjid",
+    "dkm",
+    "lpj",
+    "laporan-keuangan",
+    "iuran",
+    "kupon",
+    "whatsapp",
+    "nextjs",
+    "supabase",
+    "vercel",
+    "indonesia",
+    "open-source"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mouziqiufashionkids-dev/LPJ-Digital"
   }
 }

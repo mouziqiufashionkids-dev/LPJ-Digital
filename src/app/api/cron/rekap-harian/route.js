@@ -1,21 +1,28 @@
 import { getStats, getSettings } from "@/lib/store";
-import { kirimKeGrupWA } from "@/lib/notif-wa";
+import { kirimKeGrupWA, alamatWeb } from "@/lib/notif-wa";
 
 export const dynamic = "force-dynamic";
 
 // Dipicu oleh Vercel Cron setiap hari jam 20:00 WIB (13:00 UTC).
-//   - SEBELUM 11 Sep 2026 : kirim rekap harian ke grup WA panitia
-//   - TEPAT  11 Sep 2026  : kirim pesan penutup (terima kasih + laporan akhir)
-//   - SETELAH 11 Sep 2026 : berhenti otomatis, tidak ada pesan yang dikirim
+// Tanggal acara diambil dari Pengaturan Web (kolom "tanggal acara"):
+//   - SEBELUM hari-H  : kirim rekap harian ke grup WA panitia
+//   - TEPAT hari-H    : kirim pesan penutup (terima kasih + laporan akhir)
+//   - SETELAH hari-H  : berhenti otomatis, tidak ada pesan yang dikirim
+//   - tanggal kosong  : rekap harian terus (belum ada hari-H yang ditentukan)
 //
-// Kirim manual pesan penutup kapan saja (khusus panitia):
+// Kirim manual pesan penutup kapan saja (khusus panitia, wajib token):
 //   /api/cron/rekap-harian?kirim=penutup&t=<token admin>
-
-const TANGGAL_MAUDID = "2026-09-11"; // Maulid Nabi ﷺ 1448 H
 
 function tanggalJakarta() {
   // en-CA menghasilkan format YYYY-MM-DD (aman untuk dibandingkan)
   return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+}
+
+function tanggalAcaraJakarta(settings) {
+  if (!settings?.tanggal_acara) return null;
+  const d = new Date(settings.tanggal_acara);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
 }
 
 async function tokenAdmin() {
@@ -29,16 +36,18 @@ async function tokenAdmin() {
     .join("");
 }
 
-async function susunPesanPenutup() {
-  const [st, settings] = await Promise.all([getStats(), getSettings()]);
-  const nama = settings.nama_masjid || "Masjid Al-Hikmah";
+async function susunPesanPenutup(settings) {
+  const st = await getStats();
+  const nama = settings.nama_masjid || "Masjid";
+  const kegiatan = settings.nama_kegiatan || "Acara";
+  const web = alamatWeb();
   const garis = "=========================";
   const rp = (n) => `Rp ${(n || 0).toLocaleString("id-ID")}`;
-  return `*PESAN PENUTUP — MAULID NABI \uFDFA 1448 H*
+  return `*PESAN PENUTUP — ${kegiatan.toUpperCase()}*
 ${garis}
 ${nama}
 
-Alhamdulillah, kegiatan Maulid Nabi \uFDFA telah terlaksana dengan lancar atas izin Allah dan dukungan seluruh warga.
+Alhamdulillah, kegiatan ${kegiatan} telah terlaksana dengan lancar atas izin Allah dan dukungan seluruh warga.
 
 *LAPORAN AKHIR KAS*
 MASUK: ${rp(st.dana_masuk)}
@@ -48,7 +57,7 @@ ${st.donasi_barang ? `DONASI BARANG: ${rp(st.donasi_barang)} (non-kas)\n` : ""}I
 TARGET: ${rp(st.target_dana)} (${st.persen || 0}%)
 
 Laporan lengkap + bukti nota:
-dkm-alhikmah.vercel.app/laporan
+${web ? `${web}/laporan` : "halaman Laporan web panitia"}
 
 Jazakumullahu khairan kepada seluruh panitia, donatur, dan warga yang telah berpartisipasi. Semoga Allah membalas kebaikan kalian dengan balasan terbaik dan menjadikan amal kita diterima.
 
@@ -56,13 +65,14 @@ Barakallahu fiikum \uD83C\uDF19
 Panitia ${nama}`;
 }
 
-async function susunRekapHarian(hariIni) {
-  const [st, settings] = await Promise.all([getStats(), getSettings()]);
+async function susunRekapHarian(hariIni, settings) {
+  const st = await getStats();
+  const web = alamatWeb();
   const garis = "=========================";
-  const pesan = `*REKAP HARIAN — ${hariIni}*
+  return `*REKAP HARIAN — ${hariIni}*
 ${garis}
-*Maulid Nabi \uFDFA 1448 H*
-${settings.nama_masjid || "Masjid Al-Hikmah"}
+*${settings.nama_kegiatan || "Kegiatan"}*
+${settings.nama_masjid || "Masjid"}
 
 MASUK: Rp ${(st.dana_masuk || 0).toLocaleString("id-ID")}
 KELUAR: Rp ${(st.dana_keluar || 0).toLocaleString("id-ID")}
@@ -74,16 +84,16 @@ TARGET: Rp ${(st.target_dana || 0).toLocaleString("id-ID")}
 
 ${garis}
 Update realtime:
-dkm-alhikmah.vercel.app
+${web || "(alamat web belum diatur)"}
 
 Dikirim otomatis jam 20.00 WIB
-Panitia ${settings.nama_masjid || "Masjid Al-Hikmah"}`;
-  return pesan;
+Panitia ${settings.nama_masjid || "Masjid"}`;
 }
 
 export async function GET(request) {
   try {
     const url = new URL(request.url);
+    const settings = await getSettings();
 
     // --- proteksi opsional: jika CRON_SECRET diisi di Vercel, wajib cocok ---
     const rahasia = process.env.CRON_SECRET;
@@ -108,7 +118,7 @@ export async function GET(request) {
           { status: 401 }
         );
       }
-      const pesan = await susunPesanPenutup();
+      const pesan = await susunPesanPenutup(settings);
       // pratinjau: kembalikan isi pesan TANPA mengirim ke grup
       if (url.searchParams.get("pratinjau") === "1") {
         return Response.json({ ok: true, jenis: "pratinjau", pesan });
@@ -123,20 +133,21 @@ export async function GET(request) {
     }
 
     const hariIni = tanggalJakarta();
+    const tglAcara = tanggalAcaraJakarta(settings);
 
     // --- setelah acara selesai: berhenti otomatis, tidak kirim apa pun ---
-    if (hariIni > TANGGAL_MAUDID) {
+    if (tglAcara && hariIni > tglAcara) {
       return Response.json({
         ok: true,
         berhenti: true,
         pesan:
-          "Maulid sudah selesai — rekap harian dihentikan otomatis. Cron job boleh dihapus dari Vercel dashboard (Settings → Cron Jobs).",
+          "Acara sudah selesai — rekap harian dihentikan otomatis. Cron job boleh dihapus dari Vercel dashboard (Settings → Cron Jobs).",
       });
     }
 
     // --- hari-H: pesan penutup (terima kasih + laporan akhir) ---
-    if (hariIni === TANGGAL_MAUDID) {
-      const pesan = await susunPesanPenutup();
+    if (tglAcara && hariIni === tglAcara) {
+      const pesan = await susunPesanPenutup(settings);
       const hasil = await kirimKeGrupWA(pesan);
       return Response.json({
         ok: true,
@@ -145,10 +156,15 @@ export async function GET(request) {
       });
     }
 
-    // --- sebelum hari-H: rekap harian biasa ---
-    const pesan = await susunRekapHarian(hariIni);
+    // --- sebelum hari-H (atau tanggal acara belum diisi): rekap harian biasa ---
+    const pesan = await susunRekapHarian(hariIni, settings);
     const hasil = await kirimKeGrupWA(pesan);
-    return Response.json({ ok: true, jenis: "rekap", notifTerkirim: hasil.terkirim });
+    return Response.json({
+      ok: true,
+      jenis: "rekap",
+      notifTerkirim: hasil.terkirim,
+      tanggalAcara: tglAcara || "(belum diatur di Pengaturan Web)",
+    });
   } catch (e) {
     return Response.json({ ok: false, pesan: e.message }, { status: 500 });
   }

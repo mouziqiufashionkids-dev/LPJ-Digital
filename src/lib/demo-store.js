@@ -428,6 +428,14 @@ export function ubahTransaksi(id, patch = {}) {
   return { ok: true };
 }
 
+// Hapus transaksi permanen (mode demo)
+export function hapusTransaksi(id) {
+  const sebelum = S.transaksi.length;
+  S.transaksi = S.transaksi.filter((x) => String(x.id) !== String(id));
+  const terhapus = sebelum - S.transaksi.length;
+  return terhapus ? { ok: true, terhapus } : { ok: false, pesan: "Transaksi tidak ditemukan" };
+}
+
 export function tambahTransaksi({ tanggal, tipe, jumlah, kategori, keterangan, buktiUrl }) {
   S.transaksi.push({
     id: `t${S.transaksi.length + 1}`,

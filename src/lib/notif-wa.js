@@ -11,6 +11,19 @@
 
 const FONNTE_URL = "https://api.fonnte.com/send";
 
+// Alamat web untuk tautan di pesan WA — otomatis ikut domain deploy:
+//   1. NEXT_PUBLIC_SITE_URL (kalau pakai domain custom)
+//   2. VERCEL_PROJECT_PRODUCTION_URL (domain produksi Vercel)
+//   3. VERCEL_URL (deploy apa pun di Vercel)
+export function alamatWeb() {
+  const dari =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_URL ||
+    "";
+  return String(dari).replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
 async function bacaPengaturanNotif() {
   try {
     const { getKonten } = await import("./store");
@@ -75,7 +88,7 @@ ${jumlahStr}
 • KK Lunas: ${stats?.kk_lunas || 0}/${stats?.kk_total || 0}
 
 ${garis}
-Update realtime: dkm-alhikmah.vercel.app
+Update realtime: ${alamatWeb()}
 Dikirim otomatis oleh sistem
 Panitia ${namaMasjid || "Masjid Al-Hikmah"}`;
 }
@@ -93,7 +106,7 @@ ${garis}
 Progress: ${stats?.persen || 0}%
 
 ${garis}
-Update realtime: dkm-alhikmah.vercel.app
+Update realtime: ${alamatWeb()}
 Dikirim otomatis oleh sistem
 Panitia ${namaMasjid || "Masjid Al-Hikmah"}`;
 }

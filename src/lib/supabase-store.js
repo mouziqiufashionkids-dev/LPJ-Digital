@@ -5,12 +5,9 @@
 import { createClient } from "@supabase/supabase-js";
 import { KONTEN_DEFAULT } from "./konten";
 
-// URL proyek Supabase — bisa dari env ATAU fallback di bawah
-// (URL ini bukan rahasia: sudah tampil publik di link foto bukti).
-export const SUPABASE_URL_FALLBACK = "https://zxyftqrufaxzdvfvqpfq.supabase.co";
-
-export const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || SUPABASE_URL_FALLBACK;
+// URL proyek Supabase — dari env (Settings → API di dashboard Supabase).
+// Tidak diisi + service role tidak diisi -> aplikasi jalan MODE DEMO.
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 
 // SELALU klien baru + fetch TANPA CACHE (Next.js men-cache fetch internal!)
 function db() {
@@ -400,6 +397,14 @@ export async function ubahTransaksi(id, patch = {}) {
   if (h.error) return { ok: false, pesan: h.error.message };
   return { ok: true };
 }
+
+// Hapus transaksi permanen (khusus panitia, lewat endpoint admin)
+export async function hapusTransaksi(id) {
+  const h = await db().from("transaksi").delete().eq("id", id);
+  if (h.error) return { ok: false, pesan: h.error.message };
+  return { ok: true };
+}
+
 
 export async function tambahTransaksi({ tanggal, tipe, jumlah, kategori, keterangan, buktiUrl }) {
   await db().from("transaksi").insert({

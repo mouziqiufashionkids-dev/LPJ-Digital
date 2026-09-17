@@ -1,8 +1,10 @@
 # Panduan Deploy — dari Demo ke Web Sungguhan
 
 > Target: web live gratis 100% (Supabase free + Vercel free), dengan
-> domain `maulid-alhikmah.vercel.app` yang jelas & meyakinkan bagi warga.
+> domain `nama-masjidmu.vercel.app` yang jelas & meyakinkan bagi warga.
 > Waktu pengerjaan: ± 30–45 menit, tanpa biaya.
+> Tidak mau pakai terminal sama sekali? Buka
+> [PANDUAN-SETUP-WEBSITE.md](PANDUAN-SETUP-WEBSITE.md).
 
 ## Langkah 0 — Siapkan dua akun gratis
 
@@ -44,22 +46,24 @@ Cara A (paling cepat — lewat berkas zip):
 
 1. vercel.com → **Add New → Project** → import repo `LPJ-Digital`
 2. **PENTING — sebelum deploy**, ganti nama project:
-   **Settings → General → Project Name** → `maulid-alhikmah`
-   → alamat web menjadi **`maulid-alhikmah.vercel.app`**
+   **Settings → General → Project Name** → mis. `dkm-masjidku`
+   → alamat web menjadi **`dkm-masjidku.vercel.app`**
    (nama jelas = warga tidak curiga penipuan)
-3. **Environment Variables** → tambahkan 3 nilai:
+3. **Environment Variables** → tambahkan:
 
-   | Name | Value |
-   |---|---|
-   | `NEXT_PUBLIC_SUPABASE_URL` | Project URL dari Langkah 2.5 |
-   | `SUPABASE_SERVICE_ROLE_KEY` | service_role dari Langkah 2.5 |
-   | `ADMIN_PASSWORD` | sandi panitia buatanmu (GANTI dari default!) |
+   | Name | Wajib? | Value |
+   |---|---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Project URL dari Langkah 2 |
+   | `SUPABASE_SERVICE_ROLE_KEY` | ✅ | service_role dari Langkah 2 |
+   | `ADMIN_PASSWORD` | ✅ | sandi panitia buatanmu (GANTI dari default!) |
+   | `NEXT_PUBLIC_SITE_URL` | ⬜ | domain custom, mis. `https://masjidku.my.id` |
+   | `CRON_SECRET` | ⬜ | kunci tambahan pelindung endpoint cron |
 
 4. **Deploy** → tunggu ± 2 menit → web live! 🎉
 
 ## Langkah 4 — Cek hasil deploy
 
-- [ ] Buka `maulid-alhikmah.vercel.app` — beranda + jadwal sholat tampil
+- [ ] Buka `nama-masjidmu.vercel.app` — beranda + jadwal sholat tampil
 - [ ] Klik logo 3× → login dengan `ADMIN_PASSWORD` baru
 - [ ] Tambah warga asli (tempel daftar KK dari Excel)
 - [ ] Cetak kupon → bagikan ke juru tagih

@@ -1,100 +1,162 @@
-# LPJ Digital — Maulid Nabi ﷺ
+<div align="center">
 
-Laporan pertanggungjawaban digital kegiatan Maulid Nabi di bawah **nama
-masjid** (bisa dipakai ulang untuk kegiatan lain): kupon iuran (ancalah)
-otomatis + cetak massal, progress dana live, kas keluar dengan nota
-bisa dilihat, dan kotak saran warga. Konsep lengkap:
-[`docs/KONSEP.md`](docs/KONSEP.md).
+# 🕌 LPJ Digital untuk Masjid & DKM
 
-## Menjalankan (mode demo — tanpa setup)
+**Platform laporan pertanggungjawaban yang transparan, realtime, dan gratis —**
+dari iuran warga sampai LPJ siap cetak.
+
+Next.js · Supabase · Vercel · Fonnte (WhatsApp)
+
+**[Coba 2 Menit](#-coba-dulu-tanpa-instal-apa-apa) · [Pasang Sendiri](#-pasang-sendiri-gratis-3045-menit) · [Fitur Lengkap](#-fitur)**
+
+</div>
+
+---
+
+## 🌙 Cerita di Baliknya
+
+Proyek ini lahir dari kebutuhan nyata: **warga minta transparansi, panitia kewalahan dengan Excel.**
+
+> "Uang iuran saya sudah masuk belum?" — pertanyaan yang tiap hari harus
+> dijawab bendahara dengan buka Excel satu per satu.
+
+Untuk Maulid Nabi ﷺ 1448 H, DKM Masjid Al-Hikmah membangun platform ini
+agar **seluruh warga bisa melihat kas secara realtime** — dan saat LPJ
+dibacakan di pengajian, semua angka sudah terbuka, berjalan sendiri,
+lengkap dengan bukti nota.
+
+Sekarang kodenya dibagikan **gratis** supaya masjid, mushala, dan DKM
+lain tidak perlu mulai dari nol. **Semoga menjadi amal jariyah.** 🤲
+
+## ✨ Fitur
+
+**Untuk warga (tanpa login):**
+- 🏠 **Beranda** — progres kas realtime, jadwal sholat, social proof tamu & saran warga
+- 🔎 **Cek Iuran** — cari nama / scan QR kupon → kwitansi digital (sudah bayar / belum)
+- 📊 **Laporan** — arus kas lengkap + foto bukti nota tiap pengeluaran
+- 💌 **Undangan** — RSVP + hitung mundur hari-H
+- 📜 **Proposal** — halaman sponsor interaktif dengan CTA donasi
+- 💬 **Kotak Saran** — masukan warga, tampil setelah dimoderasi
+
+**Untuk panitia (sandi):**
+- 🔐 Panel admin — akses lewat klik logo 3× atau `/admin/login`
+- 👥 CRUD warga — tempel dari Excel, anti-dobel, kelas iuran otomatis (K1/K2/K3/Sponsor)
+- 🎟️ Kupon ber-QR — cetak A4 per kelas, kirim via WhatsApp per warga
+- 💰 Catat kas — pemasukan/pengeluaran + upload foto nota (maks 4 MB)
+- 📦 **Donasi barang terpisah dari kas uang** (non-kas, tampil terpisah)
+- 📱 Notifikasi WhatsApp otomatis ke grup panitia (via Fonnte, gratis)
+- ⏰ Rekap harian otomatis jam 20:00 WIB (Vercel Cron) — berhenti sendiri setelah acara
+- 🖨️ LPJ siap cetak/PDF (desktop: tabel rapi, HP: kartu)
+- 🌙 Mode gelap + responsif penuh di HP
+
+## 📸 Tangkapan Layar
+
+| Beranda & Progres Realtime | Kwitansi Digital (Cek Iuran) |
+|---|---|
+| ![Beranda](docs/img/beranda.png) | ![Cek Iuran](docs/img/cek-iuran.png) |
+
+| Laporan Kas + Bukti Nota | Panel Panitia |
+|---|---|
+| ![Laporan](docs/img/laporan.png) | ![Admin](docs/img/admin.png) |
+
+*(Semua tangkapan layar memakai data contoh / mode demo.)*
+
+## 🚀 Coba Dulu (Tanpa Instal Apa-apa)
 
 ```bash
+git clone https://github.com/mouziqiufashionkids-dev/LPJ-Digital.git
+cd LPJ-Digital
 npm install
 npm run dev
 ```
 
-Buka http://localhost:3000 — aplikasi jalan dengan **data contoh**
-(48 KK, transaksi, saran). Coba:
+Buka `http://localhost:3000` → jalan dengan **data contoh (mode demo)**,
+tanpa database, tanpa akun, tanpa konfigurasi. Login panitia demo:
+klik logo 3× → sandi `alhikmah2026`.
 
-- Beranda: progress dana live + rekap "X dari Y KK sudah lunas"
-- `/undangan`: undangan digital + rundown + **konfirmasi kehadiran (RSVP)**
-  — nama yang konfirmasi langsung tampil live sebagai calon tamu
-- `/proposal`: **proposal sponsor digital interaktif** — bisa dipersonalisasi
-  per sponsor (`/proposal?untuk=Nama`), CTA donasi sesuai minat
-  (donasi uang via transfer/kas, sumbang barang, atau tanya panitia dulu),
-  rekening & tombol WA panitia
-- `/cek-iuran`: ketik nama (mis. *Asep*) atau kode kupon (*MLD-0001*)
-  → status + kwitansi digital
-- `/laporan`: rincian kas — **klik gambar nota** untuk melihat bukti
-- `/kotak-saran`: kirim saran (masuk moderasi dulu)
-- **Panel panitia** (dilindungi sandi):
-  - Akses: **klik logo masjid 3×** di halaman mana pun → login
-  - Sandi default mode demo: `alhikmah2026` — ganti lewat `ADMIN_PASSWORD`
-  - Login tahan banting: token di memori + localStorage + cookie
-    (tetap jalan walau cookie diblokir), sesi 8 jam
-  - Tambah warga masal: **manual / tempel daftar / unggah Excel (.xlsx) atau
-    CSV** — kolom `Nama; RT; Alamat; Nominal; Kelas` dikenali otomatis
-  - **Kelas ancalah**: Kelas 1 Rp 150rb · Kelas 2 Rp 100rb · Kelas 3 Rp 75rb ·
-    **Sponsor** (nominal bebas) — nominal otomatis dari kelas
-  - `/admin/kupon`: **cetak kupon per kelas atau khusus sponsor** (desain
-    emas, dicetak terpisah) — A4, 10 kupon/lembar, QR per kupon
-  - Tombol **🔧 Perbaiki kupon hilang** di halaman kupon — membuatkan
-    kupon untuk warga yang belum punya (aman diklik kapan pun)
-  - Tombol **WA kirim proposal** ke setiap sponsor (tautan otomatis
-    ter-personalisasi)
-  - `/admin/pengaturan`: **⚙ Pengaturan Web** — panitia mengedit sendiri:
-    nama masjid/kegiatan, tanggal, **nomor WA bendahara**, **rekening & QRIS
-    donasi**, kota jadwal sholat, plus **semua kalimat utama** di tiap
-    halaman (pembuka beranda, isi undangan, teks proposal sponsor, footer,
-    dll) dengan placeholder `{masjid}`/`{kegiatan}` otomatis
+> Ingin lihat pemakaian nyata? Lihat
+> [dkm-alhikmah.vercel.app](https://dkm-alhikmah.vercel.app) —
+> LPJ Maulid Nabi ﷺ 1448 H DKM Masjid Al-Hikmah (contoh produksi).
 
-## Beralih ke data sungguhan (Supabase — gratis)
+## 🛠️ Pasang Sendiri (Gratis, ±30–45 menit)
 
-1. Buat project di [supabase.com](https://supabase.com)
-2. SQL Editor → jalankan seluruh isi [`supabase/schema.sql`](supabase/schema.sql)
-3. Salin `.env.example` jadi `.env.local`, isi:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-4. Restart `npm run dev` — data kini tersimpan di database
+Semua layanan pakai **free tier** — total biaya **Rp 0**:
 
-## Deploy ke Vercel
+| Layanan | Fungsi | Biaya |
+|---|---|---|
+| [Vercel](https://vercel.com) | hosting web | gratis |
+| [Supabase](https://supabase.com) | database + storage foto | gratis |
+| [Fonnte](https://fonnte.com) | kirim WhatsApp ke grup | gratis |
 
-1. Push repo ini ke GitHub
-2. [vercel.com](https://vercel.com) → Import project → pilih repo
-3. (Penting, biar tidak dicurigai penipuan) **Settings → General →
-   Project Name** diganti jadi nama jelas, mis. `maulid-lpj` → alamat
-   jadi `maulid-lpj.vercel.app`
-4. Environment Variables → isi dua nilai Supabase (sama seperti .env.local)
-5. Deploy
+**Ringkasan 4 langkah** (panduan lengkap: [docs/DEPLOY.md](docs/DEPLOY.md)
+atau versi tanpa terminal: [docs/PANDUAN-SETUP-WEBSITE.md](docs/PANDUAN-SETUP-WEBSITE.md)):
 
-## Status pengembangan
+1. **Fork/clone** repo ini ke akun GitHub-mu
+2. **Supabase** → new project → jalankan `supabase/schema.sql` di SQL Editor →
+   salin `Project URL` + `service_role` key
+3. **Vercel** → import repo → set env vars → deploy:
 
-- [x] Konsep v2 (`docs/KONSEP.md`) + riset web masjid referensi
-      (`docs/REFERENSI.md`)
-- [x] Branding masjid di header + **logo masjid profesional**
-- [x] Halaman publik: beranda live, cek iuran + kwitansi, laporan dengan
-      nota bisa dilihat (klik gambar), kotak saran
-- [x] **Undangan digital + RSVP live** (rundown, konfirmasi kehadiran,
-      daftar calon tamu, rekap di admin)
-- [x] Panel panitia tersembunyi & **dilindungi sandi** (klik logo 3× →
-      login, middleware `/admin/*` + `/api/admin/*`, sesi 8 jam)
-- [x] Tambah warga masal (manual/tempel/CSV) → kupon otomatis
-- [x] Cetak kupon massal A4 + QR per kupon
-- [x] **Catat transaksi (pemasukan/pengeluaran) + upload foto nota**
-      dari panel panitia
-- [x] **Jadwal sholat harian** (API gratis aladhan, metode Kemenag,
-      highlight waktu berikutnya + tanggal hijriah)
-- [x] **Galeri dokumentasi** — upload dari admin, tampil di beranda
-      dengan lightbox
-- [x] Nama masjid (Masjid Al-Hikmah) & tanggal acara (5 Sep 2026)
-- [x] **Kelas ancalah** (1=150rb, 2=100rb, 3=75rb, Sponsor bebas) +
-      **unggah Excel .xlsx** (SheetJS) dengan deteksi kolom otomatis
-- [x] **Cetak kupon per kelas & kupon sponsor terpisah** (desain emas)
-- [x] **Proposal sponsor digital** `/proposal` — personal, CTA donasi
-      transfer/kas + WA panitia, rekening & QRIS opsional
-- [x] Logo SVG digambar presisi (bukan AI) — tajam di semua ukuran
-- [ ] Deploy produksi — ikuti [`docs/DEPLOY.md`](docs/DEPLOY.md)
-      (Supabase + Vercel, gratis, ± 30 menit)
-- [ ] Edit warga & pengaturan lewat UI (sementara lewat database)
-- [ ] Ekspor laporan PDF/Excel untuk rapat panitia
-# trigger deploy Fri Aug 28 10:29:00 UTC 2026
+   | Env | Isi |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | Project URL Supabase |
+   | `SUPABASE_SERVICE_ROLE_KEY` | service_role key (jangan kasih awalan `NEXT_PUBLIC_`!) |
+   | `ADMIN_PASSWORD` | sandi panel panitimu **(WAJIB ganti!)** |
+   | `NEXT_PUBLIC_SITE_URL` *(opsional)* | domain custom, mis. `https://masjidku.my.id` |
+   | `CRON_SECRET` *(opsional)* | kunci tambahan untuk melindungi endpoint cron |
+
+4. Buka web-mu → klik logo 3× → login → ganti pengaturan (nama masjid,
+   tanggal acara, rekening) → impor daftar warga → selesai! 🎉
+
+**Pengaturan harian tidak perlu terminal** — nama masjid, tanggal acara,
+marquee, anggaran (RAB), hingga token Fonnte semuanya diedit dari menu
+**Pengaturan Web** di panel panitia.
+
+## ❓ FAQ
+
+**Kok gratis semua?** Free tier Vercel + Supabase cukup untuk kegiatan
+kampung (±500 foto bukti). Fonnte gratis untuk pengiriman WA wajar.
+
+**Bagaimana notifikasi WhatsApp bekerja?** Daftar Fonnte dengan nomor WA
+bendahara → scan QR → masukkan bot ke grup panitia → isi token & Group ID
+di menu Pengaturan Web. Setiap transaksi & kupon lunas otomatis terkirim.
+
+**Rekap harian berhenti kapan?** Otomatis berhenti setelah tanggal acara
+(diambil dari Pengaturan Web). Bisa juga kirim manual pesan penutup
+(terima kasih + laporan akhir) dari panel panitia.
+
+**Bisa untuk acara selain Maulid?** Bisa — nama kegiatan, tanggal, dan
+seluruh teks bisa diganti dari pengaturan (qurban, haul, santunan, dll).
+
+**Data warga aman?** Halaman publik hanya menampilkan nama + status iuran.
+Panel panitia dilindungi sandi, dan semua API panitia lewat middleware
+server-side. *Tetap jangan commit file `.env` ke repo.*
+
+## 🤝 Berbagi & Kontribusi
+
+- Mau sebar ke masjid lain? Ada template pesannya di [docs/BAGIKAN.md](docs/BAGIKAN.md)
+- Mau bantu kembangkan? Baca [CONTRIBUTING.md](CONTRIBUTING.md)
+- Menemukan masalah? Buka issue di GitHub
+
+## 📁 Struktur Singkat
+
+```
+src/app/            halaman publik + panel panitia + API routes
+src/lib/            store (Supabase/demo), notifikasi WA, konten editable
+src/components/     komponen UI (ticker, marquee, kupon, dll)
+supabase/schema.sql skema database (jalankan sekali di SQL Editor)
+docs/               panduan deploy, setup tanpa terminal, berbagi
+```
+
+## 📜 Lisensi
+
+[MIT](LICENSE) — pakai gratis, ubah gratis, sebar gratis.
+Kami hanya mohon doanya: **semoga bermanfaat untuk umat.** 🌙
+
+---
+
+<div align="center">
+
+**Barakallahu fiikum** — dibuat dengan ♥ oleh Panitia Maulid Nabi ﷺ 1448 H,
+DKM Masjid Al-Hikmah
+
+</div>
