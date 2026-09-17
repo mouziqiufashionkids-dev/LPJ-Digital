@@ -15,18 +15,26 @@ async function bacaSegar() {
     (async () => {
       const [ws, ts, ks] = await Promise.all([
         c.from("warga").select("ancalah"),
-        c.from("transaksi").select("tipe,jumlah"),
+        c.from("transaksi").select("tipe,jumlah,kategori"),
         c.from("kupon").select("status"),
       ]);
-      const masuk = (ts.data || []).filter((x) => x.tipe === "masuk").reduce((a, x) => a + x.jumlah, 0);
+      // Donasi Barang TIDAK dihitung sebagai kas uang (non-kas) — sama seperti getStats()
+      const semuaMasuk = (ts.data || []).filter((x) => x.tipe === "masuk");
+      const donasiBarang = semuaMasuk
+        .filter((x) => x.kategori === "Donasi Barang")
+        .reduce((a, x) => a + x.jumlah, 0);
+      const masuk = semuaMasuk
+        .filter((x) => x.kategori !== "Donasi Barang")
+        .reduce((a, x) => a + x.jumlah, 0);
       const keluar = (ts.data || []).filter((x) => x.tipe === "keluar").reduce((a, x) => a + x.jumlah, 0);
       const target = (ws.data || []).reduce((a, x) => a + x.ancalah, 0);
       return {
         target_dana: target, dana_masuk: masuk, dana_keluar: keluar,
-        sisa: masuk - keluar, persen: target ? Math.round((masuk / target) * 100) : 0,
+        sisa: masuk - keluar, donasi_barang: donasiBarang,
+        persen: target ? Math.round((masuk / target) * 100) : 0,
         kk_total: (ws.data || []).length,
         kk_lunas: (ks.data || []).filter((x) => x.status === "lunas").length,
-        transaksi_masuk: (ts.data || []).filter((x) => x.tipe === "masuk").length,
+        transaksi_masuk: semuaMasuk.length,
         transaksi_keluar: (ts.data || []).filter((x) => x.tipe === "keluar").length,
         diperbarui: new Date().toLocaleString("id-ID", {
           dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta",

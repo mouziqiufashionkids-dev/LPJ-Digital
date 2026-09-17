@@ -285,6 +285,11 @@ export default function AdminPage() {
           </div>
         ))}
       </div>
+      {st.donasi_barang > 0 && (
+        <p className="text-xs text-zamrud-900/60 mt-2">
+          📦 Donasi barang (non-kas): <b>{rupiah(st.donasi_barang)}</b> — tidak termasuk arus kas uang
+        </p>
+      )}
 
       {/* tambah warga + generate kupon */}
       <div className="mt-8">
