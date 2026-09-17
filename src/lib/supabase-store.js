@@ -6,8 +6,16 @@ import { createClient } from "@supabase/supabase-js";
 import { KONTEN_DEFAULT } from "./konten";
 
 // URL proyek Supabase — dari env (Settings → API di dashboard Supabase).
-// Tidak diisi + service role tidak diisi -> aplikasi jalan MODE DEMO.
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+// CATATAN PENTING untuk yang memasang repo ini:
+//   - WAJIB isi env NEXT_PUBLIC_SUPABASE_URL dengan URL proyek Supabase-mu sendiri!
+//   - Fallback di bawah hanyalah URL proyek milik DKM Masjid Al-Hikmah
+//     (pencipta awal repo ini) — BUKAN rahasia (tampil publik di link foto
+//     bukti), tapi database itu bukan milikmu: tanpa env, datamu tidak akan
+//     pernah tersimpan.
+export const SUPABASE_URL_FALLBACK = "https://zxyftqrufaxzdvfvqpfq.supabase.co";
+
+export const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || SUPABASE_URL_FALLBACK;
 
 // SELALU klien baru + fetch TANPA CACHE (Next.js men-cache fetch internal!)
 function db() {
